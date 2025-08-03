@@ -1,61 +1,61 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 基于 `Laravel` 的API服务
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 介绍
 
-## About Laravel
+版本号：v1.0.0
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 软件架构
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+软件架构说明
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 安装说明
 
-## Learning Laravel
+1. 创建符号链接：php artisan storage:link
+2. 配置环境变量文件.env（配置 数据库 等信息）
+3. php.ini取消 `symlink` 函数禁用
+4. 创建数据表并填充：
+    - 初次执行：`php artisan migrate --seed`
+    - 清空所有并重新执行：`php artisan migrate:fresh --seed`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 运行命令历史
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```shell
+#!/bin/sh
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 启用 API 路由
+php artisan install:api &&
 
-## Laravel Sponsors
+# 创建 系统枚举类
+php artisan make:enum SysLogAction &&
+php artisan make:enum SysUserType &&
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 使用说明
 
-### Premium Partners
+### 使用前须安装以下扩展
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- 开启 `fileinfo` 扩展
 
-## Contributing
+## 更新 `Composer` 的自动加载文件
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```shell
+composer dump-autoload
+// 后续开启系统扩展都等同,不做赘述
+```
 
-## Code of Conduct
+- 开启 `mbstring` 扩展
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 常见问题
 
-## Security Vulnerabilities
+### 413 Request Entity Too Large
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+处理方案：
 
-## License
+1. 调整Nginx配置
+    - 配置文件中增加或修改 `client_max_body_size` 指令。例如，将大小设置为100MB（http { client_max_body_size 100m; }）
+2. 调整PHP配置
+    - 调整PHP的 `upload_max_filesize` 和 `post_max_size` 配置项（upload_max_filesize = 100M post_max_size = 100M）
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 参考资料
+
+- [overtru 相关扩展包](https://packagist.org/packages/overtrue/)
