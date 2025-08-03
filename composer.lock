@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "48abe0de8af4c860ce286c9a625006d4",
+    "content-hash": "b5f1cd960a4c5879a536115fed8faa0a",
     "packages": [
         {
             "name": "brick/math",
@@ -3711,12 +3711,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/laravel-tool.git",
-                "reference": "684f7aed17f0002031e06a0b6e4a0f0d0e73058c"
+                "reference": "d6b00d9c3c0c997ca0451e14a28e7b2570798860"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/684f7aed17f0002031e06a0b6e4a0f0d0e73058c",
-                "reference": "684f7aed17f0002031e06a0b6e4a0f0d0e73058c",
+                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/d6b00d9c3c0c997ca0451e14a28e7b2570798860",
+                "reference": "d6b00d9c3c0c997ca0451e14a28e7b2570798860",
                 "shasum": ""
             },
             "require": {
@@ -3753,7 +3753,7 @@
                 "issues": "https://github.com/siushin/laravel-tool/issues",
                 "source": "https://github.com/siushin/laravel-tool/tree/v1.0.0"
             },
-            "time": "2025-08-03T14:56:23+00:00"
+            "time": "2025-08-03T16:43:13+00:00"
         },
         {
             "name": "siushin/util",
@@ -8726,7 +8726,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.3"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
