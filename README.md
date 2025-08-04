@@ -4,6 +4,15 @@
 
 版本号：v1.0.0
 
+## 快速开始
+
+创建项目：`composer create-project siushin/laravel-api`
+
+### 创建数据库
+
+1. 提前在本地，创建数据库: `laravel_api`（在env文件中，配置MySQL信息：用户名`root`，密码：``（空密码））
+2. 初始化系统，后台登录的账号密码：`admin` / `admin`
+
 ## 软件架构
 
 软件架构说明

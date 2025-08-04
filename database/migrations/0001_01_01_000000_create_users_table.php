@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('username')->comment('用户名');
             $table->string('nick_name')->comment('昵称');
             $table->char('gender', 20)->default(SysGenderType::unknown->value)->comment('性别[' . enum_to_string_chain(SysGenderType::cases()) . ']');
-            $table->string('email')->comment('邮箱')->unique();
+            $table->string('email')->nullable()->comment('邮箱')->unique();
             $table->timestamp('email_verified_at')->nullable()->comment('邮箱二次确认');
             $table->char('phone', 11)->unique()->comment('手机号码');
             $table->string('password')->comment('密码');

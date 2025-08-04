@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
 
         $user = User::query()->first();
         $user->username = env('APP_ADMIN', 'admin');
-        $user->phone = env('APP_ADMIN_PHONE', '10000');
+        $user->phone = env('APP_ADMIN_PHONE', '');
         $user->password = Hash::make(env('APP_ADMIN_PASSWORD', 'admin'));
         $user->nick_name = env('APP_ADMIN_NAME', '超级管理员');
-        $user->email = env('APP_EMAIL', 'siushin@163.com');
+        $user->email = env('APP_EMAIL', '');
         $user->save();
     }
 }
