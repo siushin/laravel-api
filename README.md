@@ -8,6 +8,9 @@
 
 创建项目：`composer create-project siushin/laravel-api`
 
+> ⚠️⚠️⚠️注意：执行命令 `composer create-project` 或 `composer install` 都会执行 **清空** 表并 **重新填充** 数据
+`php artisan migrate:fresh --seed`。如有重要数据，请自行备份。
+
 ### 创建数据库
 
 1. 提前在本地，创建数据库: `laravel_api`（数据库用户名`root`，密码：``(空)）
