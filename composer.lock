@@ -3706,16 +3706,16 @@
         },
         {
             "name": "siushin/laravel-tool",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/laravel-tool.git",
-                "reference": "38b221b7aad44f14cbc0a399cd7261cd7a2ea4e8"
+                "reference": "d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/38b221b7aad44f14cbc0a399cd7261cd7a2ea4e8",
-                "reference": "38b221b7aad44f14cbc0a399cd7261cd7a2ea4e8",
+                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0",
+                "reference": "d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0",
                 "shasum": ""
             },
             "require": {
@@ -3726,6 +3726,11 @@
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "src/Funcs/LaraDateTime.php",
+                    "src/Funcs/LaraRequest.php",
+                    "src/Funcs/LaraResponse.php"
+                ],
                 "psr-4": {
                     "Siushin\\LaravelTool\\": "src/"
                 }
@@ -3750,9 +3755,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/laravel-tool/issues",
-                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.0"
+                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.1"
             },
-            "time": "2025-08-04T14:09:49+00:00"
+            "time": "2025-08-04T16:10:21+00:00"
         },
         {
             "name": "siushin/util",

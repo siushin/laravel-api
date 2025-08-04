@@ -41,7 +41,6 @@ class UserFactory extends Factory
         return [
             'username' => fake()->unique()->word(),
             'nick_name' => fake()->name(),
-            'gender' => '未知',
             'phone' => $generatePhoneNumber(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),

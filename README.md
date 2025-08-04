@@ -2,23 +2,40 @@
 
 ## 介绍
 
-版本号：v1.0.0
+版本号：laravel-api v1.0.0
 
 ## 快速开始
 
 创建项目：`composer create-project siushin/laravel-api`
-
-> ⚠️⚠️⚠️注意：执行命令 `composer create-project` 或 `composer install` 都会执行 **清空** 表并 **重新填充** 数据
-`php artisan migrate:fresh --seed`。如有重要数据，请自行备份。
 
 ### 创建数据库
 
 1. 提前在本地，创建数据库: `laravel_api`（数据库用户名`root`，密码：``(空)）
 2. 初始化系统，后台登录的账号密码：`admin` / `admin`
 
+### ⚠️⚠️⚠️注意事项
+
+> 注意：执行命令 `composer create-project` 或 `composer install` 都会执行 **清空** 表并 **重新填充** 数据
+`php artisan migrate:fresh --seed`。如有重要数据，请自行备份。
+
 ## 软件架构
 
 软件架构说明
+
+### 目录模块划分
+
+| 目录名    | 描述                                                           |
+|--------|--------------------------------------------------------------|
+| Cases  |                                                              |
+| Enums  | 枚举，以 `Sys` 开头（方便全局搜索）                                        |
+| Funcs  | 助手函数，分以 `Lara` 开头的基于Laravel的助手函数，以及以 `Func`开头的常用助手函数（方便全局搜索） |
+| Traits | 特征，没有明显命名规范，自行查询源码或文档                                        |
+
+### 已实现模块
+
+✅管理员登录/授权
+✅管理员管理
+✅日志管理
 
 ## 安装说明
 

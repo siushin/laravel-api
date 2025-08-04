@@ -11,6 +11,9 @@ use Illuminate\Validation\Rule;
 use Siushin\LaravelTool\Enums\SysLogAction;
 use Siushin\LaravelTool\Enums\SysUserType;
 
+/**
+ * 控制器：登录/授权
+ */
 class LoginController extends Controller
 {
     public int $expire_hour   = 2;
@@ -29,7 +32,7 @@ class LoginController extends Controller
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
-     * @author lintong<siushin@163.com>
+     * @author siushin<siushin@163.com>
      */
     public function index(Request $request): JsonResponse
     {
@@ -71,7 +74,7 @@ class LoginController extends Controller
      * 刷新 API 令牌
      * @param Request $request
      * @return JsonResponse
-     * @author lintong<siushin@163.com>
+     * @author siushin<siushin@163.com>
      */
     public function refreshToken(Request $request): JsonResponse
     {
@@ -84,7 +87,7 @@ class LoginController extends Controller
      * @param string $token
      * @param int    $expire_second
      * @return array
-     * @author lintong<siushin@163.com>
+     * @author siushin<siushin@163.com>
      */
     private function buildTokenData(string $token, int $expire_second): array
     {
