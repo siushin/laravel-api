@@ -5,7 +5,7 @@ declare(strict_types=1);
  * 助手函数：日志、调试（基于Laravel）
  */
 
-use App\Models\Log as LogModel;
+use App\Models\SysLog;
 use Illuminate\Support\Facades\Log;
 use Siushin\LaravelTool\Enums\SysUserType;
 
@@ -15,6 +15,7 @@ use Siushin\LaravelTool\Enums\SysUserType;
  * @param string     $content
  * @param array|null $extend_data
  * @return bool
+ * @author siushin<siushin@163.com>
  */
 function logging(string $action_type, string $content, array $extend_data = null): bool
 {
@@ -33,7 +34,7 @@ function logging(string $action_type, string $content, array $extend_data = null
         $created_at = getDateTimeArr()['datetime'];
         $extend_data && $extend_data = json_encode($extend_data, JSON_UNESCAPED_UNICODE);
         $data = compact('source_type', 'user_id', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
-        return LogModel::query()->insert($data);
+        return SysLog::query()->insert($data);
     } catch (Exception $e) {
         Log::error($e->getMessage());
         return false;

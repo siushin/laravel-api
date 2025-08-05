@@ -12,11 +12,15 @@ use Siushin\LaravelTool\Enums\SysUserType;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
-class Log extends Model
+/**
+ * 模型：系统日志
+ */
+class SysLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
     protected $primaryKey = 'log_id';
+    protected $table      = 'sys_logs';
 
     protected $guarded = [];
 
@@ -48,6 +52,7 @@ class Log extends Model
      * @param array $params
      * @return array
      * @throws Exception
+     * @author siushin<siushin@163.com>
      */
     public static function getPageData(array $params = []): array
     {

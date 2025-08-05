@@ -11,7 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('logs', function (Blueprint $table) {
+        Schema::create('sys_logs', function (Blueprint $table) {
             $table->id('log_id')->comment('日志ID');
             $table->char('source_type', 10)->comment('来源类型[' . enum_to_string_chain(SysUserType::cases()) . ']');
             $table->unsignedBigInteger('user_id')->nullable()->comment('用户ID');
@@ -31,6 +31,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('logs');
+        Schema::dropIfExists('sys_logs');
     }
 };
