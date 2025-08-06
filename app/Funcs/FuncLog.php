@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 /**
  * 助手函数：日志、调试（基于Laravel）

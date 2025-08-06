@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b5f1cd960a4c5879a536115fed8faa0a",
+    "content-hash": "53ed3af81bf4aa864924f3abfd2c4ddb",
     "packages": [
         {
             "name": "brick/math",
@@ -3706,16 +3706,16 @@
         },
         {
             "name": "siushin/laravel-tool",
-            "version": "v1.0.1",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/laravel-tool.git",
-                "reference": "d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0"
+                "reference": "6b0d16c74b8509bcfcf4325d31d36bdd3580a9da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0",
-                "reference": "d07d6f1e3ddb5ef5e01dd22827de1b1b3b9947a0",
+                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/6b0d16c74b8509bcfcf4325d31d36bdd3580a9da",
+                "reference": "6b0d16c74b8509bcfcf4325d31d36bdd3580a9da",
                 "shasum": ""
             },
             "require": {
@@ -3746,7 +3746,7 @@
                     "homepage": "http://www.siushin.com"
                 }
             ],
-            "description": "基于 Laravel 的工具类、助手函数等",
+            "description": "LaravelTool 基于 Laravel 的枚举、助手函数、Trait特征、工具类、模型转换等常用工具类及助手函数。",
             "keywords": [
                 "helper",
                 "laravel",
@@ -3755,9 +3755,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/laravel-tool/issues",
-                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.1"
+                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.0"
             },
-            "time": "2025-08-04T16:10:21+00:00"
+            "time": "2025-08-06T16:35:52+00:00"
         },
         {
             "name": "siushin/util",
@@ -3765,12 +3765,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/util.git",
-                "reference": "8be41dbb0a2f0cbc088a41ca69f349138b210c07"
+                "reference": "2b6187801acaaf3528bf5fdcd0e461ab66e8be63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/util/zipball/8be41dbb0a2f0cbc088a41ca69f349138b210c07",
-                "reference": "8be41dbb0a2f0cbc088a41ca69f349138b210c07",
+                "url": "https://api.github.com/repos/siushin/util/zipball/2b6187801acaaf3528bf5fdcd0e461ab66e8be63",
+                "reference": "2b6187801acaaf3528bf5fdcd0e461ab66e8be63",
                 "shasum": ""
             },
             "require": {
@@ -3800,7 +3800,7 @@
                     "homepage": "http://www.siushin.com"
                 }
             ],
-            "description": "常见PHP助手函数，如：String、Array、Request、DateTime，以及PHP工具类",
+            "description": "PHP常用工具集，如：常用工具类及助手函数，如：String、Array、Request、DateTime。",
             "keywords": [
                 "php"
             ],
@@ -3808,7 +3808,7 @@
                 "issues": "https://github.com/siushin/util/issues",
                 "source": "https://github.com/siushin/util/tree/v1.0.0"
             },
-            "time": "2025-08-03T14:47:05+00:00"
+            "time": "2025-08-06T16:35:31+00:00"
         },
         {
             "name": "symfony/clock",
@@ -8730,7 +8730,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "ext-fileinfo": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"

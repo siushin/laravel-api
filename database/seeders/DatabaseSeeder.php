@@ -24,5 +24,10 @@ class DatabaseSeeder extends Seeder
         $user->nick_name = env('APP_ADMIN_NAME', '超级管理员');
         $user->email = env('APP_EMAIL', '');
         $user->save();
+
+        $this->call([
+            DictionarySeeder::class,
+            OrganizationSeeder::class,
+        ]);
     }
 }

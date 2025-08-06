@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\UploadFileType;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Siushin\LaravelTool\Enums\SysLogAction;
+use Siushin\LaravelTool\Enums\SysUploadFileType;
 use Siushin\LaravelTool\Traits\ModelTool;
 
 /**
@@ -32,11 +32,11 @@ class SysFile extends Model
     ];
 
     private static array $allowImages = [
-        UploadFileType::JPG, UploadFileType::JPEG, UploadFileType::PNG, UploadFileType::GIF,
+        SysUploadFileType::JPG, SysUploadFileType::JPEG, SysUploadFileType::PNG, SysUploadFileType::GIF,
     ];
 
     private static array $allowPDFs = [
-        UploadFileType::PDF,
+        SysUploadFileType::PDF,
     ];
 
     protected $hidden = ['original_file_name', 'fileable_type', 'fileable_id', 'created_at', 'updated_at'];

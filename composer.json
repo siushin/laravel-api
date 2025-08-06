@@ -1,6 +1,6 @@
 {
     "name": "siushin/laravel-api",
-    "description": "基于 Laravel 的API框架，提供常用工具类、助手函数等服务",
+    "description": "LaravelAPI 基于 Laravel 的API框架，提供常用工具类、助手函数等服务",
     "type": "project",
     "keywords": [
         "laravel",

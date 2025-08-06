@@ -32,6 +32,7 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/organization/add', [OrganizationController::class, 'add']);
     Route::post('/organization/update', [OrganizationController::class, 'update']);
     Route::post('/organization/delete', [OrganizationController::class, 'delete']);
+    Route::post('/organization/move', [OrganizationController::class, 'move']);
 
     // 数据字典分类管理
     Route::post('/DictionaryCategory/index', [DictionaryCategoryController::class, 'index']);

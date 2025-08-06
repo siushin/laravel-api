@@ -17,6 +17,7 @@ class FileController extends Controller
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
+     * @author siushin<siushin@163.com>
      */
     public function upload(Request $request): JsonResponse
     {

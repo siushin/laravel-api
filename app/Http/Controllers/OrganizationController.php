@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\SysOrganization;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -28,54 +27,49 @@ class OrganizationController extends Controller
 
     /**
      * 新增组织架构
-     * @param Request $request
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public function add(Request $request): JsonResponse
+    public function add(): JsonResponse
     {
-        $params = $request->all();
+        $params = request()->all();
         return success(SysOrganization::addOrganization($params));
     }
 
     /**
      * 更新组织架构
-     * @param Request $request
-     * @param string  $id
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(): JsonResponse
     {
-        $params = array_merge($request->only(['organization_name']), ['organization_id' => $id]);
+        $params = request()->only(['organization_id', 'organization_name', 'organization_pid']);
         return success(SysOrganization::updateOrganization($params));
     }
 
     /**
      * 删除组织架构
-     * @param string $id
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public function delete(string $id): JsonResponse
+    public function delete(): JsonResponse
     {
-        $params = ['organization_id' => $id];
+        $params = request()->only(['organization_id']);
         return success(SysOrganization::deleteOrganization($params));
     }
 
     /**
      * 移动组织架构
-     * @param Request $request
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public function move(Request $request): JsonResponse
+    public function move(): JsonResponse
     {
-        $params = $request->all();
+        $params = request()->all();
         return success(SysOrganization::moveOrganization($params));
     }
 }
