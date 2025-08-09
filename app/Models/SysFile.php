@@ -63,7 +63,7 @@ class SysFile extends Model
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public static function uploadFile(UploadedFile $file, string $disk = 'local'): array
+    public static function uploadFile(UploadedFile $file, string $disk = 'public'): array
     {
         // 获取原始文件名
         $originalName = $file->getClientOriginalName();
@@ -78,7 +78,7 @@ class SysFile extends Model
         !$file_path && throw_exception('存储文件失败');
 
         // 文件名
-        $full_file_path = storage_path("app") . "/$file_path";
+        $full_file_path = storage_path("app/" . ltrim($disk, '/')) . "/$file_path";
         // 额外表信息处理
         $extra_obj = $fileable_type = self::getFileableType($file_type);
         $fileable_id = Str::ulid()->toBase32();

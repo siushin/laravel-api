@@ -107,7 +107,7 @@ class DictionaryController extends Controller
     {
         $params = $request->all();
         [$category_name, $tpl_path] = SysDictionaryCategory::getDictionaryTempFilePath($params);
-        return response()->download($tpl_path, "{$category_name}模板文件.xlsx");
+        return response()->download($tpl_path, "{$category_name}_模板文件.xlsx");
     }
 
     /**

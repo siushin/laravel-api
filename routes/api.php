@@ -3,6 +3,7 @@
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\DictionaryCategoryController;
 use App\Http\Controllers\DictionaryController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganizationController;
@@ -24,6 +25,9 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/info', fn(Request $request) => $request->user());
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [UserController::class, 'changePassword']);
+
+    // 文件管理
+    Route::post('/file/upload', [FileController::class, 'upload']); // 上传文件
 
     // TODO 用户管理
 

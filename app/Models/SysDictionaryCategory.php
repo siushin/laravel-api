@@ -36,7 +36,7 @@ class SysDictionaryCategory extends Model
 
     /**
      * 获取数据字典模板文件路径
-     * @param array $params
+     * @param array $params 请求参数（需包含 category_code）
      * @return array
      * @throws Exception
      * @author siushin<siushin@163.com>

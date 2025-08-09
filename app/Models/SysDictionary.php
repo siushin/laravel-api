@@ -136,16 +136,17 @@ class SysDictionary extends Model
     /**
      * 新增数据字典
      * @param array $params
-     * @param array $response_fields
+     * @param array $response_keys
      * @return array
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public static function addDictionary(array $params = [], array $response_fields = []): array
+    public static function addDictionary(array $params = [], array $response_keys = []): array
     {
         $category_id = SysDictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
 
+        self::trimValueArray($params, [], [null]);
         self::checkEmptyParam($params, ['category_code', 'dictionary_name']);
 
         $category_code = $params['category_code'];
@@ -178,8 +179,8 @@ class SysDictionary extends Model
         !$info && throw_exception('添加数据字典失败');
         $info = $info->toArray();
         logging(SysLogAction::insert->name, "添加数据字典失败(dictionary_name: {$params['dictionary_name']})", $info);
-        $response_fields = $response_fields ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
-        return self::filterFieldArray($info, $response_fields);
+        $response_keys = $response_keys ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
+        return self::getArrayByKeys($info, $response_keys);
     }
 
     /**
@@ -191,7 +192,11 @@ class SysDictionary extends Model
      */
     public static function updateDictionary(array $params = []): array
     {
+        self::trimValueArray($params, [], [null]);
+        $params = self::getArrayByKeys($params, ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'extend_data']);
+
         self::checkEmptyParam($params, ['dictionary_id', 'dictionary_name']);
+
         $dictionary_id = $params['dictionary_id'];
         $dictionary_name = $params['dictionary_name'];
         $extend_data = self::getQueryParam($params, 'extend_data');
@@ -248,23 +253,40 @@ class SysDictionary extends Model
         $bool = $info->delete();
         !$bool && throw_exception('删除失败');
 
-        logging(SysLogAction::delete->name, "删除数据字典(dictionary_id: {$info['dictionary_id']})", $info->toArray());
+        logging(SysLogAction::delete->name, "删除数据字典(ID: {$info['dictionary_id']})", $info->toArray());
 
         return [];
     }
 
     /**
      * 批量删除数据字典
-     * @param mixed $params
+     * @param array $params 请求参数（需包含 dictionary_ids）
      * @return array
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public static function batchDeleteDictionary(mixed $params): array
+    public static function batchDeleteDictionary(array $params): array
     {
         self::checkEmptyParam($params, ['dictionary_ids']);
+
         $dictionary_ids = self::getQueryParam($params, 'dictionary_ids', [], ',');
-        self::destroy($dictionary_ids);
+        empty($dictionary_ids) && throw_exception('无效的字典ID列表');
+
+        $records = self::query()->whereIn('dictionary_id', $dictionary_ids)->get();
+
+        if ($records->count() != count($dictionary_ids)) {
+            throw_exception('无效的字典ID列表，请刷新页面重试～');
+        }
+
+        $deletedCount = self::destroy($dictionary_ids);
+        $deletedCount === 0 && throw_exception('删除失败，可能记录已不存在');
+
+        logging(
+            SysLogAction::batchDelete->name,
+            "批量删除数据字典(数量: $deletedCount, IDs: " . implode(',', $dictionary_ids) . ")",
+            $records->toArray()
+        );
+
         return [];
     }
 }
