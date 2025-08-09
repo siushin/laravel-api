@@ -46,12 +46,12 @@
             "@php artisan package:discover --ansi"
         ],
         "post-install-cmd": [
-            "@php -r \"if (!file_exists('vendor/just-installed.flag')) { touch('vendor/just-installed.flag'); system('php artisan migrate:fresh --seed --ansi'); }\"",
-            "Siushin\\Util\\Installer::postInstall"
+            "@php -r \"if (!file_exists('vendor/just-installed.flag')) { touch('vendor/just-installed.flag'); system('php artisan migrate:fresh --seed --ansi'); }\""
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php -r \"if (file_exists('vendor/just-installed.flag')) { unlink('vendor/just-installed.flag'); }\"",
+            "@php artisan laravel-tool:publish",
             "Siushin\\Util\\Installer::postInstall"
         ],
         "post-root-package-install": [
@@ -75,7 +75,10 @@
         "package-name": "siushin/laravel-api",
         "laravel": {
             "dont-discover": []
-        }
+        },
+        "providers": [
+            "Siushin\\LaravelTool\\ServiceProvider"
+        ]
     },
     "config": {
         "optimize-autoloader": true,
