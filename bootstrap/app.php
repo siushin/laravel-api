@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AccessAuth;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // 跳过所有CSRF保护
         $middleware->validateCsrfTokens(except: ['*']);
+        $middleware->append(AccessAuth::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 将 所有 异常 呈现为 JSON

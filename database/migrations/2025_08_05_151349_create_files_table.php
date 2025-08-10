@@ -20,18 +20,24 @@ return new class extends Migration {
             $table->char('file_ext_name')->comment('文件扩展名');
             $table->unsignedBigInteger('user_id')->default(0)->comment('用户ID（上传人）');
             $table->string('checksum', 64)->comment('文件的校验和（SHA-256哈希值）');
-            $table->ulidMorphs('fileable'); // 一对一（多态）
             $table->timestamps();
+            $table->softDeletes();
 
             $table->comment('文件表');
         });
 
         Schema::create('sys_file_images', function (Blueprint $table) {
             $table->id('image_id')->comment('图片ID');
-            $table->ulid('fileable_id')->comment('关联ID');
+            $table->unsignedBigInteger('file_id')->comment('文件ID');
             $table->unsignedInteger('image_width')->comment('图片宽度（px）');
             $table->unsignedInteger('image_height')->comment('图片高度（px）');
             $table->timestamps();
+
+            // 设置级联删除
+            $table->foreign('file_id')
+                ->references('file_id')
+                ->on('sys_files')
+                ->onDelete('cascade');
 
             $table->comment('文件-附属信息-图片表');
         });

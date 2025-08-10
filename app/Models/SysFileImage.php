@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Intfs\IFile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * 模型：图片文件
@@ -23,26 +23,26 @@ class SysFileImage extends Model implements IFile
 
     /**
      * 获取图片文件
-     * @return MorphOne
+     * @return BelongsTo
      * @author siushin<siushin@163.com>
      */
-    public function file(): MorphOne
+    public function file(): BelongsTo
     {
-        return $this->morphOne(SysFile::class, 'fileable');
+        return $this->belongsTo(SysFile::class);
     }
 
     /**
      * 后置钩子：上传文件扩展
-     * @param string $fileable_id
+     * @param int    $file_id
      * @param string $full_file_path
      * @return void
      * @author siushin<siushin@163.com>
      */
-    public static function uploadFileExtraAfterHook(string $fileable_id, string $full_file_path): void
+    public static function uploadFileExtraAfterHook(int $file_id, string $full_file_path): void
     {
         list($width, $height) = getimagesize($full_file_path);
         $data = [
-            'fileable_id' => $fileable_id,
+            'file_id' => $file_id,
             'image_width' => $width,
             'image_height' => $height,
         ];

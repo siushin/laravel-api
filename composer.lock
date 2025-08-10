@@ -3709,16 +3709,16 @@
         },
         {
             "name": "siushin/laravel-tool",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/laravel-tool.git",
-                "reference": "faa8916e48136970090139d72f7e4c02304c4412"
+                "reference": "bfcfcfa05ce2c400afd7882ce3a6038bddf822fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/faa8916e48136970090139d72f7e4c02304c4412",
-                "reference": "faa8916e48136970090139d72f7e4c02304c4412",
+                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/bfcfcfa05ce2c400afd7882ce3a6038bddf822fd",
+                "reference": "bfcfcfa05ce2c400afd7882ce3a6038bddf822fd",
                 "shasum": ""
             },
             "require": {
@@ -3766,22 +3766,22 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/laravel-tool/issues",
-                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.0"
+                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.1"
             },
-            "time": "2025-08-09T14:42:03+00:00"
+            "time": "2025-08-09T17:27:55+00:00"
         },
         {
             "name": "siushin/util",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/util.git",
-                "reference": "adaf29eeee1126799e94f1c340eda3d7cda50b0a"
+                "reference": "c1cec2990b77a7929947625e0c1bdda6c3bf2e98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/util/zipball/adaf29eeee1126799e94f1c340eda3d7cda50b0a",
-                "reference": "adaf29eeee1126799e94f1c340eda3d7cda50b0a",
+                "url": "https://api.github.com/repos/siushin/util/zipball/c1cec2990b77a7929947625e0c1bdda6c3bf2e98",
+                "reference": "c1cec2990b77a7929947625e0c1bdda6c3bf2e98",
                 "shasum": ""
             },
             "require": {
@@ -3817,9 +3817,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/util/issues",
-                "source": "https://github.com/siushin/util/tree/v1.0.0"
+                "source": "https://github.com/siushin/util/tree/v1.0.1"
             },
-            "time": "2025-08-09T14:42:12+00:00"
+            "time": "2025-08-09T17:28:03+00:00"
         },
         {
             "name": "symfony/clock",

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\DemoController;
 use App\Http\Controllers\DictionaryCategoryController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\FileController;
@@ -10,9 +9,6 @@ use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// 测试接口
-Route::post('/demo', [DemoController::class, 'index']);
 
 // 公共路由
 Route::post('/admin/login', [LoginController::class, 'index']);
@@ -27,7 +23,9 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/changePassword', [UserController::class, 'changePassword']);
 
     // 文件管理
-    Route::post('/file/upload', [FileController::class, 'upload']); // 上传文件
+    Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
+    Route::post('/file/delete', [FileController::class, 'delete']);     // 删除文件
+    Route::post('/file/cleanup', [FileController::class, 'cleanup']);   // 清空文件
 
     // TODO 用户管理
 

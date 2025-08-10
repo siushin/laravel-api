@@ -20,7 +20,7 @@ function logging(string $action_type, string $content, array $extend_data = null
 {
     try {
         $source_type = request()->user_type ?? SysUserType::guest->name;
-        $user_id = request()->user_id ?? null;
+        $user_id = currentUserId() ?? null;
         $ip_address = request()->ip();
 
         $ip2region = new Ip2Region();
