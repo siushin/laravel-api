@@ -16,6 +16,10 @@ composer create-project siushin/laravel-api
 > 注意：执行命令 `composer create-project` 或 `composer install` 都会执行 **清空** 表并 **重新填充** 数据
 `php artisan migrate:fresh --seed`。如有重要数据，请自行备份。
 
+## LaravelAPI接口文档
+
+[LaravelAPI - API接口文档](https://s.apifox.cn/9e462aa5-5078-455c-b631-75b9d9e2a303)
+
 ## 目录结构
 
 | 目录名    | 描述                                                           |
