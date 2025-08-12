@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\OrganizationTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,6 +16,9 @@ return new class extends Migration {
             $table->char('organization_name')->comment('组织架构名称');
             $table->unsignedBigInteger('organization_pid')->comment('上级组织架构ID');
             $table->char('full_organization_pid')->comment('完整上级组织架构ID');
+            $table->enum('organization_type', OrganizationTypeEnum::cases())
+                ->default(OrganizationTypeEnum::DEFAULT->value)
+                ->comment('组织架构类型[' . enum_to_string_chain(OrganizationTypeEnum::cases()) . ']');
             $table->timestamps();
 
             $table->comment('组织架构表');

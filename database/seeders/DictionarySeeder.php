@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\DictionaryCategory;
+use App\Enums\DictionaryCategoryEnum;
 use App\Models\SysDictionary;
 use App\Models\SysDictionaryCategory;
 use Illuminate\Database\Seeder;
@@ -23,7 +23,7 @@ class DictionarySeeder extends Seeder
 
         // 数据字典分类
         $categories = [];
-        foreach (DictionaryCategory::cases() as $category) {
+        foreach (DictionaryCategoryEnum::cases() as $category) {
             $categories[] = [
                 'category_name' => $category->value,
                 'category_code' => $category->name,
@@ -38,8 +38,8 @@ class DictionarySeeder extends Seeder
 
         // 数据字典
         $dictionary_map = [
-            DictionaryCategory::UserType->name => SysUserType::cases(),
-            DictionaryCategory::AllowUploadFileType->name => SysUploadFileType::cases(),
+            DictionaryCategoryEnum::UserType->name => SysUserType::cases(),
+            DictionaryCategoryEnum::AllowUploadFileType->name => SysUploadFileType::cases(),
         ];
         $dictionary_data = [];
         foreach ($dictionary_map as $category_code => $dictionary_enums) {

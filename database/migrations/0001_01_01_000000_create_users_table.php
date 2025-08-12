@@ -15,7 +15,9 @@ return new class extends Migration {
             $table->id()->comment('用户ID');
             $table->string('username')->comment('用户名');
             $table->string('nick_name')->comment('昵称');
-            $table->char('gender', 20)->default(SysGenderType::male->value)->comment('性别[' . enum_to_string_chain(SysGenderType::cases()) . ']');
+            $table->enum('gender', array_column(SysGenderType::cases(), 'name'))
+                ->default(SysGenderType::male->name)
+                ->comment('性别[' . enum_to_string_chain(SysGenderType::cases()) . ']');
             $table->string('email')->nullable()->comment('邮箱')->unique();
             $table->timestamp('email_verified_at')->nullable()->comment('邮箱二次确认');
             $table->char('phone', 11)->unique()->comment('手机号码');
