@@ -13,13 +13,13 @@ return new class extends Migration {
         Schema::create('sys_admins', function (Blueprint $table) {
             $table->id();
             $table->string('username', 50)->unique()->comment('用户名');
-            $table->string('real_name', 50)->nullable()->comment('真实姓名');
+            $table->string('real_name', 50)->nullable()->comment('姓名');
+            $table->string('mobile', 11)->nullable()->unique()->comment('手机号');
+            $table->string('email')->nullable()->unique()->comment('邮箱');
+            $table->string('password')->comment('密码');
             $table->string('company_id')->nullable()->comment('所属公司ID');
             $table->string('department_id')->nullable()->comment('所属部门ID');
             $table->string('avatar')->nullable()->comment('头像');
-            $table->string('password')->comment('密码');
-            $table->string('mobile', 20)->nullable()->unique()->comment('手机号');
-            $table->string('email')->nullable()->unique()->comment('邮箱');
             $table->tinyInteger('status')->default(1)->comment('状态:1正常,0禁用');
             $table->string('last_login_ip', 50)->nullable()->comment('最后登录IP');
             $table->timestamp('last_login_time')->nullable()->comment('最后登录时间');

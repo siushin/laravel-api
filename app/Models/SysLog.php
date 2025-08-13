@@ -64,12 +64,12 @@ class SysLog extends Model
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));
-        $user_list = User::query()->whereIn('id', $user_ids)->select(['username', 'nick_name', 'id'])->get()->toArray();
+        $user_list = User::query()->whereIn('id', $user_ids)->select(['username', 'real_name', 'id'])->get()->toArray();
         $user_list = array_column($user_list, null, 'id');
 
         foreach ($data['data'] as &$item) {
             if (isset($user_list[$item['user_id']])) {
-                $item['username'] = "{$user_list[$item['user_id']]['nick_name']}({$user_list[$item['user_id']]['username']})";
+                $item['username'] = "{$user_list[$item['user_id']]['real_name']}({$user_list[$item['user_id']]['username']})";
             } else {
                 $item['username'] = '';
             }

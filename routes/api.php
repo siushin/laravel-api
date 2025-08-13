@@ -11,11 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 公共路由
-Route::post('/admin/login', [LoginController::class, 'index']);
+Route::post('/admin/login', [LoginController::class, 'admin']);
+Route::post('/user/login', [LoginController::class, 'user']);
 // 下载数据字典模板
 Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);
 
-// API鉴权 路由组
+// API鉴权 管理员 路由组
 Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     // 管理员鉴权信息
     Route::post('/info', fn(Request $request) => $request->user());
@@ -52,4 +53,13 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/log/index', [LogController::class, 'index']);
     Route::post('/log/getSourceTypeList', [LogController::class, 'getSourceTypeList']);
     Route::post('/log/getActionList', [LogController::class, 'getActionList']);
+});
+
+// API鉴权 用户 路由组
+Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
+    // TODO 用户管理
+    // 用户 鉴权信息
+    Route::post('/info', fn(Request $request) => $request->user());
+    Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
+    Route::post('/changePassword', [UserController::class, 'changePassword']);
 });

@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
+use Database\Factories\AdminFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,18 +13,16 @@ use Laravel\Sanctum\HasApiTokens;
 use Siushin\Util\Traits\ParamTool;
 
 /**
- * 模型：用户
+ * 模型：管理员
  */
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<AdminFactory> */
     use HasApiTokens, HasFactory, Notifiable, ParamTool;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $primaryKey = 'id';
+    protected $table      = 'sys_admins';
+
     protected $fillable = [
         'username',
         'mobile',
@@ -33,34 +30,21 @@ class User extends Authenticatable
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
-        'remember_token',
-        'email_verified_at',
         'created_at',
         'updated_at',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
     /**
-     * 修改用户密码
+     * 修改管理员密码
      * @param array $params
      * @return array
      * @throws Exception
@@ -68,10 +52,10 @@ class User extends Authenticatable
      */
     public static function updatePassword(array $params): array
     {
-        self::checkEmptyParam($params, ['user_id', 'password']);
+        self::checkEmptyParam($params, ['admin_id', 'password']);
 
-        $info = self::query()->findOrFail($params['user_id']);
-        !$info && throw_exception('账号不存在');
+        $info = self::query()->findOrFail($params['admin_id']);
+        !$info && throw_exception('管理员账号不存在');
 
         $info->password = Hash::make($params['password']);
         $info->save();
@@ -80,13 +64,13 @@ class User extends Authenticatable
     }
 
     /**
-     * 根据用户IDs获取用户名（键值对 - 列表）
-     * @param array $user_ids
+     * 根据管理员IDs获取管理员用户名（键值对 - 列表）
+     * @param array $admin_ids
      * @return Collection
      * @author siushin<siushin@163.com>
      */
-    public static function getUsernameByIDs(array $user_ids): Collection
+    public static function getUsernameByAdminIDs(array $admin_ids): Collection
     {
-        return self::query()->whereIn('id', $user_ids)->pluck('username', 'id');
+        return self::query()->whereIn('id', $admin_ids)->pluck('username', 'id');
     }
 }

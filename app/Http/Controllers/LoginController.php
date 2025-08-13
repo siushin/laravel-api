@@ -27,14 +27,19 @@ class LoginController extends Controller
         $this->expire_second = $this->expire_minute * 60;
     }
 
+    public function admin(Request $request): JsonResponse
+    {
+        return success();
+    }
+
     /**
-     * 登录
+     * 用户登录
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public function index(Request $request): JsonResponse
+    public function user(Request $request): JsonResponse
     {
         // 验证请求数据
         $request->validate([

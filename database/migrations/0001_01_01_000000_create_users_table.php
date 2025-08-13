@@ -13,16 +13,16 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id()->comment('用户ID');
-            $table->string('username')->comment('用户名');
-            $table->string('nick_name')->comment('昵称');
+            $table->string('username', 50)->unique()->comment('用户名');
+            $table->string('real_name', 50)->nullable()->comment('姓名');
+            $table->string('mobile', 11)->nullable()->unique()->comment('手机号');
+            $table->string('email')->nullable()->comment('邮箱')->unique();
+            $table->string('password')->comment('密码');
             $table->enum('gender', array_column(SysGenderType::cases(), 'name'))
                 ->default(SysGenderType::male->name)
                 ->comment('性别[' . enum_to_string_chain(SysGenderType::cases()) . ']');
-            $table->string('email')->nullable()->comment('邮箱')->unique();
-            $table->timestamp('email_verified_at')->nullable()->comment('邮箱二次确认');
-            $table->char('phone', 11)->unique()->comment('手机号码');
-            $table->string('password')->comment('密码');
             $table->rememberToken()->comment('记住用户');
+            $table->timestamp('email_verified_at')->nullable()->comment('邮箱二次确认');
             $table->timestamps();
 
             $table->comment('用户表');
