@@ -13,6 +13,7 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "nwidart/laravel-modules": "^12.0",
         "siushin/laravel-tool": "^1.0",
         "zoujingli/ip2region": "^2.0"
     },
@@ -86,7 +87,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",
