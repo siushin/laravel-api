@@ -2,135 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\AccountTypeEnum;
-use Database\Factories\UserFactory;
-use Exception;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\HasApiTokens;
-use Siushin\Util\Traits\ParamTool;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 模型：用户
+ * 模型：客户
  */
-class User extends Authenticatable
+class User extends Model
 {
-    /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, ParamTool, SoftDeletes;
-
     protected $table = 'bs_user';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'username',
-        'password',
-        'account_type',
-        'status',
-        'last_login_ip',
-        'last_login_time',
+        'id',
+        'user_id',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * 关联账号
+     * @return BelongsTo
      */
-    protected $hidden = [
-        'password',
-        'deleted_at',
-        'created_at',
-        'updated_at',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function account(): BelongsTo
     {
-        return [
-            'last_login_time'   => 'datetime',
-            'password'          => 'hashed',
-            'account_type'      => AccountTypeEnum::class,
-        ];
-    }
-
-    /**
-     * 修改用户密码
-     * @param array $params
-     * @return array
-     * @throws Exception
-     * @author siushin<siushin@163.com>
-     */
-    public static function updatePassword(array $params): array
-    {
-        self::checkEmptyParam($params, ['user_id', 'password']);
-
-        $info = self::query()->findOrFail($params['user_id']);
-        !$info && throw_exception('账号不存在');
-
-        $info->password = Hash::make($params['password']);
-        $info->save();
-
-        return [];
-    }
-
-    /**
-     * 根据用户IDs获取用户名（键值对 - 列表）
-     * @param array $user_ids
-     * @return Collection
-     * @author siushin<siushin@163.com>
-     */
-    public static function getUsernameByIDs(array $user_ids): Collection
-    {
-        return self::query()->whereIn('id', $user_ids)->pluck('username', 'id');
-    }
-
-    /**
-     * 管理员信息
-     * @return HasOne
-     */
-    public function adminInfo(): HasOne
-    {
-        return $this->hasOne(Admin::class, 'user_id');
-    }
-
-    /**
-     * 客户信息
-     * @return HasOne
-     */
-    public function customerInfo(): HasOne
-    {
-        return $this->hasOne(Customer::class, 'user_id');
-    }
-
-    /**
-     * 用户资料信息
-     * @return HasOne
-     */
-    public function profile(): HasOne
-    {
-        return $this->hasOne(UserProfile::class, 'user_id');
-    }
-
-    /**
-     * 社交网络信息
-     * @return HasMany
-     */
-    public function socialAccounts(): HasMany
-    {
-        return $this->hasMany(UserSocial::class, 'user_id');
+        return $this->belongsTo(Account::class, 'user_id');
     }
 }
+

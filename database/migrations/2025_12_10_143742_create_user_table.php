@@ -10,13 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('bs_customer', function (Blueprint $table) {
-            $table->id()->comment('客户ID');
-            $table->unsignedBigInteger('user_id')->unique()->comment('用户ID');
+        Schema::create('bs_user', function (Blueprint $table) {
+            $table->id()->comment('用户ID');
+            $table->unsignedBigInteger('user_id')->unique()->comment('账号ID');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_user')->onDelete('cascade');
-            $table->comment('客户表');
+            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->comment('用户表');
         });
     }
 
@@ -25,7 +25,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_customer');
+        Schema::dropIfExists('bs_user');
     }
 };
 

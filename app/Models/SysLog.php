@@ -64,7 +64,7 @@ class SysLog extends Model
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));
-        $user_list = User::query()->whereIn('id', $user_ids)->select(['username', 'real_name', 'id'])->get()->toArray();
+        $user_list = Account::query()->whereIn('id', $user_ids)->select(['username', 'real_name', 'id'])->get()->toArray();
         $user_list = array_column($user_list, null, 'id');
 
         foreach ($data['data'] as &$item) {

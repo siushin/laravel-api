@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 模型：用户资料
+ * 模型：账号资料
  */
-class UserProfile extends Model
+class AccountProfile extends Model
 {
-    protected $table = 'bs_user_profile';
+    protected $table = 'bs_account_profile';
 
     protected $fillable = [
         'id',
@@ -21,12 +21,11 @@ class UserProfile extends Model
     ];
 
     /**
-     * 关联用户
+     * 关联账号
      * @return BelongsTo
      */
-    public function user(): BelongsTo
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Account::class, 'user_id');
     }
 }
-

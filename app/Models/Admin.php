@@ -20,12 +20,12 @@ class Admin extends Model
     ];
 
     /**
-     * 关联用户
+     * 关联账号
      * @return BelongsTo
      */
-    public function user(): BelongsTo
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Account::class, 'user_id');
     }
 }
 

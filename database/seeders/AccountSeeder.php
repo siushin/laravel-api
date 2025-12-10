@@ -4,19 +4,19 @@ namespace Database\Seeders;
 
 use App\Enums\AccountTypeEnum;
 use App\Models\Admin;
-use App\Models\Customer;
+use App\Models\Account;
+use App\Models\AccountProfile;
+use App\Models\AccountSocial;
 use App\Models\User;
-use App\Models\UserProfile;
-use App\Models\UserSocial;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Siushin\LaravelTool\Enums\GenderTypeEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
- * 数据填充：用户账号
+ * 数据填充：账号
  */
-class UserSeeder extends Seeder
+class AccountSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -45,24 +45,24 @@ class UserSeeder extends Seeder
             }
         };
 
-        // 创建用户账号
-        $users = User::factory(100)->create();
+        // 创建账号
+        $accounts = Account::factory(100)->create();
 
-        // 为每个用户创建关联数据
-        foreach ($users as $user) {
-            // 创建用户资料
-            UserProfile::query()->create([
+        // 为每个账号创建关联数据
+        foreach ($accounts as $account) {
+            // 创建账号资料
+            AccountProfile::query()->create([
                 'id' => generateId(),
-                'user_id' => $user->id,
+                'user_id' => $account->id,
                 'real_name' => $generateRandomName(),
                 'gender' => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
                 'avatar' => null,
             ]);
 
             // 创建社交网络数据（手机号）
-            UserSocial::query()->create([
+            AccountSocial::query()->create([
                 'id' => generateId(),
-                'user_id' => $user->id,
+                'user_id' => $account->id,
                 'social_type' => SocialTypeEnum::Mobile->value,
                 'social_account' => $generateMobileNumber(),
                 'social_name' => null,
@@ -73,9 +73,9 @@ class UserSeeder extends Seeder
 
             // 随机决定是否创建邮箱数据
             if (fake()->boolean()) {
-                UserSocial::query()->create([
+                AccountSocial::query()->create([
                     'id' => generateId(),
-                    'user_id' => $user->id,
+                    'user_id' => $account->id,
                     'social_type' => SocialTypeEnum::Email->value,
                     'social_account' => fake()->unique()->safeEmail(),
                     'social_name' => null,
@@ -86,36 +86,36 @@ class UserSeeder extends Seeder
             }
 
             // 根据账号类型创建对应的附属信息
-            if ($user->account_type === AccountTypeEnum::Admin) {
+            if ($account->account_type === AccountTypeEnum::Admin) {
                 Admin::query()->create([
                     'id' => generateId(),
-                    'user_id' => $user->id,
+                    'user_id' => $account->id,
                     'company_id' => null,
                     'department_id' => null,
                 ]);
-            } elseif ($user->account_type === AccountTypeEnum::Customer) {
-                Customer::query()->create([
+            } elseif ($account->account_type === AccountTypeEnum::User) {
+                User::query()->create([
                     'id' => generateId(),
-                    'user_id' => $user->id,
+                    'user_id' => $account->id,
                 ]);
             }
         }
 
-        // 初始化超级管理员账号（按创建时间取第一条记录，不管是什么用户类型）
-        $adminUser = User::query()
+        // 初始化超级管理员账号（按创建时间取第一条记录，不管是什么账号类型）
+        $adminAccount = Account::query()
             ->orderBy('created_at')
             ->first();
 
-        if ($adminUser) {
-            $wasCustomer = $adminUser->account_type === AccountTypeEnum::Customer;
+        if ($adminAccount) {
+            $wasCustomer = $adminAccount->account_type === AccountTypeEnum::User;
 
             // 如果原本是客户类型，删除对应的客户表脏数据
             if ($wasCustomer) {
-                Customer::query()->where('user_id', $adminUser->id)->delete();
+                User::query()->where('user_id', $adminAccount->id)->delete();
             }
 
             // 更新为超级管理员账号
-            $adminUser->update([
+            $adminAccount->update([
                 'username'     => env('APP_ADMIN', 'admin'),
                 'password'     => Hash::make(env('APP_ADMIN_PASSWORD', 'admin')),
                 'status'       => 1,
@@ -123,8 +123,8 @@ class UserSeeder extends Seeder
             ]);
 
             // 更新管理员资料
-            UserProfile::query()->updateOrCreate(
-                ['user_id' => $adminUser->id],
+            AccountProfile::query()->updateOrCreate(
+                ['user_id' => $adminAccount->id],
                 [
                     'real_name' => env('APP_ADMIN_NAME', '超级管理员'),
                     'gender' => GenderTypeEnum::male->name,
@@ -135,7 +135,7 @@ class UserSeeder extends Seeder
             if ($wasCustomer) {
                 Admin::query()->create([
                     'id' => generateId(),
-                    'user_id' => $adminUser->id,
+                    'user_id' => $adminAccount->id,
                     'company_id' => null,
                     'department_id' => null,
                 ]);

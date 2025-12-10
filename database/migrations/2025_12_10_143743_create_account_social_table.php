@@ -40,9 +40,9 @@ return new class extends Migration {
         }
         $socialTypeComment = '社交类型[' . implode(',', $commentParts) . ']';
 
-        Schema::create('bs_user_social', function (Blueprint $table) use ($socialTypeComment) {
+        Schema::create('bs_account_social', function (Blueprint $table) use ($socialTypeComment) {
             $table->id()->comment('社交网络ID');
-            $table->unsignedBigInteger('user_id')->comment('用户ID');
+            $table->unsignedBigInteger('user_id')->comment('账号ID');
             $table->enum('social_type', array_column(SocialTypeEnum::cases(), 'value'))
                 ->comment($socialTypeComment);
             $table->string('social_account', 100)->comment('社交账号');
@@ -52,10 +52,10 @@ return new class extends Migration {
             $table->timestamp('verified_at')->nullable()->comment('验证时间');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_user')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
             $table->index(['user_id', 'social_type']);
-            $table->unique(['user_id', 'social_type', 'social_account'], 'user_social_unique');
-            $table->comment('用户社交网络表');
+            $table->unique(['user_id', 'social_type', 'social_account'], 'account_social_unique');
+            $table->comment('账号社交网络表');
         });
     }
 
@@ -64,7 +64,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_user_social');
+        Schema::dropIfExists('bs_account_social');
     }
 };
-

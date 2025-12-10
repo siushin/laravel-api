@@ -3,14 +3,14 @@
 namespace Database\Factories;
 
 use App\Enums\AccountTypeEnum;
-use App\Models\User;
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * @extends Factory<User>
+ * @extends Factory<Account>
  */
-class UserFactory extends Factory
+class AccountFactory extends Factory
 {
     /**
      * The current password being used by the factory.

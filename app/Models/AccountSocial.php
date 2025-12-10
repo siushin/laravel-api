@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
- * 模型：用户社交网络
+ * 模型：账号社交网络
  */
-class UserSocial extends Model
+class AccountSocial extends Model
 {
-    protected $table = 'bs_user_social';
+    protected $table = 'bs_account_social';
 
     protected $fillable = [
         'id',
@@ -34,12 +34,11 @@ class UserSocial extends Model
     }
 
     /**
-     * 关联用户
+     * 关联账号
      * @return BelongsTo
      */
-    public function user(): BelongsTo
+    public function account(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Account::class, 'user_id');
     }
 }
-

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('department_id')->nullable()->comment('所属部门ID');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_user')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
             $table->index('company_id');
             $table->index('department_id');
             $table->comment('管理员表');

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\UserSocial;
+use App\Models\Account;
+use App\Models\AccountSocial;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,28 +47,28 @@ class LoginController extends Controller
         $requestSource = $request->get('request_source');
         $accountType = $request->get('account_type');
 
-        // 验证访问来源标识
+        // 验证请求来源
         $validSources = array_map(fn($case) => $case->value, RequestSourceEnum::cases());
         if (!in_array($requestSource, $validSources)) {
-            throw_exception('访问来源标识有误');
+            throw_exception('请求来源有误');
         }
 
         // 尝试认证用户
         $extend_data = ['username' => $request['username']];
 
-        // 先尝试通过用户名查找用户，并根据账号类型筛选
-        $userQuery = User::query()->where('username', $request['username']);
+        // 先尝试通过用户名查找账号，并根据账号类型筛选
+        $accountQuery = Account::query()->where('username', $request['username']);
 
         // 根据账号类型筛选（account_type 现在是字符串值）
         if ($accountType) {
-            $userQuery->where('account_type', $accountType);
+            $accountQuery->where('account_type', $accountType);
         }
 
-        $user = $userQuery->first();
+        $account = $accountQuery->first();
 
         // 如果通过用户名找不到，尝试通过邮箱或手机号在社交网络表中查找
-        if (!$user) {
-            $userSocial = UserSocial::query()
+        if (!$account) {
+            $accountSocial = AccountSocial::query()
                 ->whereIn('social_type', [
                     SocialTypeEnum::Email->value,
                     SocialTypeEnum::Mobile->value
@@ -76,39 +76,39 @@ class LoginController extends Controller
                 ->where('social_account', $request['username'])
                 ->first();
 
-            if ($userSocial) {
-                $userQuery = User::query()->where('id', $userSocial->user_id);
+            if ($accountSocial) {
+                $accountQuery = Account::query()->where('id', $accountSocial->user_id);
                 // 根据账号类型筛选
                 if ($accountType) {
-                    $userQuery->where('account_type', $accountType);
+                    $accountQuery->where('account_type', $accountType);
                 }
-                $user = $userQuery->first();
+                $account = $accountQuery->first();
             }
         }
 
-        if (!$user || !Hash::check($request['password'], $user->password)) {
-            logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(user: {$request['username']})", $extend_data);
+        if (!$account || !Hash::check($request['password'], $account->password)) {
+            logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
             throw_exception('账号或密码不正确');
         }
 
         // 记录登录信息
-        $user->update([
+        $account->update([
             'last_login_ip'   => $request->ip(),
             'last_login_time' => now(),
         ]);
 
         // 认证成功后生成并返回访问令牌
-        $token = $user->createToken(
-            'user_token', ['*'], now()->addHours($this->expire_hour)
+        $token = $account->createToken(
+            'account_token', ['*'], now()->addHours($this->expire_hour)
         )->plainTextToken;
 
         $data = [
             'code'    => 0,
             'message' => '登录成功',
-            'data'    => $user,
+            'data'    => $account,
             'token'   => self::buildTokenData($token, $this->expire_second)
         ];
-        logging(LogActionEnum::login->name, "用户登录系统(user: {$request['username']})", $extend_data);
+        logging(LogActionEnum::login->name, "用户登录系统(account: {$request['username']})", $extend_data);
         return response()->json($data);
     }
 
@@ -120,7 +120,7 @@ class LoginController extends Controller
      */
     public function refreshToken(Request $request): JsonResponse
     {
-        $token = $request->user()->createToken('user_token', ['*'], now()->addHours($this->expire_hour))->plainTextToken;
+        $token = $request->user()->createToken('account_token', ['*'], now()->addHours($this->expire_hour))->plainTextToken;
         return success(['token' => self::buildTokenData($token, $this->expire_second)]);
     }
 

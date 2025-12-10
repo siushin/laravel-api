@@ -6,7 +6,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrganizationController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +22,7 @@ Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
     // 用户 鉴权信息
     Route::post('/info', fn(Request $request) => $request->user());
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
-    Route::post('/changePassword', [UserController::class, 'changePassword']);
+    Route::post('/changePassword', [AccountController::class, 'changePassword']);
 });
 
 // API鉴权 管理员 路由组
@@ -30,7 +30,7 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     // 管理员 鉴权信息
     Route::post('/info', fn(Request $request) => $request->user());
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
-    Route::post('/changePassword', [UserController::class, 'changePassword']);
+    Route::post('/changePassword', [AccountController::class, 'changePassword']);
 
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件

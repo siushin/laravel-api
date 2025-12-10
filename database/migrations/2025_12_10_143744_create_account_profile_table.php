@@ -11,9 +11,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('bs_user_profile', function (Blueprint $table) {
-            $table->id()->comment('用户资料ID');
-            $table->unsignedBigInteger('user_id')->unique()->comment('用户ID');
+        Schema::create('bs_account_profile', function (Blueprint $table) {
+            $table->id()->comment('账号资料ID');
+            $table->unsignedBigInteger('user_id')->unique()->comment('账号ID');
             $table->string('real_name')->nullable()->comment('姓名');
             $table->enum('gender', array_column(GenderTypeEnum::cases(), 'name'))
                 ->default(GenderTypeEnum::male->name)
@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->string('avatar')->nullable()->comment('头像');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_user')->onDelete('cascade');
-            $table->comment('用户资料表');
+            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->comment('账号资料表');
         });
     }
 
@@ -31,7 +31,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_user_profile');
+        Schema::dropIfExists('bs_account_profile');
     }
 };
-

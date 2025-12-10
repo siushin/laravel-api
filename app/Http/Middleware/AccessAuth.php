@@ -22,10 +22,10 @@ class AccessAuth
     {
         $path = $request->path();
 
-        // 默认访问来源标识（匿名访问）
+        // 默认请求来源（匿名访问）
         $requestSource = RequestSourceEnum::guest->value;
 
-        // 根据路由动态分配访问来源标识
+        // 根据路由动态分配请求来源
         if (str_starts_with($path, 'api/admin/')) {
             $requestSource = RequestSourceEnum::admin_api->value;
         } elseif (str_starts_with($path, 'api/we/')) {
@@ -37,9 +37,9 @@ class AccessAuth
         // 根据路由判断账号类型：api/admin/ 开头为 Admin，其他为 Customer
         $accountType = str_starts_with($path, 'api/admin/')
             ? AccountTypeEnum::Admin->value
-            : AccountTypeEnum::Customer->value;
+            : AccountTypeEnum::User->value;
 
-        // 将访问来源标识和账号类型注入请求
+        // 将请求来源和账号类型注入请求
         $request->merge([
             'request_source' => $requestSource,
             'account_type' => $accountType,
