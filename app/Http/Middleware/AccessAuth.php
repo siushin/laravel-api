@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\AccountTypeEnum;
 use Closure;
 use Illuminate\Http\Request;
-use Siushin\LaravelTool\Enums\SysUserType;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,20 +22,28 @@ class AccessAuth
     {
         $path = $request->path();
 
-        // 默认用户类型（访客）
-        $userType = SysUserType::guest->name;
+        // 默认访问来源标识（匿名访问）
+        $requestSource = RequestSourceEnum::guest->value;
 
-        // 根据路由动态分配用户类型
+        // 根据路由动态分配访问来源标识
         if (str_starts_with($path, 'api/admin/')) {
-            $userType = SysUserType::admin->name;
+            $requestSource = RequestSourceEnum::admin_api->value;
         } elseif (str_starts_with($path, 'api/we/')) {
-            $userType = SysUserType::we->name;
+            $requestSource = RequestSourceEnum::wechat_mini->value;
         } elseif (str_starts_with($path, 'api/user/')) {
-            $userType = SysUserType::user->name;
+            $requestSource = RequestSourceEnum::api->value;
         }
 
-        // 将用户类型注入请求
-        $request->merge(['user_type' => $userType]);
+        // 根据路由判断账号类型：api/admin/ 开头为 Admin，其他为 Customer
+        $accountType = str_starts_with($path, 'api/admin/')
+            ? AccountTypeEnum::Admin->value
+            : AccountTypeEnum::Customer->value;
+
+        // 将访问来源标识和账号类型注入请求
+        $request->merge([
+            'request_source' => $requestSource,
+            'account_type' => $accountType,
+        ]);
 
         return $next($request);
     }

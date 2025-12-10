@@ -6,8 +6,8 @@ use App\Models\SysLog;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Siushin\LaravelTool\Enums\SysLogAction;
-use Siushin\LaravelTool\Enums\SysUserType;
+use Siushin\LaravelTool\Enums\LogActionEnum;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 class LogController extends Controller
 {
@@ -31,7 +31,7 @@ class LogController extends Controller
      */
     public function getSourceTypeList(): JsonResponse
     {
-        return success(enum_to_array(SysUserType::cases()));
+        return success(enum_to_array(RequestSourceEnum::cases()));
     }
 
     /**
@@ -41,7 +41,7 @@ class LogController extends Controller
      */
     public function getActionList(): JsonResponse
     {
-        $all_action_list = enum_to_array(SysLogAction::cases(), 'array');
+        $all_action_list = enum_to_array(LogActionEnum::cases(), 'array');
         return success($all_action_list);
     }
 }

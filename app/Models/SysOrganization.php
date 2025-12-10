@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Siushin\LaravelTool\Enums\SysLogAction;
+use Siushin\LaravelTool\Enums\LogActionEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\LaravelTool\Utils\Tree;
 use Siushin\Util\Traits\ParamTool;
@@ -97,7 +97,7 @@ class SysOrganization extends Model
         $organization['full_organization_pid'] = $parent_full_organization_pid . $organization['organization_id'] . ',';
         $organization->save();
 
-        logging(SysLogAction::insert->name, "新增组织架构($organization->organization_name)", $organization->toArray());
+        logging(LogActionEnum::insert->name, "新增组织架构($organization->organization_name)", $organization->toArray());
 
         return $organization->toArray();
     }
@@ -124,7 +124,7 @@ class SysOrganization extends Model
         $info->save();
 
         $extend_data = compareArray($info->toArray(), $old_data);
-        logging(SysLogAction::update->name, "更新组织架构($info->organization_name)", $extend_data);
+        logging(LogActionEnum::update->name, "更新组织架构($info->organization_name)", $extend_data);
 
         return [];
     }
@@ -150,7 +150,7 @@ class SysOrganization extends Model
         $delete_total = self::destroy($delete_sub_ids);
 
         $extend_data = compact('delete_sub_ids');
-        logging(SysLogAction::delete->name, "删除组织架构($info->organization_name)", $extend_data);
+        logging(LogActionEnum::delete->name, "删除组织架构($info->organization_name)", $extend_data);
 
         return compact('organization_id', 'delete_total');
     }
@@ -215,7 +215,7 @@ class SysOrganization extends Model
                 ]);
 
             $extend_data = compact('newFullOrganizationId', 'oldFullOrganizationId');
-            logging(SysLogAction::update->name, "移动组织架构($newOrganization->organization_name)", $extend_data);
+            logging(LogActionEnum::update->name, "移动组织架构($newOrganization->organization_name)", $extend_data);
         });
 
         return [];

@@ -25,25 +25,27 @@ composer create-project siushin/laravel-api
 | 目录名    | 描述                                                           |
 |--------|--------------------------------------------------------------|
 | Cases  |                                                              |
-| Enums  | 枚举，以 `Sys` 开头（方便全局搜索）                                        |
+| Enums  | 枚举类，一般以 `Enum` 结尾                                            |
 | Funcs  | 助手函数，分以 `Lara` 开头的基于Laravel的助手函数，以及以 `Func`开头的常用助手函数（方便全局搜索） |
 | Traits | 特征，没有明显命名规范，自行查询源码或文档                                        |
 
 ## 已实现模块
 
-✅管理员登录/授权
-✅管理员管理
+✅用户登录 / 授权
+✅用户管理
 ✅日志管理
 
 ## 🧑🏻‍💻 关于作者
 
-十年开发经验，具有丰富的前、后端软件开发经验~
+多年开发经验，具有丰富的前、后端软件开发经验~
 
-👤 作者：<https://github.com/siushin>
+微信：siushin
 
-💻 个人博客：<http://www.siushin.com>
+Github：<https://github.com/siushin>
 
-📮 邮箱：<a href="mailto:siushin@163.com">siushin@163.com</a>
+个人博客：<http://www.siushin.com>
+
+邮箱：<a href="mailto:siushin@163.com">siushin@163.com</a>
 
 ## 💡 反馈交流
 

@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Siushin\LaravelTool\Enums\SysUserType;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 return new class extends Migration {
     /**
@@ -11,12 +11,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        $user_type_list = array_column(SysUserType::cases(), 'name');
+        $source_type_list = array_column(RequestSourceEnum::cases(), 'value');
 
-        Schema::create('sys_logs', function (Blueprint $table) use ($user_type_list) {
+        Schema::create('sys_logs', function (Blueprint $table) use ($source_type_list) {
             $table->id('log_id')->comment('日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID');
-            $table->enum('account_type', $user_type_list)->comment('账号类型[' . enum_to_string_chain(SysUserType::cases()) . ']');
+            $table->enum('source_type', $source_type_list)->comment('访问来源[' . enum_to_string_chain(RequestSourceEnum::cases()) . ']');
             $table->char('action_type', 20)->comment('操作类型');
             $table->string('content')->comment('日志内容');
             $table->ipAddress()->comment('IP地址');
@@ -27,10 +27,10 @@ return new class extends Migration {
             $table->comment('日志表');
         });
 
-        Schema::create('sys_operation_log', function (Blueprint $table) use ($user_type_list) {
+        Schema::create('sys_operation_log', function (Blueprint $table) use ($source_type_list) {
             $table->id()->comment('ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID');
-            $table->enum('account_type', $user_type_list)->comment('账号类型[' . enum_to_string_chain(SysUserType::cases()) . ']');
+            $table->enum('source_type', $source_type_list)->comment('访问来源[' . enum_to_string_chain(RequestSourceEnum::cases()) . ']');
             $table->string('module', 50)->comment('模块名称');
             $table->string('action', 50)->comment('操作类型');
             $table->string('method', 10)->comment('HTTP方法');

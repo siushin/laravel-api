@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('bs_admin', function (Blueprint $table) {
+            $table->id()->comment('管理员ID');
+            $table->unsignedBigInteger('user_id')->unique()->comment('用户ID');
+            $table->unsignedBigInteger('company_id')->nullable()->comment('所属公司ID');
+            $table->unsignedBigInteger('department_id')->nullable()->comment('所属部门ID');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('bs_user')->onDelete('cascade');
+            $table->index('company_id');
+            $table->index('department_id');
+            $table->comment('管理员表');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('bs_admin');
+    }
+};
+

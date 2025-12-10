@@ -6,17 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 模型：管理员
+ * 模型：客户
  */
-class Admin extends Model
+class Customer extends Model
 {
-    protected $table = 'bs_admin';
+    protected $table = 'bs_customer';
 
     protected $fillable = [
         'id',
         'user_id',
-        'company_id',
-        'department_id',
     ];
 
     /**

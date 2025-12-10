@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use Siushin\LaravelTool\Enums\SysLogAction;
-use Siushin\LaravelTool\Enums\SysUploadFileType;
+use Siushin\LaravelTool\Enums\LogActionEnum;
+use Siushin\LaravelTool\Enums\UploadFileTypeEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 
 /**
@@ -38,11 +38,11 @@ class SysFile extends Model
     ];
 
     private static array $allowImages = [
-        SysUploadFileType::JPG, SysUploadFileType::JPEG, SysUploadFileType::PNG, SysUploadFileType::GIF,
+        UploadFileTypeEnum::JPG, UploadFileTypeEnum::JPEG, UploadFileTypeEnum::PNG, UploadFileTypeEnum::GIF,
     ];
 
     private static array $allowPDFs = [
-        SysUploadFileType::PDF,
+        UploadFileTypeEnum::PDF,
     ];
 
     protected $hidden = ['original_file_name', 'created_at', 'updated_at'];
@@ -110,7 +110,7 @@ class SysFile extends Model
         ];
         $result = self::query()->create($data);
 
-        logging(SysLogAction::upload_file->name, "上传文件({$result['file_name']})", $result->toArray());
+        logging(LogActionEnum::upload_file->name, "上传文件({$result['file_name']})", $result->toArray());
 
         // 根据文件类型分发执行附属模型
         if (method_exists($extra_file_obj, 'uploadFileExtraAfterHook')) {
@@ -241,6 +241,6 @@ class SysFile extends Model
                     self::deleteFile($file->toArray());
                 }
             });
-        logging(SysLogAction::batchDelete->name, "批量删除文件{$count}个", compact('file_ids'));
+        logging(LogActionEnum::batchDelete->name, "批量删除文件{$count}个", compact('file_ids'));
     }
 }

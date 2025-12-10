@@ -3,9 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\AccountTypeEnum;
 use Database\Factories\UserFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -19,7 +23,9 @@ use Siushin\Util\Traits\ParamTool;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, ParamTool;
+    use HasApiTokens, HasFactory, Notifiable, ParamTool, SoftDeletes;
+
+    protected $table = 'bs_user';
 
     /**
      * The attributes that are mass assignable.
@@ -28,9 +34,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
-        'mobile',
-        'email',
         'password',
+        'account_type',
+        'status',
+        'last_login_ip',
+        'last_login_time',
     ];
 
     /**
@@ -40,8 +48,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
-        'email_verified_at',
+        'deleted_at',
         'created_at',
         'updated_at',
     ];
@@ -54,8 +61,9 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'last_login_time'   => 'datetime',
+            'password'          => 'hashed',
+            'account_type'      => AccountTypeEnum::class,
         ];
     }
 
@@ -88,5 +96,41 @@ class User extends Authenticatable
     public static function getUsernameByIDs(array $user_ids): Collection
     {
         return self::query()->whereIn('id', $user_ids)->pluck('username', 'id');
+    }
+
+    /**
+     * 管理员信息
+     * @return HasOne
+     */
+    public function adminInfo(): HasOne
+    {
+        return $this->hasOne(Admin::class, 'user_id');
+    }
+
+    /**
+     * 客户信息
+     * @return HasOne
+     */
+    public function customerInfo(): HasOne
+    {
+        return $this->hasOne(Customer::class, 'user_id');
+    }
+
+    /**
+     * 用户资料信息
+     * @return HasOne
+     */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class, 'user_id');
+    }
+
+    /**
+     * 社交网络信息
+     * @return HasMany
+     */
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(UserSocial::class, 'user_id');
     }
 }

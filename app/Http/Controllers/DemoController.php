@@ -12,7 +12,7 @@ class DemoController extends Controller
      * @return void
      * @author siushin<siushin@163.com>
      */
-    public function index()
+    public function index(): void
     {
         echo 'Demo Controller';
     }

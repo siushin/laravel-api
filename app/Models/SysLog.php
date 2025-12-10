@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Siushin\LaravelTool\Cases\Json;
-use Siushin\LaravelTool\Enums\SysLogAction;
-use Siushin\LaravelTool\Enums\SysUserType;
+use Siushin\LaravelTool\Enums\LogActionEnum;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
@@ -36,14 +36,14 @@ class SysLog extends Model
     protected function sourceType(): Attribute
     {
         return Attribute::make(
-            get: fn(string $value) => SysUserType::{$value}->value,
+            get: fn(string $value) => RequestSourceEnum::from($value)->value,
         );
     }
 
     protected function actionType(): Attribute
     {
         return Attribute::make(
-            get: fn(string $value) => SysLogAction::{$value}->value,
+            get: fn(string $value) => LogActionEnum::{$value}->value,
         );
     }
 

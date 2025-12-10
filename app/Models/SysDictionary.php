@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Siushin\LaravelTool\Cases\Json;
-use Siushin\LaravelTool\Enums\SysLogAction;
+use Siushin\LaravelTool\Enums\LogActionEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
@@ -178,7 +178,7 @@ class SysDictionary extends Model
         $info = self::query()->create($params);
         !$info && throw_exception('添加数据字典失败');
         $info = $info->toArray();
-        logging(SysLogAction::insert->name, "添加数据字典失败(dictionary_name: {$params['dictionary_name']})", $info);
+        logging(LogActionEnum::insert->name, "添加数据字典失败(dictionary_name: {$params['dictionary_name']})", $info);
         $response_keys = $response_keys ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
         return self::getArrayByKeys($info, $response_keys);
     }
@@ -233,7 +233,7 @@ class SysDictionary extends Model
         !$bool && throw_exception('更新数据字典失败');
 
         $log_extend_data = compareArray($update_data, $old_data);
-        logging(SysLogAction::update->name, "更新数据字典(dictionary_name: {$params['dictionary_name']})", $log_extend_data);
+        logging(LogActionEnum::update->name, "更新数据字典(dictionary_name: {$params['dictionary_name']})", $log_extend_data);
 
         return [];
     }
@@ -253,7 +253,7 @@ class SysDictionary extends Model
         $bool = $info->delete();
         !$bool && throw_exception('删除失败');
 
-        logging(SysLogAction::delete->name, "删除数据字典(ID: {$info['dictionary_id']})", $info->toArray());
+        logging(LogActionEnum::delete->name, "删除数据字典(ID: {$info['dictionary_id']})", $info->toArray());
 
         return [];
     }
@@ -282,7 +282,7 @@ class SysDictionary extends Model
         $deletedCount === 0 && throw_exception('删除失败，可能记录已不存在');
 
         logging(
-            SysLogAction::batchDelete->name,
+            LogActionEnum::batchDelete->name,
             "批量删除数据字典(数量: $deletedCount, IDs: " . implode(',', $dictionary_ids) . ")",
             $records->toArray()
         );

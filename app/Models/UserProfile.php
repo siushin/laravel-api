@@ -6,17 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * 模型：管理员
+ * 模型：用户资料
  */
-class Admin extends Model
+class UserProfile extends Model
 {
-    protected $table = 'bs_admin';
+    protected $table = 'bs_user_profile';
 
     protected $fillable = [
         'id',
         'user_id',
-        'company_id',
-        'department_id',
+        'real_name',
+        'gender',
+        'avatar',
     ];
 
     /**

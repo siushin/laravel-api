@@ -11,14 +11,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 公共路由
-Route::post('/admin/login', [LoginController::class, 'admin']);
-Route::post('/user/login', [LoginController::class, 'user']);
-// 下载数据字典模板
-Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);
+Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);  // 下载数据字典模板
+
+// 不需要认证的接口
+Route::post('/user/login', [LoginController::class, 'login']);
+Route::post('/admin/login', [LoginController::class, 'login']);
+
+// API鉴权 用户 路由组
+Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
+    // 用户 鉴权信息
+    Route::post('/info', fn(Request $request) => $request->user());
+    Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
+    Route::post('/changePassword', [UserController::class, 'changePassword']);
+});
 
 // API鉴权 管理员 路由组
 Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
-    // 管理员鉴权信息
+    // 管理员 鉴权信息
     Route::post('/info', fn(Request $request) => $request->user());
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [UserController::class, 'changePassword']);
@@ -27,8 +36,6 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
     Route::post('/file/delete', [FileController::class, 'delete']);     // 删除文件
     Route::post('/file/cleanup', [FileController::class, 'cleanup']);   // 清空文件
-
-    // TODO 用户管理
 
     // 组织架构管理
     Route::post('/organization/index', [OrganizationController::class, 'index']);
@@ -53,13 +60,4 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/log/index', [LogController::class, 'index']);
     Route::post('/log/getSourceTypeList', [LogController::class, 'getSourceTypeList']);
     Route::post('/log/getActionList', [LogController::class, 'getActionList']);
-});
-
-// API鉴权 用户 路由组
-Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
-    // TODO 用户管理
-    // 用户 鉴权信息
-    Route::post('/info', fn(Request $request) => $request->user());
-    Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
-    Route::post('/changePassword', [UserController::class, 'changePassword']);
 });

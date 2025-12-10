@@ -6,7 +6,7 @@
 
 use App\Models\SysLog;
 use Illuminate\Support\Facades\Log;
-use Siushin\LaravelTool\Enums\SysUserType;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 /**
  * 写入日志
@@ -20,7 +20,7 @@ function logging(string $action_type, string $content, array $extend_data = null
 {
     try {
         $account_id = currentUserId() ?? null;
-        $account_type = request()->user_type ?? SysUserType::guest->name;
+        $source_type = request()->request_source ?? RequestSourceEnum::guest->value;
         $ip_address = request()->ip();
 
         $ip2region = new Ip2Region();
@@ -32,7 +32,7 @@ function logging(string $action_type, string $content, array $extend_data = null
 
         $created_at = getDateTimeArr()['datetime'];
         $extend_data && $extend_data = json_encode($extend_data, JSON_UNESCAPED_UNICODE);
-        $data = compact('account_id', 'account_type', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
+        $data = compact('account_id', 'source_type', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
         return SysLog::query()->insert($data);
     } catch (Exception $e) {
         Log::error($e->getMessage());
