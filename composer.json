@@ -30,7 +30,10 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\Base\\": "Modules/Base/app/",
+            "Modules\\Base\\Database\\Factories\\": "Modules/Base/database/factories/",
+            "Modules\\Base\\Database\\Seeders\\": "Modules/Base/database/seeders/"
         },
         "files": [
             "app/Funcs/FuncLog.php"

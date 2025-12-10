@@ -1,0 +1,11 @@
+{
+    "name": "Base",
+    "alias": "LaravelAPI基础模块",
+    "description": "LaravelAPI 基础模块，勿删除！",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Base\\Providers\\BaseServiceProvider"
+    ],
+    "files": []
+}
