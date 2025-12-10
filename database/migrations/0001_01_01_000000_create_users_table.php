@@ -11,13 +11,42 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('bs_user', function (Blueprint $table) {
+        // 从枚举注释中提取中文描述的辅助函数
+        $getEnumComment = function (AccountTypeEnum $case): ?string {
+            $reflection = new \ReflectionClass(AccountTypeEnum::class);
+            $file = $reflection->getFileName();
+            if ($file && file_exists($file)) {
+                $lines = file($file);
+                // 查找匹配的 case 行
+                foreach ($lines as $line) {
+                    // 匹配 case CaseName = 'value'; // 中文描述
+                    if (preg_match('/case\s+' . preg_quote($case->name, '/') . '\s*=\s*[\'"]' . preg_quote($case->value, '/') . '[\'"]\s*;\s*\/\/\s*(.+)/', $line, $matches)) {
+                        return trim($matches[1]);
+                    }
+                }
+            }
+            return null;
+        };
+
+        // 生成带中文描述的注释字符串
+        $commentParts = [];
+        foreach (AccountTypeEnum::cases() as $case) {
+            $description = $getEnumComment($case);
+            if ($description) {
+                $commentParts[] = $case->value . ':' . $description;
+            } else {
+                $commentParts[] = $case->value;
+            }
+        }
+        $accountTypeComment = '账号类型[' . implode(',', $commentParts) . ']';
+
+        Schema::create('bs_user', function (Blueprint $table) use ($accountTypeComment) {
             $table->id()->comment('用户ID');
             $table->string('username', 50)->unique()->comment('用户名');
             $table->string('password')->comment('密码');
             $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
                 ->default(AccountTypeEnum::Customer->value)
-                ->comment('账号类型[' . enum_to_string_chain(AccountTypeEnum::cases()) . ']');
+                ->comment($accountTypeComment);
             $table->tinyInteger('status')->default(1)->comment('状态:1正常,0禁用');
             $table->string('last_login_ip', 50)->nullable()->comment('最后登录IP');
             $table->timestamp('last_login_time')->nullable()->comment('最后登录时间');

@@ -7,6 +7,6 @@ namespace App\Enums;
  */
 enum OrganizationTypeEnum: string
 {
-    // 默认
-    case DEFAULT = 'default';
+    case Default = 'default';   // 默认
+    case Country = 'country';   // 国家
 }
