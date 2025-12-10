@@ -3,6 +3,8 @@
 namespace Modules\Base\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\Sanctum;
+use Modules\Base\Models\PersonalAccessToken;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -25,6 +27,9 @@ class BaseServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        // 配置 Sanctum 使用自定义的 PersonalAccessToken 模型
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
     }
 
     /**
@@ -97,8 +102,14 @@ class BaseServiceProvider extends ServiceProvider
 
                     $key = ($config === 'config.php') ? $this->nameLower : implode('.', $normalized);
 
-                    $this->publishes([$file->getPathname() => config_path($config)], 'config');
-                    $this->merge_config_from($file->getPathname(), $key);
+                    // 特殊处理 laravel-tool.php，使其可以通过 config('laravel-tool') 访问
+                    if ($config === 'laravel-tool.php') {
+                        $this->publishes([$file->getPathname() => config_path($config)], 'config');
+                        $this->merge_config_from($file->getPathname(), 'laravel-tool');
+                    } else {
+                        $this->publishes([$file->getPathname() => config_path($config)], 'config');
+                        $this->merge_config_from($file->getPathname(), $key);
+                    }
                 }
             }
         }

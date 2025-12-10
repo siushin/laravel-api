@@ -36,7 +36,7 @@
             "Modules\\Base\\Database\\Seeders\\": "Modules/Base/database/seeders/"
         },
         "files": [
-            "app/Funcs/FuncLog.php"
+            "Modules/Base/app/Funcs/FuncLog.php"
         ]
     },
     "autoload-dev": {

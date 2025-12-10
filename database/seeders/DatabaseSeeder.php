@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,10 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            DictionarySeeder::class,
-            OrganizationSeeder::class,
-            AccountSeeder::class,
-        ]);
+        // 调用 Base 模块的 seeder
+        $this->call(\Modules\Base\Database\Seeders\BaseDatabaseSeeder::class);
     }
 }

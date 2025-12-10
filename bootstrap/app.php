@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Middleware\AccessAuth;
+use Modules\Base\Http\Middleware\AccessAuth;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
