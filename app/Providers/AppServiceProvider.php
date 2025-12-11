@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // 设置应用默认语言为中文
+        app()->setLocale('zh_CN');
     }
 }
