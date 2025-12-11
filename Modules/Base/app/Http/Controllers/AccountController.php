@@ -25,7 +25,7 @@ class AccountController extends Controller
         // 验证请求参数
         $request->validate([
             'current_password' => ['required', 'string'],
-            'password'         => ['required', 'string', 'min:8'],
+            'password'         => ['required', 'string', 'min:6'],
             'confirm_password' => ['required', 'string', 'same:password'],
         ], [
             'current_password.required' => '当前密码不能为空',
