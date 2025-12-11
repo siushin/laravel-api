@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Siushin\LaravelTool\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
+use function Laravel\Prompts\error;
 
 /**
  * 控制器：用户登录/授权
@@ -109,6 +110,31 @@ class LoginController extends Controller
         $userData['token'] = self::buildTokenData($token, $this->expire_second);
         logging(LogActionEnum::login->name, "用户登录系统(account: {$request['username']})", $extend_data);
         return success($userData, '登录成功');
+    }
+
+
+    /**
+     * 退出用户登录
+     * @param Request $request
+     * @return JsonResponse
+     * @author siushin<siushin@163.com>
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $account = $request->user();
+
+        // 获取当前使用的token并删除
+        $currentToken = $account->currentAccessToken();
+        if ($currentToken) {
+            // 删除当前token
+            $currentToken->delete();
+        }
+
+        // 记录用户退出登录日志
+        $extend_data = ['username' => $account->username];
+        logging('logout', "用户退出登录(account: {$account->username})", $extend_data);
+
+        return success([], '用户退出登录成功');
     }
 
     /**

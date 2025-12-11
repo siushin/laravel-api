@@ -23,6 +23,7 @@ Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
+    Route::post('/logout', [LoginController::class, 'logout']);
 });
 
 // API鉴权 管理员 路由组
@@ -31,6 +32,7 @@ Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
+    Route::post('/logout', [LoginController::class, 'logout']);
 
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
