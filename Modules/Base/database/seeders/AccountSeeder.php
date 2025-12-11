@@ -131,6 +131,62 @@ class AccountSeeder extends Seeder
                 ]
             );
 
+            // 创建或更新手机号社交账号信息
+            $adminMobile = env('APP_ADMIN_MOBILE');
+            if ($adminMobile) {
+                $mobileSocial = AccountSocial::query()
+                    ->where('user_id', $adminAccount->id)
+                    ->where('social_type', SocialTypeEnum::Mobile->value)
+                    ->first();
+
+                if ($mobileSocial) {
+                    $mobileSocial->update([
+                        'social_account' => $adminMobile,
+                        'is_verified' => true,
+                        'verified_at' => now(),
+                    ]);
+                } else {
+                    AccountSocial::query()->create([
+                        'id' => generateId(),
+                        'user_id' => $adminAccount->id,
+                        'social_type' => SocialTypeEnum::Mobile->value,
+                        'social_account' => $adminMobile,
+                        'social_name' => null,
+                        'avatar' => null,
+                        'is_verified' => true,
+                        'verified_at' => now(),
+                    ]);
+                }
+            }
+
+            // 创建或更新邮箱社交账号信息
+            $adminEmail = env('APP_EMAIL');
+            if ($adminEmail) {
+                $emailSocial = AccountSocial::query()
+                    ->where('user_id', $adminAccount->id)
+                    ->where('social_type', SocialTypeEnum::Email->value)
+                    ->first();
+
+                if ($emailSocial) {
+                    $emailSocial->update([
+                        'social_account' => $adminEmail,
+                        'is_verified' => true,
+                        'verified_at' => now(),
+                    ]);
+                } else {
+                    AccountSocial::query()->create([
+                        'id' => generateId(),
+                        'user_id' => $adminAccount->id,
+                        'social_type' => SocialTypeEnum::Email->value,
+                        'social_account' => $adminEmail,
+                        'social_name' => null,
+                        'avatar' => null,
+                        'is_verified' => true,
+                        'verified_at' => now(),
+                    ]);
+                }
+            }
+
             // 如果原本是客户类型，需要创建管理员信息（原本是管理员类型的话，前面循环中已创建）
             if ($wasCustomer) {
                 Admin::query()->create([

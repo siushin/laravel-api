@@ -20,7 +20,7 @@ Route::post('/admin/login', [LoginController::class, 'login']);
 // API鉴权 用户 路由组
 Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
     // 用户 鉴权信息
-    Route::post('/info', fn(Request $request) => $request->user());
+    Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
 });
@@ -28,7 +28,7 @@ Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
 // API鉴权 管理员 路由组
 Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
     // 管理员 鉴权信息
-    Route::post('/info', fn(Request $request) => $request->user());
+    Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
 

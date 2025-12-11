@@ -4,6 +4,7 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountSocial;
+use Modules\Base\Enums\AccountTypeEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -102,14 +103,25 @@ class LoginController extends Controller
             'account_token', ['*'], now()->addHours($this->expire_hour)
         )->plainTextToken;
 
-        $data = [
-            'code'    => 0,
-            'message' => '登录成功',
-            'data'    => $account,
-            'token'   => self::buildTokenData($token, $this->expire_second)
-        ];
+        // 获取用户数据（不包括token）
+        $userData = $this->getUserData($account);
+
+        $userData['token'] = self::buildTokenData($token, $this->expire_second);
         logging(LogActionEnum::login->name, "用户登录系统(account: {$request['username']})", $extend_data);
-        return response()->json($data);
+        return success($userData, '登录成功');
+    }
+
+    /**
+     * 获取用户信息
+     * @param Request $request
+     * @return JsonResponse
+     * @author siushin<siushin@163.com>
+     */
+    public function getUserInfo(Request $request): JsonResponse
+    {
+        $account = $request->user();
+        $userData = $this->getUserData($account);
+        return success($userData);
     }
 
     /**
@@ -120,8 +132,61 @@ class LoginController extends Controller
      */
     public function refreshToken(Request $request): JsonResponse
     {
+        // 将当前使用的token设为过期
+        $currentToken = $request->user()->currentAccessToken();
+        if ($currentToken) {
+            $currentToken->update(['expires_at' => now()]);
+        }
+
+        // 创建新的token
         $token = $request->user()->createToken('account_token', ['*'], now()->addHours($this->expire_hour))->plainTextToken;
         return success(['token' => self::buildTokenData($token, $this->expire_second)]);
+    }
+
+    /**
+     * 获取用户数据（不包括token）
+     * @param Account $account
+     * @return array
+     * @author siushin<siushin@163.com>
+     */
+    private function getUserData(Account $account): array
+    {
+        // 根据账号类型加载对应的数据
+        $userData = $account->toArray();
+
+        // 加载对应的类型信息并合并到$userData
+        if ($account->account_type === AccountTypeEnum::Admin) {
+            $typeInfo = $account->adminInfo;
+            if ($typeInfo) {
+                // 只返回需要的字段：company_id, department_id，并合并到$userData
+                $userData = array_merge($userData, $typeInfo->only(['company_id', 'department_id']));
+            }
+        } elseif ($account->account_type === AccountTypeEnum::User) {
+            $typeInfo = $account->customerInfo;
+            if ($typeInfo) {
+                // User表只有id和user_id，没有其他业务字段，无需合并
+            }
+        }
+
+        // 加载账号资料信息并合并到$userData
+        $profile = $account->profile;
+        if ($profile) {
+            // 只返回需要的字段：real_name, gender, avatar，并合并到$userData
+            $userData = array_merge($userData, $profile->only(['real_name', 'gender', 'avatar']));
+        }
+
+        // 加载所有已验证的社交信息
+        $socialAccounts = $account->socialAccounts()
+            ->where('is_verified', true)
+            ->get()
+            ->map(function ($social) {
+                // 只返回需要的字段：social_type, social_account, social_name, avatar
+                return $social->only(['social_type', 'social_account', 'social_name', 'avatar']);
+            })
+            ->toArray();
+        $userData['social_accounts'] = $socialAccounts;
+
+        return $userData;
     }
 
     /**
