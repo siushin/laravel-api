@@ -199,6 +199,7 @@ class LoginController extends Controller
             'password'              => ['required', 'string', 'min:6'],
             'password_confirmation' => ['required', 'string', 'same:password'],
             'mobile'                => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
+            'code'                  => ['required', 'string', 'size:6'],
         ], [
             'username.required'              => '用户名不能为空',
             'password.required'              => '密码不能为空',
@@ -207,6 +208,8 @@ class LoginController extends Controller
             'password_confirmation.same'     => '两次输入的密码不一致',
             'mobile.required'                => '手机号不能为空',
             'mobile.regex'                   => '手机号格式不正确',
+            'code.required'                  => '验证码不能为空',
+            'code.size'                      => '验证码必须为6位数字',
         ]);
 
         // AccessAuth 中间件已经根据路径注入了 request_source 和 account_type
@@ -217,6 +220,11 @@ class LoginController extends Controller
         $validSources = array_map(fn($case) => $case->value, RequestSourceEnum::cases());
         if (!in_array($requestSource, $validSources)) {
             throw_exception('请求来源有误');
+        }
+
+        // 验证注册验证码
+        if (!$this->smsService->verifyCode($request['mobile'], $request['code'], SmsTypeEnum::Register)) {
+            throw_exception('验证码错误或已过期');
         }
 
         // 检查用户名是否已存在
