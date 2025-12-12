@@ -15,6 +15,8 @@ Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']
 // 不需要认证的接口
 Route::post('/user/login', [LoginController::class, 'login']);
 Route::post('/admin/login', [LoginController::class, 'login']);
+Route::post('/user/loginByCode', [LoginController::class, 'loginByCode']);
+Route::post('/admin/loginByCode', [LoginController::class, 'loginByCode']);
 
 // API鉴权 用户 路由组
 Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {

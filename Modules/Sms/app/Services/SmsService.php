@@ -31,8 +31,8 @@ class SmsService
         SmsTypeEnum::Login->value         => [
             'code_expire_minutes'   => 5,
             'ip_limit_window'       => 60,
-            'ip_limit_max_requests' => 5,
-            'daily_max_requests'    => 20,
+            'ip_limit_max_requests' => 3,
+            'daily_max_requests'    => 10,
         ],
         // 重置密码验证码
         SmsTypeEnum::ResetPassword->value => [
@@ -46,7 +46,7 @@ class SmsService
             'code_expire_minutes'   => 5,
             'ip_limit_window'       => 60,
             'ip_limit_max_requests' => 3,
-            'daily_max_requests'    => 10,
+            'daily_max_requests'    => 5,
         ],
         // 更换手机号验证码
         SmsTypeEnum::ChangeMobile->value  => [

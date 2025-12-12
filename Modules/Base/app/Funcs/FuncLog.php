@@ -10,13 +10,13 @@ use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 /**
  * 写入日志
- * @param string     $action_type
- * @param string     $content
- * @param array|null $extend_data
+ * @param string $action_type
+ * @param string $content
+ * @param array  $extend_data
  * @return bool
  * @author siushin<siushin@163.com>
  */
-function logging(string $action_type, string $content, array $extend_data = null): bool
+function logging(string $action_type, string $content, array $extend_data = []): bool
 {
     try {
         $account_id = currentUserId() ?? null;
@@ -32,7 +32,8 @@ function logging(string $action_type, string $content, array $extend_data = null
 
         $created_at = getDateTimeArr()['datetime'];
         $extend_data && $extend_data = json_encode($extend_data, JSON_UNESCAPED_UNICODE);
-        $data = compact('account_id', 'source_type', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
+        $id = generateId();
+        $data = compact('id', 'account_id', 'source_type', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
         return SysLog::query()->insert($data);
     } catch (Exception $e) {
         Log::error($e->getMessage());

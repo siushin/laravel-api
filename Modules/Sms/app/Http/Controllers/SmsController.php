@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Sms\Services\SmsService;
 use Psr\SimpleCache\InvalidArgumentException;
+use Siushin\LaravelTool\Enums\LogActionEnum;
 
 /**
  * 控制器：短信服务
@@ -40,9 +41,41 @@ class SmsController extends Controller
         // 校验参数
         $params = $this->smsService->validateParams($request->all());
 
-        // 调用服务类发送验证码
-        $result = $this->smsService->sendVerificationCode($params['mobile'], $params['type']);
+        try {
+            // 调用服务类发送验证码
+            $result = $this->smsService->sendVerificationCode($params['mobile'], $params['type']);
 
-        return success($result, '验证码发送成功');
+            // 发送成功，记录成功日志（包含请求参数和返回结果）
+            $logData = [
+                'request' => [
+                    'mobile' => $params['mobile'],
+                    'type'   => $params['type']->value,
+                ],
+                'result'  => $result,
+            ];
+            logging(LogActionEnum::send_sms->name, "发送短信验证码成功(mobile: {$params['mobile']}, type: {$params['type']->value})", $logData);
+
+            return success([], '验证码发送成功');
+        } catch (Exception $e) {
+            // 解析异常信息：如果是JSON格式，提取message字段；否则直接使用异常消息
+            $errorMessage = $e->getMessage();
+            if (json_validate($errorMessage)) {
+                $errorData = json_decode($errorMessage, true);
+                $errorMessage = $errorData['message'] ?? $errorMessage;
+            }
+
+            // 发送失败，记录失败日志到 sys_logs 表
+            $extendData = [
+                'request' => [
+                    'mobile' => $params['mobile'],
+                    'type'   => $params['type']->value,
+                ],
+                'error'   => $errorMessage,
+            ];
+            logging(LogActionEnum::send_sms->name, "发送短信验证码失败(mobile: {$params['mobile']}, type: {$params['type']->value}, error: {$errorMessage})", $extendData);
+
+            // 重新抛出异常，让框架处理错误响应
+            throw $e;
+        }
     }
 }

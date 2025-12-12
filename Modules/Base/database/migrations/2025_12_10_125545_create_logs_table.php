@@ -14,7 +14,7 @@ return new class extends Migration {
         $source_type_list = array_column(RequestSourceEnum::cases(), 'value');
 
         Schema::create('sys_logs', function (Blueprint $table) use ($source_type_list) {
-            $table->id('log_id')->comment('日志ID');
+            $table->id()->comment('ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID');
             $table->enum('source_type', $source_type_list)->comment('访问来源[' . enum_to_string_chain(RequestSourceEnum::cases()) . ']');
             $table->char('action_type', 20)->comment('操作类型');

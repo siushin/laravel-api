@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Modules\Base\Enums\AccountTypeEnum;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountSocial;
+use Modules\Base\Services\AuthService;
+use Modules\Sms\Enums\SmsTypeEnum;
+use Modules\Sms\Services\SmsService;
+use Psr\SimpleCache\InvalidArgumentException;
 use Siushin\LaravelTool\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
@@ -18,19 +22,24 @@ use Siushin\LaravelTool\Enums\SocialTypeEnum;
  */
 class LoginController extends Controller
 {
-    public int $expire_hour   = 2;
-    public int $expire_minute = 120;
-    public int $expire_second = 7200;
+    /**
+     * 认证服务
+     */
+    private AuthService $authService;
 
-    public function __construct()
+    /**
+     * 短信服务
+     */
+    private SmsService $smsService;
+
+    public function __construct(AuthService $authService, SmsService $smsService)
     {
-        $this->expire_minute = config('sanctum.expiration') ?: $this->expire_minute;
-        $this->expire_hour = $this->expire_minute / 60;
-        $this->expire_second = $this->expire_minute * 60;
+        $this->authService = $authService;
+        $this->smsService = $smsService;
     }
 
     /**
-     * 用户登录
+     * 用户登录（用户名+密码）
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
@@ -44,73 +53,77 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        // AccessAuth 中间件已经根据路径注入了 request_source 和 account_type
-        $requestSource = $request->get('request_source');
-        $accountType = $request->get('account_type');
-
-        // 验证请求来源
-        $validSources = array_map(fn($case) => $case->value, RequestSourceEnum::cases());
-        if (!in_array($requestSource, $validSources)) {
-            throw_exception('请求来源有误');
-        }
+        // 验证请求来源和账号类型
+        $sourceInfo = $this->authService->validateRequestSource($request);
+        $accountType = $sourceInfo['account_type'];
 
         // 尝试认证用户
         $extend_data = ['username' => $request['username']];
 
-        // 先尝试通过用户名查找账号，并根据账号类型筛选
-        $accountQuery = Account::query()->where('username', $request['username']);
+        // 通过用户名、邮箱或手机号查找账号
+        $account = $this->authService->findAccountByIdentifier($request['username'], $accountType);
 
-        // 根据账号类型筛选（account_type 现在是字符串值）
-        if ($accountType) {
-            $accountQuery->where('account_type', $accountType);
-        }
-
-        $account = $accountQuery->first();
-
-        // 如果通过用户名找不到，尝试通过邮箱或手机号在社交网络表中查找
-        if (!$account) {
-            $accountSocial = AccountSocial::query()
-                ->whereIn('social_type', [
-                    SocialTypeEnum::Email->value,
-                    SocialTypeEnum::Mobile->value
-                ])
-                ->where('social_account', $request['username'])
-                ->first();
-
-            if ($accountSocial) {
-                $accountQuery = Account::query()->where('id', $accountSocial->user_id);
-                // 根据账号类型筛选
-                if ($accountType) {
-                    $accountQuery->where('account_type', $accountType);
-                }
-                $account = $accountQuery->first();
-            }
-        }
-
-        if (!$account || !Hash::check($request['password'], $account->password)) {
+        // 验证账号和密码
+        if (!$account || !$this->authService->verifyPassword($account, $request['password'])) {
             logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
             throw_exception('账号或密码不正确');
         }
 
-        // 记录登录信息
-        $account->update([
-            'last_login_ip'   => $request->ip(),
-            'last_login_time' => now(),
-        ]);
+        // 执行登录流程
+        $result = $this->authService->processLogin($account, $request, $request['username'], $extend_data);
 
-        // 认证成功后生成并返回访问令牌
-        $token = $account->createToken(
-            'account_token', ['*'], now()->addHours($this->expire_hour)
-        )->plainTextToken;
-
-        // 获取用户数据（不包括token）
-        $userData = $this->getUserData($account);
-
-        $userData['token'] = self::buildTokenData($token, $this->expire_second);
-        logging(LogActionEnum::login->name, "用户登录系统(account: {$request['username']})", $extend_data);
-        return success($userData, '登录成功');
+        return success($result['user_data'], '登录成功');
     }
 
+    /**
+     * 用户登录（手机号+验证码）
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Exception|InvalidArgumentException
+     * @author siushin<siushin@163.com>
+     */
+    public function loginByCode(Request $request): JsonResponse
+    {
+        // 验证请求数据
+        $request->validate([
+            'mobile' => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
+            'code'   => ['required', 'string', 'size:6'],
+        ], [
+            'mobile.required' => '手机号不能为空',
+            'mobile.regex'    => '手机号格式不正确',
+            'code.required'   => '验证码不能为空',
+            'code.size'       => '验证码必须为6位数字',
+        ]);
+
+        // 验证请求来源和账号类型
+        $sourceInfo = $this->authService->validateRequestSource($request);
+        $accountType = $sourceInfo['account_type'];
+
+        $mobile = $request['mobile'];
+        $code = $request['code'];
+
+        // 验证短信验证码
+        if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::Login)) {
+            $extend_data = ['mobile' => $mobile];
+            logging(LogActionEnum::fail_login->name, "尝试登录，验证码错误(mobile: {$mobile})", $extend_data);
+            throw_exception('验证码错误或已过期');
+        }
+
+        // 通过手机号查找账号
+        $account = $this->authService->findAccountByMobile($mobile, $accountType);
+
+        if (!$account) {
+            $extend_data = ['mobile' => $mobile];
+            logging(LogActionEnum::fail_login->name, "尝试登录，账号不存在(mobile: {$mobile})", $extend_data);
+            throw_exception('该手机号未注册');
+        }
+
+        // 执行登录流程
+        $extend_data = ['mobile' => $mobile];
+        $result = $this->authService->processLogin($account, $request, $mobile, $extend_data);
+
+        return success($result['user_data'], '登录成功');
+    }
 
     /**
      * 退出用户登录
@@ -145,7 +158,7 @@ class LoginController extends Controller
     public function getUserInfo(Request $request): JsonResponse
     {
         $account = $request->user();
-        $userData = $this->getUserData($account);
+        $userData = $this->authService->getUserData($account);
         return success($userData);
     }
 
@@ -157,79 +170,19 @@ class LoginController extends Controller
      */
     public function refreshToken(Request $request): JsonResponse
     {
+        $account = $request->user();
+
         // 将当前使用的token设为过期
-        $currentToken = $request->user()->currentAccessToken();
+        $currentToken = $account->currentAccessToken();
         if ($currentToken) {
             $currentToken->update(['expires_at' => now()]);
         }
 
         // 创建新的token
-        $token = $request->user()->createToken('account_token', ['*'], now()->addHours($this->expire_hour))->plainTextToken;
-        return success(['token' => self::buildTokenData($token, $this->expire_second)]);
+        $token = $this->authService->generateToken($account);
+        return success(['token' => $this->authService->buildTokenData($token)]);
     }
 
-    /**
-     * 获取用户数据（不包括token）
-     * @param Account $account
-     * @return array
-     * @author siushin<siushin@163.com>
-     */
-    private function getUserData(Account $account): array
-    {
-        // 根据账号类型加载对应的数据
-        $userData = $account->toArray();
-
-        // 加载对应的类型信息并合并到$userData
-        if ($account->account_type === AccountTypeEnum::Admin) {
-            $typeInfo = $account->adminInfo;
-            if ($typeInfo) {
-                // 只返回需要的字段：company_id, department_id，并合并到$userData
-                $userData = array_merge($userData, $typeInfo->only(['company_id', 'department_id']));
-            }
-        } elseif ($account->account_type === AccountTypeEnum::User) {
-            $typeInfo = $account->customerInfo;
-            if ($typeInfo) {
-                // User表只有id和user_id，没有其他业务字段，无需合并
-            }
-        }
-
-        // 加载账号资料信息并合并到$userData
-        $profile = $account->profile;
-        if ($profile) {
-            // 只返回需要的字段：real_name, gender, avatar，并合并到$userData
-            $userData = array_merge($userData, $profile->only(['real_name', 'gender', 'avatar']));
-        }
-
-        // 加载所有已验证的社交信息
-        $socialAccounts = $account->socialAccounts()
-            ->where('is_verified', true)
-            ->get()
-            ->map(function ($social) {
-                // 只返回需要的字段：social_type, social_account, social_name, avatar
-                return $social->only(['social_type', 'social_account', 'social_name', 'avatar']);
-            })
-            ->toArray();
-        $userData['social_accounts'] = $socialAccounts;
-
-        return $userData;
-    }
-
-    /**
-     * 构造 token 结构体
-     * @param string $token
-     * @param int    $expire_second
-     * @return array
-     * @author siushin<siushin@163.com>
-     */
-    private function buildTokenData(string $token, int $expire_second): array
-    {
-        return [
-            'token_type'    => 'Bearer',
-            'expires_in'    => $expire_second,
-            'access_token'  => $token,
-            'refresh_token' => $token,
-        ];
-    }
 
     /**
      * 用户注册
