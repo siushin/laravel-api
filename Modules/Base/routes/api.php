@@ -7,7 +7,6 @@ use Modules\Base\Http\Controllers\LogController;
 use Modules\Base\Http\Controllers\LoginController;
 use Modules\Base\Http\Controllers\OrganizationController;
 use Modules\Base\Http\Controllers\AccountController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 公共路由
@@ -18,7 +17,7 @@ Route::post('/user/login', [LoginController::class, 'login']);
 Route::post('/admin/login', [LoginController::class, 'login']);
 
 // API鉴权 用户 路由组
-Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {
     // 用户 鉴权信息
     Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
@@ -27,7 +26,7 @@ Route::prefix('/user')->middleware(['auth:sanctum'])->group(function () {
 });
 
 // API鉴权 管理员 路由组
-Route::prefix('/admin')->middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     // 管理员 鉴权信息
     Route::post('/info', [LoginController::class, 'getUserInfo']);
     Route::post('/refreshToken', [LoginController::class, 'refreshToken']);

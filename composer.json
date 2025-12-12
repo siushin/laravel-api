@@ -34,7 +34,10 @@
             "Database\\Seeders\\": "database/seeders/",
             "Modules\\Base\\": "Modules/Base/app/",
             "Modules\\Base\\Database\\Factories\\": "Modules/Base/database/factories/",
-            "Modules\\Base\\Database\\Seeders\\": "Modules/Base/database/seeders/"
+            "Modules\\Base\\Database\\Seeders\\": "Modules/Base/database/seeders/",
+            "Modules\\Sms\\": "Modules/Sms/app/",
+            "Modules\\Sms\\Database\\Factories\\": "Modules/Sms/database/factories/",
+            "Modules\\Sms\\Database\\Seeders\\": "Modules/Sms/database/seeders/"
         },
         "files": [
             "Modules/Base/app/Funcs/FuncLog.php"

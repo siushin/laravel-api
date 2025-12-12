@@ -1,7 +1,7 @@
 {
     "name": "Base",
-    "alias": "LaravelAPI基础模块",
-    "description": "LaravelAPI 基础模块，勿删除！",
+    "alias": "基础服务",
+    "description": "LaravelAPI 基础服务，勿删除！",
     "keywords": [],
     "priority": 0,
     "providers": [
