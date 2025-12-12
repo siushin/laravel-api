@@ -27,7 +27,7 @@ return new class extends Migration {
 
             $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
             $table->index(['user_id', 'social_type']);
-            $table->unique(['user_id', 'social_type', 'social_account'], 'account_social_unique');
+            $table->unique(['social_type', 'social_account'], 'account_social_unique');
             $table->comment('账号社交网络表');
         });
     }

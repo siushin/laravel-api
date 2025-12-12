@@ -105,7 +105,10 @@ class AccountController extends Controller
 
         // 验证短信验证码
         if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::Login)) {
-            $extend_data = ['mobile' => $mobile];
+            $extend_data = [
+                'mobile' => $mobile,
+                'code' => $code,
+            ];
             logging(LogActionEnum::fail_login->name, "尝试登录，验证码错误(mobile: {$mobile})", $extend_data);
             throw_exception('验证码错误或已过期');
         }
@@ -114,13 +117,19 @@ class AccountController extends Controller
         $account = $this->authService->findAccountByMobile($mobile, $accountType);
 
         if (!$account) {
-            $extend_data = ['mobile' => $mobile];
+            $extend_data = [
+                'mobile' => $mobile,
+                'code' => $code,
+            ];
             logging(LogActionEnum::fail_login->name, "尝试登录，账号不存在(mobile: {$mobile})", $extend_data);
             throw_exception('该手机号未注册');
         }
 
         // 执行登录流程
-        $extend_data = ['mobile' => $mobile];
+        $extend_data = [
+            'mobile' => $mobile,
+            'code' => $code,
+        ];
         $result = $this->authService->processLogin($account, $request, $mobile, $extend_data);
 
         return success($result['user_data'], '登录成功');
@@ -271,7 +280,11 @@ class AccountController extends Controller
         ]);
 
         // 记录注册日志
-        $extend_data = ['username' => $request['username'], 'mobile' => $request['mobile']];
+        $extend_data = [
+            'username' => $request['username'],
+            'mobile' => $request['mobile'],
+            'code' => $request['code'],
+        ];
         logging(LogActionEnum::login->name, "用户注册成功(account: {$request['username']})", $extend_data);
 
         return success([], '注册成功');
@@ -310,7 +323,10 @@ class AccountController extends Controller
 
         // 验证重置密码验证码
         if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::ResetPassword)) {
-            $extend_data = ['mobile' => $mobile];
+            $extend_data = [
+                'mobile' => $mobile,
+                'code' => $code,
+            ];
             logging(LogActionEnum::reset_password->name, "尝试重置密码，验证码错误(mobile: {$mobile})", $extend_data);
             throw_exception('验证码错误或已过期');
         }
@@ -319,7 +335,10 @@ class AccountController extends Controller
         $account = $this->authService->findAccountByMobile($mobile, null);
 
         if (!$account) {
-            $extend_data = ['mobile' => $mobile];
+            $extend_data = [
+                'mobile' => $mobile,
+                'code' => $code,
+            ];
             logging(LogActionEnum::reset_password->name, "尝试重置密码，账号不存在(mobile: {$mobile})", $extend_data);
             throw_exception('该手机号未注册');
         }
@@ -332,8 +351,12 @@ class AccountController extends Controller
 
         Account::updatePassword($params);
 
-        // 记录重置密码日志
-        $extend_data = ['mobile' => $mobile, 'username' => $account->username];
+        // 记录重置密码日志（不包含密码）
+        $extend_data = [
+            'mobile' => $mobile,
+            'code' => $code,
+            'username' => $account->username,
+        ];
         logging(LogActionEnum::reset_password->name, "用户重置密码成功(mobile: {$mobile})", $extend_data);
 
         return success([], '密码重置成功');
