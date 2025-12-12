@@ -1,6 +1,6 @@
 {
-    "name": "laravel-api/base",
-    "description": "LaravelAPI 基础服务",
+    "name": "laravel-api/sms",
+    "description": "LaravelAPI 短信服务",
     "authors": [
         {
             "name": "siushin",
@@ -15,9 +15,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Base\\": "app/",
-            "Modules\\Base\\Database\\Factories\\": "database/factories/",
-            "Modules\\Base\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Sms\\": "app/",
+            "Modules\\Sms\\Database\\Factories\\": "database/factories/",
+            "Modules\\Sms\\Database\\Seeders\\": "database/seeders/"
         }
-    }
+    },
 }
