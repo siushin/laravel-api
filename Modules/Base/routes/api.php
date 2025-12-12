@@ -4,7 +4,6 @@ use Modules\Base\Http\Controllers\DictionaryCategoryController;
 use Modules\Base\Http\Controllers\DictionaryController;
 use Modules\Base\Http\Controllers\FileController;
 use Modules\Base\Http\Controllers\LogController;
-use Modules\Base\Http\Controllers\LoginController;
 use Modules\Base\Http\Controllers\OrganizationController;
 use Modules\Base\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
@@ -13,27 +12,27 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);  // 下载数据字典模板
 
 // 不需要认证的接口
-Route::post('/user/login', [LoginController::class, 'login']);
-Route::post('/admin/login', [LoginController::class, 'login']);
-Route::post('/user/loginByCode', [LoginController::class, 'loginByCode']);
-Route::post('/admin/loginByCode', [LoginController::class, 'loginByCode']);
+Route::post('/user/login', [AccountController::class, 'login']);
+Route::post('/admin/login', [AccountController::class, 'login']);
+Route::post('/user/loginByCode', [AccountController::class, 'loginByCode']);
+Route::post('/admin/loginByCode', [AccountController::class, 'loginByCode']);
 
 // API鉴权 用户 路由组
 Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {
     // 用户 鉴权信息
-    Route::post('/info', [LoginController::class, 'getUserInfo']);
-    Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
+    Route::post('/info', [AccountController::class, 'getUserInfo']);
+    Route::post('/refreshToken', [AccountController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
-    Route::post('/logout', [LoginController::class, 'logout']);
+    Route::post('/logout', [AccountController::class, 'logout']);
 });
 
 // API鉴权 管理员 路由组
 Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     // 管理员 鉴权信息
-    Route::post('/info', [LoginController::class, 'getUserInfo']);
-    Route::post('/refreshToken', [LoginController::class, 'refreshToken']);
+    Route::post('/info', [AccountController::class, 'getUserInfo']);
+    Route::post('/refreshToken', [AccountController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
-    Route::post('/logout', [LoginController::class, 'logout']);
+    Route::post('/logout', [AccountController::class, 'logout']);
 
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
