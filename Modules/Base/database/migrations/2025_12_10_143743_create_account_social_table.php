@@ -11,34 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // 从枚举注释中提取中文描述的辅助函数
-        $getEnumComment = function (SocialTypeEnum $case): ?string {
-            $reflection = new \ReflectionClass(SocialTypeEnum::class);
-            $file = $reflection->getFileName();
-            if ($file && file_exists($file)) {
-                $lines = file($file);
-                // 查找匹配的 case 行
-                foreach ($lines as $line) {
-                    // 匹配 case CaseName = 'value'; // 中文描述
-                    if (preg_match('/case\s+' . preg_quote($case->name, '/') . '\s*=\s*[\'"]' . preg_quote($case->value, '/') . '[\'"]\s*;\s*\/\/\s*(.+)/', $line, $matches)) {
-                        return trim($matches[1]);
-                    }
-                }
-            }
-            return null;
-        };
-
-        // 生成带中文描述的注释字符串
-        $commentParts = [];
-        foreach (SocialTypeEnum::cases() as $case) {
-            $description = $getEnumComment($case);
-            if ($description) {
-                $commentParts[] = $case->value . ':' . $description;
-            } else {
-                $commentParts[] = $case->value;
-            }
-        }
-        $socialTypeComment = '社交类型[' . implode(',', $commentParts) . ']';
+        $socialTypeComment = buildEnumComment(SocialTypeEnum::cases(), '社交类型');
 
         Schema::create('bs_account_social', function (Blueprint $table) use ($socialTypeComment) {
             $table->id()->comment('社交网络ID');

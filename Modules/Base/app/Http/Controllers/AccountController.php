@@ -4,6 +4,7 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Enums\AccountTypeEnum;
 use Modules\Base\Models\Account;
+use Modules\Base\Models\AccountProfile;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -252,6 +253,13 @@ class AccountController extends Controller
             'password'     => Hash::make($request['password']),
             'account_type' => $accountType ?: AccountTypeEnum::User->value,
             'status'       => 1,
+        ]);
+
+        // 创建账号资料记录
+        AccountProfile::create([
+            'id'        => generateId(),
+            'user_id'   => $account->id,
+            'nickname' => $request['username'],
         ]);
 
         // 创建手机号社交账号记录

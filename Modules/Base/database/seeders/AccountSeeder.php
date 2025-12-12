@@ -54,7 +54,7 @@ class AccountSeeder extends Seeder
             AccountProfile::query()->create([
                 'id' => generateId(),
                 'user_id' => $account->id,
-                'real_name' => $generateRandomName(),
+                'nickname' => $generateRandomName(),
                 'gender' => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
                 'avatar' => null,
             ]);
@@ -126,7 +126,7 @@ class AccountSeeder extends Seeder
             AccountProfile::query()->updateOrCreate(
                 ['user_id' => $adminAccount->id],
                 [
-                    'real_name' => env('APP_ADMIN_NAME', '超级管理员'),
+                    'nickname' => env('APP_ADMIN_NAME', '超级管理员'),
                     'gender' => GenderTypeEnum::male->name,
                 ]
             );

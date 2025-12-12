@@ -15,9 +15,17 @@ class AccountProfile extends Model
     protected $fillable = [
         'id',
         'user_id',
-        'real_name',
+        'nickname',
         'gender',
         'avatar',
+        'real_name',
+        'id_card',
+        'verification_method',
+        'verified_at',
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 
     /**

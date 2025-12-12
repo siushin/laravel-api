@@ -40,7 +40,8 @@
             "Modules\\Sms\\Database\\Seeders\\": "Modules/Sms/database/seeders/"
         },
         "files": [
-            "Modules/Base/app/Funcs/FuncLog.php"
+            "Modules/Base/app/Funcs/FuncLog.php",
+            "Modules/Base/app/Funcs/FuncHelper.php"
         ]
     },
     "autoload-dev": {

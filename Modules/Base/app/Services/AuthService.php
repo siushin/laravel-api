@@ -238,8 +238,8 @@ class AuthService
         // 加载账号资料信息并合并到$userData
         $profile = $account->profile;
         if ($profile) {
-            // 只返回需要的字段：real_name, gender, avatar，并合并到$userData
-            $userData = array_merge($userData, $profile->only(['real_name', 'gender', 'avatar']));
+            // 只返回需要的字段：nickname, gender, avatar，并合并到$userData
+            $userData = array_merge($userData, $profile->only(['nickname', 'gender', 'avatar']));
         }
 
         // 加载所有已验证的社交信息

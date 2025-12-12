@@ -64,12 +64,19 @@ class SysLog extends Model
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));
-        $user_list = \Modules\Base\Models\Account::query()->whereIn('id', $user_ids)->select(['username', 'real_name', 'id'])->get()->toArray();
+        $user_list = \Modules\Base\Models\Account::query()
+            ->whereIn('id', $user_ids)
+            ->with('profile')
+            ->select(['username', 'id'])
+            ->get()
+            ->toArray();
         $user_list = array_column($user_list, null, 'id');
 
         foreach ($data['data'] as &$item) {
             if (isset($user_list[$item['user_id']])) {
-                $item['username'] = "{$user_list[$item['user_id']]['real_name']}({$user_list[$item['user_id']]['username']})";
+                $nickname = $user_list[$item['user_id']]['profile']['nickname'] ?? '';
+                $username = $user_list[$item['user_id']]['username'];
+                $item['username'] = $nickname ? "{$nickname}({$username})" : $username;
             } else {
                 $item['username'] = '';
             }

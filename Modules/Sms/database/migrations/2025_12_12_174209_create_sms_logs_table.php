@@ -15,31 +15,7 @@ return new class extends Migration {
         $smsTypeList = array_column(SmsTypeEnum::cases(), 'value');
         $sourceTypeList = array_column(RequestSourceEnum::cases(), 'value');
 
-        // 生成短信类型注释
-        $getEnumComment = function (SmsTypeEnum $case): ?string {
-            $reflection = new \ReflectionClass(SmsTypeEnum::class);
-            $file = $reflection->getFileName();
-            if ($file && file_exists($file)) {
-                $lines = file($file);
-                foreach ($lines as $line) {
-                    if (preg_match('/case\s+' . preg_quote($case->name, '/') . '\s*=\s*[\'"]' . preg_quote($case->value, '/') . '[\'"]\s*;\s*\/\/\s*(.+)/', $line, $matches)) {
-                        return trim($matches[1]);
-                    }
-                }
-            }
-            return null;
-        };
-
-        $commentParts = [];
-        foreach (SmsTypeEnum::cases() as $case) {
-            $description = $getEnumComment($case);
-            if ($description) {
-                $commentParts[] = $case->value . ':' . $description;
-            } else {
-                $commentParts[] = $case->value;
-            }
-        }
-        $smsTypeComment = '短信类型[' . implode(',', $commentParts) . ']';
+        $smsTypeComment = buildEnumComment(SmsTypeEnum::cases(), '短信类型');
 
         Schema::create('sms_logs', function (Blueprint $table) use ($smsTypeList, $sourceTypeList, $smsTypeComment) {
             $table->id()->comment('ID');
