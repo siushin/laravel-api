@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\LaravelTool\Utils\Tree;
 use Siushin\Util\Traits\ParamTool;

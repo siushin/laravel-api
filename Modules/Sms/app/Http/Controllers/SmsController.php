@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Sms\Services\SmsService;
 use Psr\SimpleCache\InvalidArgumentException;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 
 /**
  * 控制器：短信服务

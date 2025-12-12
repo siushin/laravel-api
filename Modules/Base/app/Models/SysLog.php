@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Siushin\LaravelTool\Cases\Json;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;

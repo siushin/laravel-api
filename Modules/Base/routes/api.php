@@ -18,6 +18,8 @@ Route::post('/user/loginByCode', [AccountController::class, 'loginByCode']);
 Route::post('/admin/loginByCode', [AccountController::class, 'loginByCode']);
 Route::post('/user/register', [AccountController::class, 'register']);
 Route::post('/admin/register', [AccountController::class, 'register']);
+Route::post('/user/resetPassword', [AccountController::class, 'resetPassword']);
+Route::post('/admin/resetPassword', [AccountController::class, 'resetPassword']);
 
 // API鉴权 用户 路由组
 Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {

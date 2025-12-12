@@ -6,7 +6,7 @@ use Modules\Base\Models\SysLog;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 class LogController extends Controller

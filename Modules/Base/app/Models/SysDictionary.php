@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Siushin\LaravelTool\Cases\Json;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
@@ -49,11 +49,11 @@ class SysDictionary extends Model
         $category_id = SysDictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
         $data = self::fastGetPageData(self::query(), $params, [
-            'category_id' => '=',
-            'parent_id' => '=',
-            'dictionary_name' => 'like',
+            'category_id'      => '=',
+            'parent_id'        => '=',
+            'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
-            'time_range' => 'created_at',
+            'time_range'       => 'created_at',
         ], ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'created_at']);
         return self::appendParentData($data);
     }
@@ -72,11 +72,11 @@ class SysDictionary extends Model
         $category_id = SysDictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
         $data = self::fastGetAllData(self::class, $params, [
-            'category_id' => '=',
-            'parent_id' => '=',
-            'dictionary_name' => 'like',
+            'category_id'      => '=',
+            'parent_id'        => '=',
+            'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
-            'time_range' => 'created_at',
+            'time_range'       => 'created_at',
         ], $fields);
         return ($fields && in_array('parent_name', $fields)) ? self::appendParentData($data, 'all') : $data;
     }

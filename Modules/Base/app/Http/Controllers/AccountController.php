@@ -14,7 +14,7 @@ use Modules\Base\Services\AuthService;
 use Modules\Sms\Enums\SmsTypeEnum;
 use Modules\Sms\Services\SmsService;
 use Psr\SimpleCache\InvalidArgumentException;
-use Siushin\LaravelTool\Enums\LogActionEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -196,21 +196,21 @@ class AccountController extends Controller
     {
         // 验证请求数据
         $request->validate([
-            'username'              => ['required', 'string', 'max:255'],
-            'password'              => ['required', 'string', 'min:6'],
-            'password_confirmation' => ['required', 'string', 'same:password'],
-            'mobile'                => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
-            'code'                  => ['required', 'string', 'size:6'],
+            'username'         => ['required', 'string', 'max:255'],
+            'password'         => ['required', 'string', 'min:6'],
+            'confirm_password' => ['required', 'string', 'same:password'],
+            'mobile'           => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
+            'code'             => ['required', 'string', 'size:6'],
         ], [
-            'username.required'              => '用户名不能为空',
-            'password.required'              => '密码不能为空',
-            'password.min'                   => '密码长度至少6位',
-            'password_confirmation.required' => '确认密码不能为空',
-            'password_confirmation.same'     => '两次输入的密码不一致',
-            'mobile.required'                => '手机号不能为空',
-            'mobile.regex'                   => '手机号格式不正确',
-            'code.required'                  => '验证码不能为空',
-            'code.size'                      => '验证码必须为6位数字',
+            'username.required'         => '用户名不能为空',
+            'password.required'         => '密码不能为空',
+            'password.min'              => '密码长度至少6位',
+            'confirm_password.required' => '确认密码不能为空',
+            'confirm_password.same'     => '两次输入的密码不一致',
+            'mobile.required'           => '手机号不能为空',
+            'mobile.regex'              => '手机号格式不正确',
+            'code.required'             => '验证码不能为空',
+            'code.size'                 => '验证码必须为6位数字',
         ]);
 
         // AccessAuth 中间件已经根据路径注入了 request_source 和 account_type
@@ -257,8 +257,8 @@ class AccountController extends Controller
 
         // 创建账号资料记录
         AccountProfile::create([
-            'id'        => generateId(),
-            'user_id'   => $account->id,
+            'id'       => generateId(),
+            'user_id'  => $account->id,
             'nickname' => $request['username'],
         ]);
 
@@ -275,6 +275,68 @@ class AccountController extends Controller
         logging(LogActionEnum::login->name, "用户注册成功(account: {$request['username']})", $extend_data);
 
         return success([], '注册成功');
+    }
+
+    /**
+     * 重置密码
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Exception|InvalidArgumentException
+     * @author siushin<siushin@163.com>
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        // 验证请求数据
+        $request->validate([
+            'mobile'           => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
+            'code'             => ['required', 'string', 'size:6'],
+            'password'         => ['required', 'string', 'min:6'],
+            'confirm_password' => ['required', 'string', 'same:password'],
+        ], [
+            'mobile.required'           => '手机号不能为空',
+            'mobile.regex'              => '手机号格式不正确',
+            'code.required'             => '验证码不能为空',
+            'code.size'                 => '验证码必须为6位数字',
+            'password.required'         => '新密码不能为空',
+            'password.string'           => '新密码必须是字符串',
+            'password.min'              => '密码长度至少6位',
+            'confirm_password.required' => '确认新密码不能为空',
+            'confirm_password.string'   => '确认新密码必须是字符串',
+            'confirm_password.same'     => '两次输入的密码不一致',
+        ]);
+
+        $mobile = $request['mobile'];
+        $code = $request['code'];
+
+        // 验证重置密码验证码
+        if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::ResetPassword)) {
+            $extend_data = ['mobile' => $mobile];
+            logging(LogActionEnum::reset_password->name, "尝试重置密码，验证码错误(mobile: {$mobile})", $extend_data);
+            throw_exception('验证码错误或已过期');
+        }
+
+        // 通过手机号查找账号（不限制账号类型）
+        $account = $this->authService->findAccountByMobile($mobile, null);
+
+        if (!$account) {
+            $extend_data = ['mobile' => $mobile];
+            logging(LogActionEnum::reset_password->name, "尝试重置密码，账号不存在(mobile: {$mobile})", $extend_data);
+            throw_exception('该手机号未注册');
+        }
+
+        // 更新密码
+        $params = [
+            'user_id'  => $account->id,
+            'password' => $request->input('password'),
+        ];
+
+        Account::updatePassword($params);
+
+        // 记录重置密码日志
+        $extend_data = ['mobile' => $mobile, 'username' => $account->username];
+        logging(LogActionEnum::reset_password->name, "用户重置密码成功(mobile: {$mobile})", $extend_data);
+
+        return success([], '密码重置成功');
     }
 
     /**
