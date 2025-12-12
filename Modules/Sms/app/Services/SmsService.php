@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Sms\Enums\SmsTypeEnum;
+use Modules\Sms\Models\SmsLog;
 use Psr\SimpleCache\InvalidArgumentException;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 /**
  * 短信服务类
@@ -110,36 +112,57 @@ class SmsService
         $typeValue = $type->value;
         $config = $this->getTypeConfig($typeValue);
 
-        // 获取 IP 地址
+        // 获取 IP 地址和相关信息
         $ip = request()->ip();
+        $accountId = currentUserId() ?? null;
+        $sourceType = request()->request_source ?? RequestSourceEnum::guest->value;
 
-        // IP 频繁请求限制检查
-        $this->checkIpLimit($ip, $typeValue, $config);
+        try {
+            // IP 频繁请求限制检查
+            $this->checkIpLimit($ip, $typeValue, $config);
 
-        // 检查当天手机号请求总次数限制
-        $this->checkDailyLimit($mobile, $typeValue, $config);
+            // 检查当天手机号请求总次数限制
+            $this->checkDailyLimit($mobile, $typeValue, $config);
 
-        // 生成6位随机数字验证码
-        $code = $this->generateCode();
+            // 生成6位随机数字验证码
+            $code = $this->generateCode();
 
-        // 存储验证码到 Redis，设置过期时间
-        $codeKey = $this->getCodeKey($mobile, $typeValue);
-        Cache::store('redis')->put($codeKey, $code, now()->addMinutes($config['code_expire_minutes']));
+            // 存储验证码到 Redis，设置过期时间
+            $codeKey = $this->getCodeKey($mobile, $typeValue);
+            Cache::store('redis')->put($codeKey, $code, now()->addMinutes($config['code_expire_minutes']));
 
-        // 记录 IP 请求次数
-        $this->incrementIpCount($ip, $typeValue, $config);
+            // 记录 IP 请求次数
+            $this->incrementIpCount($ip, $typeValue, $config);
 
-        // 记录当天手机号请求次数
-        $this->incrementDailyCount($mobile, $typeValue, $config);
+            // 记录当天手机号请求次数
+            $this->incrementDailyCount($mobile, $typeValue, $config);
 
-        // TODO: 实际项目中这里应该调用短信服务商 API 发送短信
-        // 目前暂时返回验证码（仅用于开发测试）
-        return [
-            'mobile' => $mobile,
-            'type'   => $typeValue,
-            'code'   => $code, // 开发阶段返回验证码，生产环境应移除
-            'expire' => $config['code_expire_minutes'],
-        ];
+            // TODO: 实际项目中这里应该调用短信服务商 API 发送短信
+            // 目前暂时返回验证码（仅用于开发测试）
+
+            // 记录成功日志到 sms_logs 表
+            $this->logSmsSend($mobile, $type, $code, $config['code_expire_minutes'], $ip, $accountId, $sourceType, true);
+
+            return [
+                'mobile' => $mobile,
+                'type'   => $typeValue,
+                'code'   => $code, // 开发阶段返回验证码，生产环境应移除
+                'expire' => $config['code_expire_minutes'],
+            ];
+        } catch (Exception $e) {
+            // 解析异常信息
+            $errorMessage = $e->getMessage();
+            if (json_validate($errorMessage)) {
+                $errorData = json_decode($errorMessage, true);
+                $errorMessage = $errorData['message'] ?? $errorMessage;
+            }
+
+            // 记录失败日志到 sms_logs 表
+            $this->logSmsSend($mobile, $type, null, null, $ip, $accountId, $sourceType, false, $errorMessage);
+
+            // 重新抛出异常
+            throw $e;
+        }
     }
 
     /**
@@ -319,6 +342,65 @@ class SmsService
     private function generateCode(): string
     {
         return str_pad((string)mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * 记录短信发送日志到 sms_logs 表
+     * @param string      $mobile        手机号
+     * @param SmsTypeEnum $type          短信类型
+     * @param string|null $code          验证码
+     * @param int|null    $expireMinutes 过期时间（分钟）
+     * @param string      $ip            IP地址
+     * @param int|null    $accountId     账号ID
+     * @param string      $sourceType    访问来源
+     * @param bool        $status        发送状态：true成功，false失败
+     * @param string|null $errorMessage  错误信息
+     * @return void
+     * @author siushin<siushin@163.com>
+     */
+    private function logSmsSend(
+        string      $mobile,
+        SmsTypeEnum $type,
+        ?string     $code,
+        ?int        $expireMinutes,
+        string      $ip,
+        ?int        $accountId,
+        string      $sourceType,
+        bool        $status,
+        ?string     $errorMessage = null
+    ): void
+    {
+        try {
+            // 获取 IP 归属地
+            $ipLocation = '';
+            try {
+                $ip2region = new \Ip2Region();
+                $ipLocation = $ip2region->simple($ip);
+            } catch (Exception $e) {
+                // IP 归属地获取失败，忽略
+            }
+
+            // 准备日志数据
+            $logData = [
+                'account_id'     => $accountId,
+                'source_type'    => $sourceType,
+                'sms_type'       => $type->value,
+                'mobile'         => $mobile,
+                'code'           => $code,
+                'status'         => $status ? 1 : 0,
+                'error_message'  => $errorMessage,
+                'ip_address'     => $ip,
+                'ip_location'    => $ipLocation,
+                'expire_minutes' => $expireMinutes,
+                'created_at'     => now(),
+            ];
+
+            // 插入日志记录
+            SmsLog::query()->insert($logData);
+        } catch (Exception $e) {
+            // 日志记录失败不影响主流程，静默处理
+            // 可以记录到 Laravel 日志，但根据用户要求不记录
+        }
     }
 }
 
