@@ -5,6 +5,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -15,9 +16,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // 将CORS中间件前置到全局中间件，确保在所有请求之前执行
+        $middleware->prepend(HandleCors::class);
+        // 将CORS中间件也前置到API路由组（双重保险）
+        $middleware->api(prepend: [
+            HandleCors::class,
+        ]);
+        // 将AccessAuth中间件追加到API路由组（在CORS之后执行）
+        $middleware->api(append: [
+            AccessAuth::class,
+        ]);
         // 跳过所有CSRF保护
         $middleware->validateCsrfTokens(except: ['*']);
-        $middleware->append(AccessAuth::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // 将 所有 异常 呈现为 JSON
