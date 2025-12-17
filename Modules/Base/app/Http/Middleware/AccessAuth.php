@@ -22,8 +22,8 @@ class AccessAuth
     {
         $path = $request->path();
 
-        // 默认请求来源（匿名访问）
-        $requestSource = RequestSourceEnum::guest->value;
+        // 默认请求来源（Web端）
+        $requestSource = RequestSourceEnum::web->value;
 
         // 根据路由动态分配请求来源
         if (str_starts_with($path, 'api/admin/')) {

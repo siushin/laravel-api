@@ -54,15 +54,11 @@ class AccountController extends Controller
             'password' => ['required'],
         ]);
 
-        // 验证请求来源和账号类型
-        $sourceInfo = $this->authService->validateRequestSource($request);
-        $accountType = $sourceInfo['account_type'];
-
         // 尝试认证用户
         $extend_data = ['username' => $request['username']];
 
         // 通过用户名、邮箱或手机号查找账号
-        $account = $this->authService->findAccountByIdentifier($request['username'], $accountType);
+        $account = $this->authService->findAccountByIdentifier($request['username']);
 
         // 验证账号和密码
         if (!$account || !$this->authService->verifyPassword($account, $request['password'])) {
@@ -96,10 +92,6 @@ class AccountController extends Controller
             'code.size'       => '验证码必须为6位数字',
         ]);
 
-        // 验证请求来源和账号类型
-        $sourceInfo = $this->authService->validateRequestSource($request);
-        $accountType = $sourceInfo['account_type'];
-
         $mobile = $request['mobile'];
         $code = $request['code'];
 
@@ -107,28 +99,31 @@ class AccountController extends Controller
         if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::Login)) {
             $extend_data = [
                 'mobile' => $mobile,
-                'code' => $code,
+                'code'   => $code,
             ];
             logging(LogActionEnum::fail_login->name, "尝试登录，验证码错误(mobile: {$mobile})", $extend_data);
             throw_exception('验证码错误或已过期');
         }
 
-        // 通过手机号查找账号
-        $account = $this->authService->findAccountByMobile($mobile, $accountType);
+        // 通过手机号查找账号（不限制账号类型，直接从数据库读取）
+        $account = $this->authService->findAccountByMobile($mobile, null);
 
         if (!$account) {
             $extend_data = [
                 'mobile' => $mobile,
-                'code' => $code,
+                'code'   => $code,
             ];
             logging(LogActionEnum::fail_login->name, "尝试登录，账号不存在(mobile: {$mobile})", $extend_data);
             throw_exception('该手机号未注册');
         }
 
+        // 账号类型直接从 bs_account 表的 account_type 字段读取
+        // $account->account_type 已经包含了该用户的账号类型
+
         // 执行登录流程
         $extend_data = [
             'mobile' => $mobile,
-            'code' => $code,
+            'code'   => $code,
         ];
         $result = $this->authService->processLogin($account, $request, $mobile, $extend_data);
 
@@ -282,8 +277,8 @@ class AccountController extends Controller
         // 记录注册日志
         $extend_data = [
             'username' => $request['username'],
-            'mobile' => $request['mobile'],
-            'code' => $request['code'],
+            'mobile'   => $request['mobile'],
+            'code'     => $request['code'],
         ];
         logging(LogActionEnum::login->name, "用户注册成功(account: {$request['username']})", $extend_data);
 
@@ -325,7 +320,7 @@ class AccountController extends Controller
         if (!$this->smsService->verifyCode($mobile, $code, SmsTypeEnum::ResetPassword)) {
             $extend_data = [
                 'mobile' => $mobile,
-                'code' => $code,
+                'code'   => $code,
             ];
             logging(LogActionEnum::reset_password->name, "尝试重置密码，验证码错误(mobile: {$mobile})", $extend_data);
             throw_exception('验证码错误或已过期');
@@ -337,7 +332,7 @@ class AccountController extends Controller
         if (!$account) {
             $extend_data = [
                 'mobile' => $mobile,
-                'code' => $code,
+                'code'   => $code,
             ];
             logging(LogActionEnum::reset_password->name, "尝试重置密码，账号不存在(mobile: {$mobile})", $extend_data);
             throw_exception('该手机号未注册');
@@ -353,8 +348,8 @@ class AccountController extends Controller
 
         // 记录重置密码日志（不包含密码）
         $extend_data = [
-            'mobile' => $mobile,
-            'code' => $code,
+            'mobile'   => $mobile,
+            'code'     => $code,
             'username' => $account->username,
         ];
         logging(LogActionEnum::reset_password->name, "用户重置密码成功(mobile: {$mobile})", $extend_data);

@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);  // 下载数据字典模板
 
 // 不需要认证的接口
-Route::post('/user/login', [AccountController::class, 'login']);
-Route::post('/admin/login', [AccountController::class, 'login']);
+Route::post('/login/account', [AccountController::class, 'login']);
 Route::post('/user/loginByCode', [AccountController::class, 'loginByCode']);
 Route::post('/admin/loginByCode', [AccountController::class, 'loginByCode']);
 Route::post('/user/register', [AccountController::class, 'register']);
