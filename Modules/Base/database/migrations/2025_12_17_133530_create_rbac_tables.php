@@ -1,5 +1,6 @@
 <?php
 
+use Modules\Base\Enums\AccountTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,25 +11,36 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        $accountTypeComment = buildEnumComment(AccountTypeEnum::cases(), '账号类型');
+
         // 角色表
-        Schema::create('sys_role', function (Blueprint $table) {
+        Schema::create('sys_role', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('role_id')->comment('角色ID');
+            $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
+                ->default(AccountTypeEnum::Admin->value)
+                ->comment($accountTypeComment);
             $table->string('role_name', 50)->comment('角色名称');
-            $table->string('role_code', 50)->unique()->comment('角色编码');
+            $table->string('role_code', 50)->comment('角色编码');
             $table->string('description')->nullable()->comment('角色描述');
             $table->tinyInteger('status')->default(1)->comment('状态: 1启用, 0禁用');
             $table->unsignedInteger('sort')->default(0)->comment('排序');
             $table->timestamps();
             $table->softDeletes()->comment('软删除时间');
 
+            // 同一账号类型下角色编码唯一
+            $table->unique(['account_type', 'role_code'], 'uk_role_account_type_code');
+            $table->index('account_type');
             $table->index('status');
             $table->index('sort');
             $table->comment('角色表');
         });
 
         // 菜单表
-        Schema::create('sys_menu', function (Blueprint $table) {
+        Schema::create('sys_menu', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('menu_id')->comment('菜单ID');
+            $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
+                ->default(AccountTypeEnum::Admin->value)
+                ->comment($accountTypeComment);
             $table->string('menu_name', 50)->comment('菜单名称');
             $table->string('menu_path', 200)->nullable()->comment('路由路径');
             $table->string('menu_icon', 50)->nullable()->comment('图标名称');
@@ -39,6 +51,9 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes()->comment('软删除时间');
 
+            // 同一账号类型下，路径唯一（如果路径不为空）
+            // 注意：parent_id=0时表示顶级菜单，parent_id>0时表示子菜单
+            $table->index('account_type');
             $table->index('parent_id');
             $table->index('menu_type');
             $table->index('status');
@@ -65,6 +80,10 @@ return new class extends Migration {
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
+            // 同一用户不能重复分配同一角色
+            // 注意：应用层需要校验用户账号类型与角色账号类型一致
+            // admin用户只能分配account_type='admin'的角色
+            // user用户只能分配account_type='user'的角色
             $table->unique(['user_id', 'role_id'], 'uk_user_role');
             $table->index('user_id');
             $table->index('role_id');
@@ -90,6 +109,9 @@ return new class extends Migration {
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
+            // 注意：应用层需要校验角色账号类型与菜单账号类型一致
+            // admin角色只能关联account_type='admin'的菜单
+            // user角色只能关联account_type='user'的菜单
             $table->unique(['role_id', 'menu_id'], 'uk_role_menu');
             $table->index('role_id');
             $table->index('menu_id');
