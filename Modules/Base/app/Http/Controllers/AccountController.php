@@ -66,7 +66,7 @@ class AccountController extends Controller
             throw_exception('账号或密码不正确');
         }
 
-        // 执行登录流程
+        // 执行登录流程（账号密码登录类型为 'account'）
         $result = $this->authService->processLogin($account, $request, $request['username'], $extend_data);
 
         return success($result['user_data'], '登录成功');
@@ -117,15 +117,12 @@ class AccountController extends Controller
             throw_exception('该手机号未注册');
         }
 
-        // 账号类型直接从 bs_account 表的 account_type 字段读取
-        // $account->account_type 已经包含了该用户的账号类型
-
-        // 执行登录流程
+        // 执行登录流程（手机验证码登录类型为 'mobile'）
         $extend_data = [
             'mobile' => $mobile,
             'code'   => $code,
         ];
-        $result = $this->authService->processLogin($account, $request, $mobile, $extend_data);
+        $result = $this->authService->processLogin($account, $request, $mobile, $extend_data, 'mobile');
 
         return success($result['user_data'], '登录成功');
     }
@@ -155,12 +152,12 @@ class AccountController extends Controller
     }
 
     /**
-     * 获取用户信息
+     * 获取当前登录用户信息
      * @param Request $request
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    public function getUserInfo(Request $request): JsonResponse
+    public function getCurrentUserInfo(Request $request): JsonResponse
     {
         $account = $request->user();
         $userData = $this->authService->getUserData($account);

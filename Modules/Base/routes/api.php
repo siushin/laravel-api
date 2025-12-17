@@ -13,17 +13,13 @@ Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']
 
 // 不需要认证的接口
 Route::post('/login/account', [AccountController::class, 'login']);
-Route::post('/user/loginByCode', [AccountController::class, 'loginByCode']);
-Route::post('/admin/loginByCode', [AccountController::class, 'loginByCode']);
-Route::post('/user/register', [AccountController::class, 'register']);
-Route::post('/admin/register', [AccountController::class, 'register']);
-Route::post('/user/resetPassword', [AccountController::class, 'resetPassword']);
-Route::post('/admin/resetPassword', [AccountController::class, 'resetPassword']);
+Route::post('/login/code', [AccountController::class, 'loginByCode']);
+Route::post('/resetPassword', [AccountController::class, 'resetPassword']);
+Route::post('/register', [AccountController::class, 'register']);
 
-// API鉴权 用户 路由组
-Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {
-    // 用户 鉴权信息
-    Route::post('/info', [AccountController::class, 'getUserInfo']);
+// API鉴权 通用接口（不区分用户类型）
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/currentUser', [AccountController::class, 'getCurrentUserInfo']);
     Route::post('/refreshToken', [AccountController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
     Route::post('/logout', [AccountController::class, 'logout']);
@@ -31,12 +27,6 @@ Route::middleware(['auth:sanctum'])->prefix('/user')->group(function () {
 
 // API鉴权 管理员 路由组
 Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
-    // 管理员 鉴权信息
-    Route::post('/info', [AccountController::class, 'getUserInfo']);
-    Route::post('/refreshToken', [AccountController::class, 'refreshToken']);
-    Route::post('/changePassword', [AccountController::class, 'changePassword']);
-    Route::post('/logout', [AccountController::class, 'logout']);
-
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
     Route::post('/file/delete', [FileController::class, 'delete']);     // 删除文件

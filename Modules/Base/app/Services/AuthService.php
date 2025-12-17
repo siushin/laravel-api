@@ -277,9 +277,10 @@ class AuthService
      * @param Request    $request    请求对象
      * @param string     $identifier 登录标识符（用于日志记录）
      * @param array|null $extendData 扩展数据（用于日志记录）
+     * @param string     $loginType  登录类型：account 或 mobile
      * @return array ['user_data' => array, 'token' => array]
      */
-    public function processLogin(Account $account, Request $request, string $identifier, ?array $extendData = null): array
+    public function processLogin(Account $account, Request $request, string $identifier, ?array $extendData = null, string $loginType = 'account'): array
     {
         // 更新登录信息
         $this->updateLoginInfo($account, $request);
@@ -292,6 +293,12 @@ class AuthService
 
         // 添加token到用户数据
         $userData['token'] = $this->buildTokenData($token);
+
+        // 添加登录类型
+        $userData['type'] = $loginType;
+
+        // 添加用户权限（根据账号类型动态返回）
+        $userData['currentAuthority'] = $account->account_type;
 
         // 记录登录日志
         $logData = $extendData ?? ['username' => $identifier];
