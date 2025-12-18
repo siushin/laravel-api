@@ -42,6 +42,27 @@ class MenuSeeder extends Seeder
             'updated_at'   => $now,
         ]);
 
+        $userManagementId = generateId();
+        DB::table('sys_menu')->insert([
+            'menu_id'      => $userManagementId,
+            'account_type' => $accountType,
+            'menu_name'    => '用户管理',
+            'menu_key'     => 'user.management',
+            'menu_path'    => '/user',
+            'menu_icon'    => 'TeamOutlined',
+            'menu_type'    => 'menu',
+            'parent_id'    => 0,
+            'component'    => null,
+            'redirect'     => '/user/account',
+            'layout'       => true,
+            'access'       => 'canAdmin',
+            'wrappers'     => null,
+            'sort'         => 2,
+            'status'       => 1,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+        ]);
+
         $notificationId = generateId();
         DB::table('sys_menu')->insert([
             'menu_id'      => $notificationId,
@@ -57,7 +78,7 @@ class MenuSeeder extends Seeder
             'layout'       => true,
             'access'       => 'canAdmin',
             'wrappers'     => null,
-            'sort'         => 2,
+            'sort'         => 3,
             'status'       => 1,
             'created_at'   => $now,
             'updated_at'   => $now,
@@ -74,11 +95,11 @@ class MenuSeeder extends Seeder
             'menu_type'    => 'menu',
             'parent_id'    => 0,
             'component'    => null,
-            'redirect'     => '/system/user',
+            'redirect'     => '/system/admin',
             'layout'       => true,
             'access'       => 'canAdmin',
             'wrappers'     => null,
-            'sort'         => 3,
+            'sort'         => 4,
             'status'       => 1,
             'created_at'   => $now,
             'updated_at'   => $now,
@@ -196,6 +217,64 @@ class MenuSeeder extends Seeder
                 'menu_icon'    => $child['menu_icon'],
                 'menu_type'    => 'menu',
                 'parent_id'    => $systemId,
+                'component'    => $child['component'],
+                'redirect'     => null,
+                'layout'       => true,
+                'access'       => 'canAdmin',
+                'wrappers'     => null,
+                'sort'         => $child['sort'],
+                'status'       => 1,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
+
+        // 插入用户管理的子菜单
+        $userManagementChildren = [
+            [
+                'menu_name' => '账号管理',
+                'menu_key'  => 'user.account',
+                'menu_path' => '/user/account',
+                'menu_icon' => 'IdcardOutlined',
+                'component' => './User/Account',
+                'sort'      => 1,
+            ],
+            [
+                'menu_name' => '用户管理',
+                'menu_key'  => 'user.user',
+                'menu_path' => '/user/user',
+                'menu_icon' => 'UserOutlined',
+                'component' => './User/User',
+                'sort'      => 2,
+            ],
+            [
+                'menu_name' => '账号资料',
+                'menu_key'  => 'user.profile',
+                'menu_path' => '/user/profile',
+                'menu_icon' => 'ProfileOutlined',
+                'component' => './User/Profile',
+                'sort'      => 3,
+            ],
+            [
+                'menu_name' => '社交绑定',
+                'menu_key'  => 'user.social',
+                'menu_path' => '/user/social',
+                'menu_icon' => 'ShareAltOutlined',
+                'component' => './User/Social',
+                'sort'      => 4,
+            ],
+        ];
+
+        foreach ($userManagementChildren as $child) {
+            DB::table('sys_menu')->insert([
+                'menu_id'      => generateId(),
+                'account_type' => $accountType,
+                'menu_name'    => $child['menu_name'],
+                'menu_key'     => $child['menu_key'],
+                'menu_path'    => $child['menu_path'],
+                'menu_icon'    => $child['menu_icon'],
+                'menu_type'    => 'menu',
+                'parent_id'    => $userManagementId,
                 'component'    => $child['component'],
                 'redirect'     => null,
                 'layout'       => true,

@@ -91,7 +91,7 @@ class MenuController extends Controller
             if ($menu['parent_id'] == $parentId) {
                 $menuItem = [
                     'path'      => $menu['menu_path'],
-                    'key'       => $menu['menu_key'],
+                    'name'      => $menu['menu_key'],
                     'title'     => $menu['menu_name'],
                     'icon'      => $menu['menu_icon'],
                     'component' => $menu['component'],
