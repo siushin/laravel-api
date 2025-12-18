@@ -7,6 +7,7 @@ use Modules\Base\Http\Controllers\LogController;
 use Modules\Base\Http\Controllers\MenuController;
 use Modules\Base\Http\Controllers\OrganizationController;
 use Modules\Base\Http\Controllers\AccountController;
+use Modules\Base\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
 
 // 公共路由
@@ -57,4 +58,7 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/log/index', [LogController::class, 'index']);
     Route::post('/log/getSourceTypeList', [LogController::class, 'getSourceTypeList']);
     Route::post('/log/getActionList', [LogController::class, 'getActionList']);
+
+    // 应用管理
+    Route::post('/app/myApps', [AppController::class, 'getMyApps']);  // 获取我的应用列表
 });
