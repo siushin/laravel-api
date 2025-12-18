@@ -16,7 +16,7 @@ return new class extends Migration {
         // 角色表
         Schema::create('sys_role', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('role_id')->comment('角色ID');
-            $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
+            $table->string('account_type', 20)
                 ->default(AccountTypeEnum::Admin->value)
                 ->comment($accountTypeComment);
             $table->string('role_name', 50)->comment('角色名称');
@@ -38,7 +38,7 @@ return new class extends Migration {
         // 菜单表
         Schema::create('sys_menu', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('menu_id')->comment('菜单ID');
-            $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
+            $table->string('account_type', 20)
                 ->default(AccountTypeEnum::Admin->value)
                 ->comment($accountTypeComment);
             $table->string('menu_name', 50)->comment('菜单名称');
@@ -46,7 +46,7 @@ return new class extends Migration {
             $table->string('menu_path', 200)->nullable()->comment('路由路径');
             $table->string('component', 200)->nullable()->comment('组件路径（相对路径，如：./Dashboard/Workplace）');
             $table->string('menu_icon', 50)->nullable()->comment('图标名称');
-            $table->enum('menu_type', ['menu', 'button'])->default('menu')->comment('类型: menu菜单, button按钮');
+            $table->string('menu_type', 20)->default('menu')->comment('类型: menu菜单, button按钮');
             $table->unsignedBigInteger('parent_id')->default(0)->comment('父菜单ID, 0表示顶级菜单');
             $table->string('redirect', 200)->nullable()->comment('重定向路径');
             $table->boolean('layout')->nullable()->comment('是否使用布局: true使用, false不使用, null默认');

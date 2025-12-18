@@ -6,8 +6,10 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\Base\Enums\LogActionEnum;
+use Ip2Region;
+use Modules\Base\Models\AccountSocial;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
+use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
  * 日志服务类
@@ -17,11 +19,11 @@ class LogService
 {
     /**
      * 记录登录日志
-     * @param Request      $request  请求对象
-     * @param int|null     $accountId 账号ID
-     * @param string|null  $username 用户名
-     * @param int          $status   登录状态：1成功，0失败
-     * @param string|null  $message  登录信息/错误信息
+     * @param Request     $request   请求对象
+     * @param int|null    $accountId 账号ID
+     * @param string|null $username  用户名
+     * @param int         $status    登录状态：1成功，0失败
+     * @param string|null $message   登录信息/错误信息
      * @return bool
      */
     public function logLogin(Request $request, ?int $accountId = null, ?string $username = null, int $status = 1, ?string $message = null): bool
@@ -42,19 +44,19 @@ class LogService
             }
 
             $data = [
-                'id' => generateId(),
-                'account_id' => $accountId,
-                'username' => $username,
-                'status' => $status,
-                'ip_address' => $ipAddress,
-                'ip_location' => $ipLocation,
-                'browser' => $browserInfo['browser'],
-                'browser_version' => $browserInfo['browser_version'],
+                'id'               => generateId(),
+                'account_id'       => $accountId,
+                'username'         => $username,
+                'status'           => $status,
+                'ip_address'       => $ipAddress,
+                'ip_location'      => $ipLocation,
+                'browser'          => $browserInfo['browser'],
+                'browser_version'  => $browserInfo['browser_version'],
                 'operating_system' => $browserInfo['os'],
-                'device_type' => $browserInfo['device_type'],
-                'user_agent' => $userAgent,
-                'message' => $message,
-                'login_at' => now(),
+                'device_type'      => $browserInfo['device_type'],
+                'user_agent'       => $userAgent,
+                'message'          => $message,
+                'login_at'         => now(),
             ];
 
             return DB::table('sys_login_log')->insert($data);
@@ -66,28 +68,29 @@ class LogService
 
     /**
      * 记录操作日志
-     * @param Request      $request      请求对象
-     * @param int|null     $accountId    账号ID
-     * @param string       $module       模块名称
-     * @param string       $action       操作类型（如：create, update, delete, export）
-     * @param string       $method       HTTP方法
-     * @param string       $path         请求路径
-     * @param array|null   $params       请求参数
-     * @param int|null     $responseCode 响应状态码
-     * @param int|null     $executionTime 执行耗时（毫秒）
+     * @param Request    $request       请求对象
+     * @param int|null   $accountId     账号ID
+     * @param string     $module        模块名称
+     * @param string     $action        操作类型（如：create, update, delete, export）
+     * @param string     $method        HTTP方法
+     * @param string     $path          请求路径
+     * @param array|null $params        请求参数
+     * @param int|null   $responseCode  响应状态码
+     * @param int|null   $executionTime 执行耗时（毫秒）
      * @return bool
      */
     public function logOperation(
         Request $request,
-        ?int $accountId = null,
-        string $module = '',
-        string $action = '',
-        string $method = '',
-        string $path = '',
-        ?array $params = null,
-        ?int $responseCode = null,
-        ?int $executionTime = null
-    ): bool {
+        ?int    $accountId = null,
+        string  $module = '',
+        string  $action = '',
+        string  $method = '',
+        string  $path = '',
+        ?array  $params = null,
+        ?int    $responseCode = null,
+        ?int    $executionTime = null
+    ): bool
+    {
         try {
             $sourceType = $request->get('request_source') ?? RequestSourceEnum::guest->value;
             $ipAddress = $request->ip();
@@ -97,20 +100,20 @@ class LogService
             $ipLocation = $this->getIpLocation($ipAddress);
 
             $data = [
-                'id' => generateId(),
-                'account_id' => $accountId,
-                'source_type' => $sourceType,
-                'module' => $module,
-                'action' => $action,
-                'method' => $method,
-                'path' => $path,
-                'params' => $params ? json_encode($params, JSON_UNESCAPED_UNICODE) : null,
-                'ip_address' => $ipAddress,
-                'ip_location' => $ipLocation,
-                'user_agent' => $userAgent,
-                'response_code' => $responseCode,
+                'id'             => generateId(),
+                'account_id'     => $accountId,
+                'source_type'    => $sourceType,
+                'module'         => $module,
+                'action'         => $action,
+                'method'         => $method,
+                'path'           => $path,
+                'params'         => $params ? json_encode($params, JSON_UNESCAPED_UNICODE) : null,
+                'ip_address'     => $ipAddress,
+                'ip_location'    => $ipLocation,
+                'user_agent'     => $userAgent,
+                'response_code'  => $responseCode,
                 'execution_time' => $executionTime,
-                'operated_at' => now(),
+                'operated_at'    => now(),
             ];
 
             return DB::table('sys_operation_log')->insert($data);
@@ -122,28 +125,29 @@ class LogService
 
     /**
      * 记录审计日志
-     * @param Request      $request      请求对象
-     * @param int|null     $accountId    操作人ID
-     * @param string       $module       模块名称
-     * @param string       $action       操作类型（如：权限变更、角色分配、数据导出、配置修改）
-     * @param string|null  $resourceType 资源类型（如：user, role, menu, config）
-     * @param int|null     $resourceId   资源ID
-     * @param array|null   $beforeData   变更前数据
-     * @param array|null   $afterData    变更后数据
-     * @param string|null  $description  操作描述
+     * @param Request     $request      请求对象
+     * @param int|null    $accountId    操作人ID
+     * @param string      $module       模块名称
+     * @param string      $action       操作类型（如：权限变更、角色分配、数据导出、配置修改）
+     * @param string|null $resourceType 资源类型（如：user, role, menu, config）
+     * @param int|null    $resourceId   资源ID
+     * @param array|null  $beforeData   变更前数据
+     * @param array|null  $afterData    变更后数据
+     * @param string|null $description  操作描述
      * @return bool
      */
     public function logAudit(
         Request $request,
-        ?int $accountId = null,
-        string $module = '',
-        string $action = '',
+        ?int    $accountId = null,
+        string  $module = '',
+        string  $action = '',
         ?string $resourceType = null,
-        ?int $resourceId = null,
-        ?array $beforeData = null,
-        ?array $afterData = null,
+        ?int    $resourceId = null,
+        ?array  $beforeData = null,
+        ?array  $afterData = null,
         ?string $description = null
-    ): bool {
+    ): bool
+    {
         try {
             $ipAddress = $request->ip();
             $userAgent = $request->userAgent() ?? '';
@@ -152,19 +156,19 @@ class LogService
             $ipLocation = $this->getIpLocation($ipAddress);
 
             $data = [
-                'id' => generateId(),
-                'account_id' => $accountId,
-                'module' => $module,
-                'action' => $action,
+                'id'            => generateId(),
+                'account_id'    => $accountId,
+                'module'        => $module,
+                'action'        => $action,
                 'resource_type' => $resourceType,
-                'resource_id' => $resourceId,
-                'before_data' => $beforeData ? json_encode($beforeData, JSON_UNESCAPED_UNICODE) : null,
-                'after_data' => $afterData ? json_encode($afterData, JSON_UNESCAPED_UNICODE) : null,
-                'description' => $description,
-                'ip_address' => $ipAddress,
-                'ip_location' => $ipLocation,
-                'user_agent' => $userAgent,
-                'audited_at' => now(),
+                'resource_id'   => $resourceId,
+                'before_data'   => $beforeData ? json_encode($beforeData, JSON_UNESCAPED_UNICODE) : null,
+                'after_data'    => $afterData ? json_encode($afterData, JSON_UNESCAPED_UNICODE) : null,
+                'description'   => $description,
+                'ip_address'    => $ipAddress,
+                'ip_location'   => $ipLocation,
+                'user_agent'    => $userAgent,
+                'audited_at'    => now(),
             ];
 
             return DB::table('sys_audit_log')->insert($data);
@@ -176,10 +180,10 @@ class LogService
 
     /**
      * 记录通用日志（兼容原有的logging函数）
-     * @param string       $actionType  操作类型（对应LogActionEnum）
-     * @param string       $content     日志内容
-     * @param array        $extendData  扩展数据
-     * @param int|null     $accountId   账号ID（可选，如果不提供会尝试从请求中获取）
+     * @param string   $actionType 操作类型（对应LogActionEnum）
+     * @param string   $content    日志内容
+     * @param array    $extendData 扩展数据
+     * @param int|null $accountId  账号ID（可选，如果不提供会尝试从请求中获取）
      * @return bool
      */
     public function logGeneral(string $actionType, string $content, array $extendData = [], ?int $accountId = null): bool
@@ -193,8 +197,8 @@ class LogService
 
                 // 如果仍然为空，且 extend_data 中包含 phone，尝试通过手机号查找
                 if (!$accountId && !empty($extendData['phone'])) {
-                    $accountSocial = \Modules\Base\Models\AccountSocial::query()
-                        ->where('social_type', \Siushin\LaravelTool\Enums\SocialTypeEnum::Phone->value)
+                    $accountSocial = AccountSocial::query()
+                        ->where('social_type', SocialTypeEnum::Phone->value)
                         ->where('social_account', $extendData['phone'])
                         ->first();
 
@@ -211,15 +215,15 @@ class LogService
             $ipLocation = $this->getIpLocation($ipAddress);
 
             $data = [
-                'log_id' => generateId(),
-                'account_id' => $accountId,
+                'log_id'      => generateId(),
+                'account_id'  => $accountId,
                 'source_type' => $sourceType,
                 'action_type' => $actionType,
-                'content' => $content,
-                'ip_address' => $ipAddress, // Laravel的ipAddress()默认字段名是ip_address
+                'content'     => $content,
+                'ip_address'  => $ipAddress,
                 'ip_location' => $ipLocation,
                 'extend_data' => !empty($extendData) ? json_encode($extendData, JSON_UNESCAPED_UNICODE) : null,
-                'created_at' => now(),
+                'created_at'  => now(),
             ];
 
             return DB::table('sys_logs')->insert($data);
@@ -243,10 +247,10 @@ class LogService
 
         if (empty($userAgent)) {
             return [
-                'browser' => null,
+                'browser'         => null,
                 'browser_version' => null,
-                'os' => null,
-                'device_type' => null,
+                'os'              => null,
+                'device_type'     => null,
             ];
         }
 
@@ -287,10 +291,10 @@ class LogService
         }
 
         return [
-            'browser' => $browser,
+            'browser'         => $browser,
             'browser_version' => $browserVersion,
-            'os' => $os,
-            'device_type' => $deviceType,
+            'os'              => $os,
+            'device_type'     => $deviceType,
         ];
     }
 
@@ -303,7 +307,7 @@ class LogService
     {
         try {
             if (class_exists('Ip2Region')) {
-                $ip2region = new \Ip2Region();
+                $ip2region = new Ip2Region();
                 return $ip2region->simple($ipAddress);
             }
         } catch (Exception $e) {

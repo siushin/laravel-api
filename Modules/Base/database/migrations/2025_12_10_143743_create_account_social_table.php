@@ -16,7 +16,7 @@ return new class extends Migration {
         Schema::create('bs_account_social', function (Blueprint $table) use ($socialTypeComment) {
             $table->id()->comment('社交网络ID');
             $table->unsignedBigInteger('user_id')->comment('账号ID');
-            $table->enum('social_type', array_column(SocialTypeEnum::cases(), 'value'))
+            $table->string('social_type', 20)
                 ->comment($socialTypeComment);
             $table->string('social_account', 100)->comment('社交账号');
             $table->string('social_name', 50)->nullable()->comment('社交昵称');

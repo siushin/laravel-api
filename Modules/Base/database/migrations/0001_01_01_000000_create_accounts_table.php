@@ -15,7 +15,7 @@ return new class extends Migration {
 
         Schema::create('bs_account', function (Blueprint $table) use ($accountTypeComment) {
             $table->id()->comment('账号ID');
-            $table->enum('account_type', array_column(AccountTypeEnum::cases(), 'value'))
+            $table->string('account_type', 20)
                 ->default(AccountTypeEnum::User->value)
                 ->comment($accountTypeComment);
             $table->string('username', 50)->unique()->comment('用户名');

@@ -12,16 +12,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        $smsTypeList = array_column(SmsTypeEnum::cases(), 'value');
-        $sourceTypeList = array_column(RequestSourceEnum::cases(), 'value');
-
+        // 构造枚举备注
+        $sourceTypeComment = buildEnumComment(RequestSourceEnum::cases(), '访问来源');
         $smsTypeComment = buildEnumComment(SmsTypeEnum::cases(), '短信类型');
 
-        Schema::create('sms_logs', function (Blueprint $table) use ($smsTypeList, $sourceTypeList, $smsTypeComment) {
+        Schema::create('sms_logs', function (Blueprint $table) use ($sourceTypeComment, $smsTypeComment) {
             $table->id()->comment('ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID');
-            $table->enum('source_type', $sourceTypeList)->comment('访问来源[' . enum_to_string_chain(RequestSourceEnum::cases()) . ']');
-            $table->enum('sms_type', $smsTypeList)->comment($smsTypeComment);
+            $table->string('source_type', 50)->comment($sourceTypeComment);
+            $table->string('sms_type', 20)->comment($smsTypeComment);
             $table->string('phone', 11)->comment('手机号');
             $table->string('code', 6)->nullable()->comment('验证码（仅开发环境可见）');
             $table->tinyInteger('status')->default(1)->comment('发送状态:1成功,0失败');

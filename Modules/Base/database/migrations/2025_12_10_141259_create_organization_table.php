@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->char('organization_name')->comment('组织架构名称');
             $table->unsignedBigInteger('organization_pid')->comment('上级组织架构ID');
             $table->char('full_organization_pid')->comment('完整上级组织架构ID');
-            $table->enum('organization_type', array_column(OrganizationTypeEnum::cases(), 'value'))
+            $table->string('organization_type', 20)
                 ->default(OrganizationTypeEnum::Default->value)
                 ->comment($organizationTypeComment);
             $table->timestamps();
