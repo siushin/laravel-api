@@ -52,6 +52,7 @@ return new class extends Migration {
             $table->boolean('layout')->nullable()->comment('是否使用布局: true使用, false不使用, null默认');
             $table->string('access', 100)->nullable()->comment('权限控制（如：canAdmin）');
             $table->text('wrappers')->nullable()->comment('包装组件（JSON数组格式）');
+            $table->tinyInteger('is_required')->default(0)->comment('是否必须选中: 1必须选中, 0非必须');
             $table->unsignedInteger('sort')->default(0)->comment('排序');
             $table->tinyInteger('status')->default(1)->comment('状态: 1启用, 0禁用');
             $table->timestamps();
@@ -63,6 +64,7 @@ return new class extends Migration {
             $table->index('parent_id');
             $table->index('menu_type');
             $table->index('status');
+            $table->index('is_required');
             $table->index('sort');
             $table->index('name');
             $table->comment('菜单表');

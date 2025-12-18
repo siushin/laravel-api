@@ -61,10 +61,73 @@ class Account extends Authenticatable
     protected function casts(): array
     {
         return [
-            'last_login_time'   => 'datetime',
-            'password'          => 'hashed',
-            'account_type'      => AccountTypeEnum::class,
+            'last_login_time' => 'datetime',
+            'password'        => 'hashed',
+            'account_type'    => AccountTypeEnum::class,
         ];
+    }
+
+    /**
+     * 获取 is_super 属性（访问器）
+     * 从关联的 adminInfo 中获取，如果已通过 setAttribute 设置则直接返回
+     * @return int|null
+     */
+    public function getIsSuperAttribute(): ?int
+    {
+        // 如果已经通过 setAttribute 设置，直接返回
+        if (array_key_exists('is_super', $this->attributes)) {
+            return $this->attributes['is_super'];
+        }
+
+        // 否则从关联关系获取
+        if ($this->account_type === AccountTypeEnum::Admin) {
+            $adminInfo = $this->relationLoaded('adminInfo') ? $this->adminInfo : $this->adminInfo;
+            return $adminInfo?->is_super;
+        }
+
+        return null;
+    }
+
+    /**
+     * 获取 company_id 属性（访问器）
+     * 从关联的 adminInfo 中获取，如果已通过 setAttribute 设置则直接返回
+     * @return int|null
+     */
+    public function getCompanyIdAttribute(): ?int
+    {
+        // 如果已经通过 setAttribute 设置，直接返回
+        if (array_key_exists('company_id', $this->attributes)) {
+            return $this->attributes['company_id'];
+        }
+
+        // 否则从关联关系获取
+        if ($this->account_type === AccountTypeEnum::Admin) {
+            $adminInfo = $this->relationLoaded('adminInfo') ? $this->adminInfo : $this->adminInfo;
+            return $adminInfo?->company_id;
+        }
+
+        return null;
+    }
+
+    /**
+     * 获取 department_id 属性（访问器）
+     * 从关联的 adminInfo 中获取，如果已通过 setAttribute 设置则直接返回
+     * @return int|null
+     */
+    public function getDepartmentIdAttribute(): ?int
+    {
+        // 如果已经通过 setAttribute 设置，直接返回
+        if (array_key_exists('department_id', $this->attributes)) {
+            return $this->attributes['department_id'];
+        }
+
+        // 否则从关联关系获取
+        if ($this->account_type === AccountTypeEnum::Admin) {
+            $adminInfo = $this->relationLoaded('adminInfo') ? $this->adminInfo : $this->adminInfo;
+            return $adminInfo?->department_id;
+        }
+
+        return null;
     }
 
     /**

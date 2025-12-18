@@ -84,7 +84,7 @@ class AuthService
 
     /**
      * 通过手机号查找账号
-     * @param string      $phone      手机号
+     * @param string      $phone       手机号
      * @param string|null $accountType 账号类型
      * @return Account|null
      */
@@ -225,8 +225,7 @@ class AuthService
         if ($account->account_type === AccountTypeEnum::Admin) {
             $typeInfo = $account->adminInfo;
             if ($typeInfo) {
-                // 只返回需要的字段：company_id, department_id，并合并到$userData
-                $userData = array_merge($userData, $typeInfo->only(['company_id', 'department_id']));
+                $userData = array_merge($userData, $typeInfo->only(['company_id', 'department_id', 'is_super']));
             }
         } elseif ($account->account_type === AccountTypeEnum::User) {
             $typeInfo = $account->customerInfo;

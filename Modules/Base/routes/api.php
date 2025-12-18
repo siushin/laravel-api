@@ -4,6 +4,7 @@ use Modules\Base\Http\Controllers\DictionaryCategoryController;
 use Modules\Base\Http\Controllers\DictionaryController;
 use Modules\Base\Http\Controllers\FileController;
 use Modules\Base\Http\Controllers\LogController;
+use Modules\Base\Http\Controllers\MenuController;
 use Modules\Base\Http\Controllers\OrganizationController;
 use Modules\Base\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/refreshToken', [AccountController::class, 'refreshToken']);
     Route::post('/changePassword', [AccountController::class, 'changePassword']);
     Route::post('/logout', [AccountController::class, 'logout']);
+    Route::post('/getUserMenus', [MenuController::class, 'getUserMenus']);
 });
 
 // API鉴权 管理员 路由组
