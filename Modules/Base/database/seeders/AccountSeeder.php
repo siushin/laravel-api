@@ -189,12 +189,19 @@ class AccountSeeder extends Seeder
 
             // 如果原本是客户类型，需要创建管理员信息（原本是管理员类型的话，前面循环中已创建）
             if ($wasCustomer) {
+                // 新创建的管理员标记为超级管理员
                 Admin::query()->create([
                     'id' => generateId(),
                     'user_id' => $adminAccount->id,
                     'company_id' => null,
                     'department_id' => null,
+                    'is_super' => 1,
                 ]);
+            } else {
+                // 原本就是管理员类型，直接将对应管理员标记为超级管理员
+                Admin::query()
+                    ->where('user_id', $adminAccount->id)
+                    ->update(['is_super' => 1]);
             }
         }
     }

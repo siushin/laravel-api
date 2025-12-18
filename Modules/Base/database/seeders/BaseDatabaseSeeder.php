@@ -15,6 +15,7 @@ class BaseDatabaseSeeder extends Seeder
             \Modules\Base\Database\Seeders\DictionarySeeder::class,
             \Modules\Base\Database\Seeders\OrganizationSeeder::class,
             \Modules\Base\Database\Seeders\AccountSeeder::class,
+            \Modules\Base\Database\Seeders\MenuSeeder::class,
         ]);
     }
 }

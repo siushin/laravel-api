@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id')->unique()->comment('用户ID');
             $table->unsignedBigInteger('company_id')->nullable()->comment('所属公司ID');
             $table->unsignedBigInteger('department_id')->nullable()->comment('所属部门ID');
+            $table->tinyInteger('is_super')->default(0)->comment('是否超级管理员：1是，0否');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
