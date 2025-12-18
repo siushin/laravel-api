@@ -9,6 +9,7 @@ use Modules\Base\Enums\AccountTypeEnum;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountSocial;
 use Modules\Base\Enums\LogActionEnum;
+use Modules\Base\Services\LogService;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -299,7 +300,11 @@ class AuthService
         // 添加用户权限（根据账号类型动态返回）
         $userData['currentAuthority'] = $account->account_type;
 
-        // 记录登录日志
+        // 记录登录日志到 sys_login_log
+        $logService = app(LogService::class);
+        $logService->logLogin($request, $account->id, $account->username, 1, '登录成功');
+
+        // 记录通用日志（兼容原有逻辑）
         $logData = $extendData ?? ['username' => $identifier];
         logging(LogActionEnum::login->name, "用户登录系统(account: {$identifier})", $logData);
 

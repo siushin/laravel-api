@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Modules\Base\Models\AccountSocial;
 use Modules\Base\Services\AuthService;
+use Modules\Base\Services\LogService;
 use Modules\Sms\Enums\SmsTypeEnum;
 use Modules\Sms\Services\SmsService;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -33,10 +34,16 @@ class AccountController extends Controller
      */
     private SmsService $smsService;
 
-    public function __construct(AuthService $authService, SmsService $smsService)
+    /**
+     * 日志服务
+     */
+    private LogService $logService;
+
+    public function __construct(AuthService $authService, SmsService $smsService, LogService $logService)
     {
         $this->authService = $authService;
         $this->smsService = $smsService;
+        $this->logService = $logService;
     }
 
     /**
@@ -62,6 +69,10 @@ class AccountController extends Controller
 
         // 验证账号和密码
         if (!$account || !$this->authService->verifyPassword($account, $request['password'])) {
+            // 记录登录失败日志到 sys_login_log
+            $this->logService->logLogin($request, $account?->id, $request['username'], 0, '账号或密码不正确');
+
+            // 记录通用日志（兼容原有逻辑）
             logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
             throw_exception('账号或密码不正确');
         }
@@ -97,6 +108,9 @@ class AccountController extends Controller
 
         // 验证短信验证码
         if (!$this->smsService->verifyCode($phone, $code, SmsTypeEnum::Login)) {
+            // 记录登录失败日志到 sys_login_log
+            $this->logService->logLogin($request, null, $phone, 0, '验证码错误或已过期');
+
             $extend_data = [
                 'phone' => $phone,
                 'code'  => $code,
@@ -109,6 +123,9 @@ class AccountController extends Controller
         $account = $this->authService->findAccountByPhone($phone);
 
         if (!$account) {
+            // 记录登录失败日志到 sys_login_log
+            $this->logService->logLogin($request, null, $phone, 0, '该手机号未注册');
+
             $extend_data = [
                 'phone' => $phone,
                 'code'  => $code,

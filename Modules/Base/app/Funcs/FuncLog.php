@@ -6,12 +6,13 @@
 
 use Modules\Base\Models\AccountSocial;
 use Modules\Base\Models\SysLog;
+use Modules\Base\Services\LogService;
 use Illuminate\Support\Facades\Log;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
- * 写入日志
+ * 写入日志（通用日志）
  * @param string $action_type
  * @param string $content
  * @param array  $extend_data
@@ -21,48 +22,10 @@ use Siushin\LaravelTool\Enums\SocialTypeEnum;
 function logging(string $action_type, string $content, array $extend_data = []): bool
 {
     try {
-        $account_id = currentUserId() ?? null;
-
-        // 如果 account_id 为空，且 extend_data 中包含 phone，尝试通过手机号查找 user_id
-        if (!$account_id) {
-            $phone = null;
-
-            // 尝试从 extend_data 中提取手机号（支持多种格式）
-            if (!empty($extend_data['phone'])) {
-                $phone = $extend_data['phone'];
-            } elseif (!empty($extend_data['request']['phone'])) {
-                $phone = $extend_data['request']['phone'];
-            }
-
-            if ($phone) {
-                $accountSocial = AccountSocial::query()
-                    ->where('social_type', SocialTypeEnum::Phone->value)
-                    ->where('social_account', $phone)
-                    ->first();
-
-                if ($accountSocial) {
-                    $account_id = $accountSocial->user_id;
-                }
-            }
-        }
-
-        $source_type = request()->request_source ?? RequestSourceEnum::guest->value;
-        $ip_address = request()->ip();
-
-        $ip2region = new Ip2Region();
-        try {
-            $ip_location = $ip2region->simple($ip_address);
-        } catch (Exception $e) {
-            $ip_location = '';
-        }
-
-        $created_at = getDateTimeArr()['datetime'];
-        $extend_data && $extend_data = json_encode($extend_data, JSON_UNESCAPED_UNICODE);
-        $id = generateId();
-        $data = compact('id', 'account_id', 'source_type', 'action_type', 'content', 'ip_address', 'ip_location', 'extend_data', 'created_at');
-        return SysLog::query()->insert($data);
+        $logService = app(LogService::class);
+        return $logService->logGeneral($action_type, $content, $extend_data);
     } catch (Exception $e) {
-        Log::error($e->getMessage());
+        Log::error('记录通用日志失败: ' . $e->getMessage());
         return false;
     }
 }
