@@ -44,14 +44,14 @@ class SmsService
             'daily_max_requests'    => 5,
         ],
         // 绑定手机号验证码
-        SmsTypeEnum::BindMobile->value    => [
+        SmsTypeEnum::BindPhone->value     => [
             'code_expire_minutes'   => 5,
             'ip_limit_window'       => 60,
             'ip_limit_max_requests' => 3,
             'daily_max_requests'    => 5,
         ],
         // 更换手机号验证码
-        SmsTypeEnum::ChangeMobile->value  => [
+        SmsTypeEnum::ChangePhone->value   => [
             'code_expire_minutes'   => 5,
             'ip_limit_window'       => 60,
             'ip_limit_max_requests' => 3,
@@ -62,52 +62,52 @@ class SmsService
     /**
      * 校验参数
      * @param array $data 请求数据数组
-     * @return array ['mobile' => string, 'type' => SmsTypeEnum]
+     * @return array ['phone' => string, 'type' => SmsTypeEnum]
      * @throws ValidationException
      * @author siushin<siushin@163.com>
      */
     public function validateParams(array $data): array
     {
         $validator = Validator::make($data, [
-            'mobile' => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
-            'type'   => ['required', 'string', 'in:register,login,reset_password,bind_mobile,change_mobile'],
+            'phone' => ['required', 'string', 'regex:/^1[3-9]\d{9}$/'],
+            'type'  => ['required', 'string', 'in:register,login,reset_password,bind_phone,change_phone'],
         ], [
-            'mobile.required' => '手机号不能为空',
-            'mobile.regex'    => '手机号格式不正确',
-            'type.required'   => '短信类型不能为空',
-            'type.in'         => '短信类型不正确',
+            'phone.required' => '手机号不能为空',
+            'phone.regex'    => '手机号格式不正确',
+            'type.required'  => '短信类型不能为空',
+            'type.in'        => '短信类型不正确',
         ]);
 
         $validated = $validator->validate();
 
         return [
-            'mobile' => $validated['mobile'],
-            'type'   => SmsTypeEnum::from($validated['type']),
+            'phone' => $validated['phone'],
+            'type'  => SmsTypeEnum::from($validated['type']),
         ];
     }
 
     /**
      * 发送短信验证码（便捷方法）
-     * @param string $mobile 手机号
-     * @param string $type   短信类型（register/login/reset_password/bind_mobile/change_mobile）
+     * @param string $phone 手机号
+     * @param string $type  短信类型（register/login/reset_password/bind_phone/change_phone）
      * @return array
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
-    public function sendSmsCode(string $mobile, string $type): array
+    public function sendSmsCode(string $phone, string $type): array
     {
-        return $this->sendVerificationCode($mobile, SmsTypeEnum::from($type));
+        return $this->sendVerificationCode($phone, SmsTypeEnum::from($type));
     }
 
     /**
      * 发送短信验证码
-     * @param string      $mobile 手机号
-     * @param SmsTypeEnum $type   短信类型
+     * @param string      $phone 手机号
+     * @param SmsTypeEnum $type  短信类型
      * @return array
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
-    public function sendVerificationCode(string $mobile, SmsTypeEnum $type): array
+    public function sendVerificationCode(string $phone, SmsTypeEnum $type): array
     {
         $typeValue = $type->value;
         $config = $this->getTypeConfig($typeValue);
@@ -122,31 +122,30 @@ class SmsService
             $this->checkIpLimit($ip, $typeValue, $config);
 
             // 检查当天手机号请求总次数限制
-            $this->checkDailyLimit($mobile, $typeValue, $config);
+            $this->checkDailyLimit($phone, $typeValue, $config);
 
             // 生成6位随机数字验证码
             $code = $this->generateCode();
 
             // 存储验证码到 Redis，设置过期时间
-            $codeKey = $this->getCodeKey($mobile, $typeValue);
+            $codeKey = $this->getCodeKey($phone, $typeValue);
             Cache::store('redis')->put($codeKey, $code, now()->addMinutes($config['code_expire_minutes']));
 
             // 记录 IP 请求次数
             $this->incrementIpCount($ip, $typeValue, $config);
 
             // 记录当天手机号请求次数
-            $this->incrementDailyCount($mobile, $typeValue, $config);
+            $this->incrementDailyCount($phone, $typeValue, $config);
 
             // TODO: 实际项目中这里应该调用短信服务商 API 发送短信
             // 目前暂时返回验证码（仅用于开发测试）
 
             // 记录成功日志到 sms_logs 表
-            $this->logSmsSend($mobile, $type, $code, $config['code_expire_minutes'], $ip, $accountId, $sourceType, true);
+            $this->logSmsSend($phone, $type, $code, $config['code_expire_minutes'], $ip, $accountId, $sourceType, true);
 
             return [
-                'mobile' => $mobile,
+                'phone'  => $phone,
                 'type'   => $typeValue,
-                'code'   => $code, // 开发阶段返回验证码，生产环境应移除
                 'expire' => $config['code_expire_minutes'],
             ];
         } catch (Exception $e) {
@@ -158,7 +157,7 @@ class SmsService
             }
 
             // 记录失败日志到 sms_logs 表
-            $this->logSmsSend($mobile, $type, null, null, $ip, $accountId, $sourceType, false, $errorMessage);
+            $this->logSmsSend($phone, $type, null, null, $ip, $accountId, $sourceType, false, $errorMessage);
 
             // 重新抛出异常
             throw $e;
@@ -167,16 +166,16 @@ class SmsService
 
     /**
      * 验证验证码
-     * @param string      $mobile 手机号
-     * @param string      $code   验证码
-     * @param SmsTypeEnum $type   短信类型
+     * @param string      $phone 手机号
+     * @param string      $code  验证码
+     * @param SmsTypeEnum $type  短信类型
      * @return bool
      * @throws InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
-    public function verifyCode(string $mobile, string $code, SmsTypeEnum $type): bool
+    public function verifyCode(string $phone, string $code, SmsTypeEnum $type): bool
     {
-        $codeKey = $this->getCodeKey($mobile, $type->value);
+        $codeKey = $this->getCodeKey($phone, $type->value);
         $cachedCode = Cache::store('redis')->get($codeKey);
 
         if ($cachedCode === null || $cachedCode !== $code) {
@@ -210,7 +209,7 @@ class SmsService
             $ttl = Redis::connection('cache')->ttl($fullKey);
 
             if ($ttl > 0) {
-                throw_exception("请求过于频繁，请 {$ttl} 秒后再试");
+                throw_exception("请求过于频繁，请 $ttl 秒后再试");
             } else {
                 throw_exception("请求过于频繁，请稍后再试");
             }
@@ -219,16 +218,16 @@ class SmsService
 
     /**
      * 检查当天手机号请求总次数限制
-     * @param string $mobile 手机号
+     * @param string $phone  手机号
      * @param string $type   短信类型
      * @param array  $config 配置
      * @return void
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
-    private function checkDailyLimit(string $mobile, string $type, array $config): void
+    private function checkDailyLimit(string $phone, string $type, array $config): void
     {
-        $dailyKey = $this->getDailyKey($mobile, $type);
+        $dailyKey = $this->getDailyKey($phone, $type);
         $requestCount = Cache::store('redis')->get($dailyKey, 0);
 
         if ($requestCount >= $config['daily_max_requests']) {
@@ -254,16 +253,16 @@ class SmsService
 
     /**
      * 增加当天手机号请求次数
-     * @param string $mobile 手机号
+     * @param string $phone  手机号
      * @param string $type   短信类型
      * @param array  $config 配置
      * @return void
-     * @throws InvalidArgumentException
+     * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
-    private function incrementDailyCount(string $mobile, string $type, array $config): void
+    private function incrementDailyCount(string $phone, string $type, array $config): void
     {
-        $dailyKey = $this->getDailyKey($mobile, $type);
+        $dailyKey = $this->getDailyKey($phone, $type);
 
         // 计算到明天0点的剩余秒数，确保 key 在当天结束时过期
         $tomorrow = now()->addDay()->startOfDay();
@@ -272,25 +271,31 @@ class SmsService
         // 先检查 key 是否存在，如果不存在则创建
         $requestCount = Cache::store('redis')->get($dailyKey, 0);
 
+        // 动态校验：增加计数前再次检查是否超过每日限制
+        $newCount = $requestCount + 1;
+        if ($newCount > $config['daily_max_requests']) {
+            throw_exception("今天发送次数已达上限（{$config['daily_max_requests']}次），请明天再试");
+        }
+
         // 如果 key 不存在或值为 0，直接设置值为 1
         if ($requestCount == 0) {
             Cache::store('redis')->put($dailyKey, 1, now()->addSeconds($secondsUntilMidnight));
         } else {
             // 如果 key 已存在，增加计数并更新过期时间
-            Cache::store('redis')->put($dailyKey, $requestCount + 1, now()->addSeconds($secondsUntilMidnight));
+            Cache::store('redis')->put($dailyKey, $newCount, now()->addSeconds($secondsUntilMidnight));
         }
     }
 
     /**
      * 获取验证码 Redis key
-     * @param string $mobile 手机号
-     * @param string $type   短信类型
+     * @param string $phone 手机号
+     * @param string $type  短信类型
      * @return string
      * @author siushin<siushin@163.com>
      */
-    private function getCodeKey(string $mobile, string $type): string
+    private function getCodeKey(string $phone, string $type): string
     {
-        return "sms:code:{$type}:{$mobile}";
+        return "sms:code:$type:$phone";
     }
 
     /**
@@ -302,20 +307,20 @@ class SmsService
      */
     private function getIpKey(string $ip, string $type): string
     {
-        return "sms:ip:{$type}:{$ip}";
+        return "sms:ip:$type:$ip";
     }
 
     /**
      * 获取每日限流 Redis key
-     * @param string $mobile 手机号
-     * @param string $type   短信类型
+     * @param string $phone 手机号
+     * @param string $type  短信类型
      * @return string
      * @author siushin<siushin@163.com>
      */
-    private function getDailyKey(string $mobile, string $type): string
+    private function getDailyKey(string $phone, string $type): string
     {
         $date = now()->format('Y-m-d');
-        return "sms:daily:{$type}:{$mobile}:{$date}";
+        return "sms:daily:$type:$phone:$date";
     }
 
     /**
@@ -328,7 +333,7 @@ class SmsService
     private function getTypeConfig(string $type): array
     {
         if (!isset($this->typeConfig[$type])) {
-            throw_exception("不支持的短信类型：{$type}");
+            throw_exception("不支持的短信类型：$type");
         }
 
         return $this->typeConfig[$type];
@@ -346,7 +351,7 @@ class SmsService
 
     /**
      * 记录短信发送日志到 sms_logs 表
-     * @param string      $mobile        手机号
+     * @param string      $phone         手机号
      * @param SmsTypeEnum $type          短信类型
      * @param string|null $code          验证码
      * @param int|null    $expireMinutes 过期时间（分钟）
@@ -359,7 +364,7 @@ class SmsService
      * @author siushin<siushin@163.com>
      */
     private function logSmsSend(
-        string      $mobile,
+        string      $phone,
         SmsTypeEnum $type,
         ?string     $code,
         ?int        $expireMinutes,
@@ -385,7 +390,7 @@ class SmsService
                 'account_id'     => $accountId,
                 'source_type'    => $sourceType,
                 'sms_type'       => $type->value,
-                'mobile'         => $mobile,
+                'phone'          => $phone,
                 'code'           => $code,
                 'status'         => $status ? 1 : 0,
                 'error_message'  => $errorMessage,

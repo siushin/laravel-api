@@ -23,21 +23,21 @@ function logging(string $action_type, string $content, array $extend_data = []):
     try {
         $account_id = currentUserId() ?? null;
 
-        // 如果 account_id 为空，且 extend_data 中包含 mobile，尝试通过手机号查找 user_id
+        // 如果 account_id 为空，且 extend_data 中包含 phone，尝试通过手机号查找 user_id
         if (!$account_id) {
-            $mobile = null;
+            $phone = null;
 
             // 尝试从 extend_data 中提取手机号（支持多种格式）
-            if (!empty($extend_data['mobile'])) {
-                $mobile = $extend_data['mobile'];
-            } elseif (!empty($extend_data['request']['mobile'])) {
-                $mobile = $extend_data['request']['mobile'];
+            if (!empty($extend_data['phone'])) {
+                $phone = $extend_data['phone'];
+            } elseif (!empty($extend_data['request']['phone'])) {
+                $phone = $extend_data['request']['phone'];
             }
 
-            if ($mobile) {
+            if ($phone) {
                 $accountSocial = AccountSocial::query()
-                    ->where('social_type', SocialTypeEnum::Mobile->value)
-                    ->where('social_account', $mobile)
+                    ->where('social_type', SocialTypeEnum::Phone->value)
+                    ->where('social_account', $phone)
                     ->first();
 
                 if ($accountSocial) {

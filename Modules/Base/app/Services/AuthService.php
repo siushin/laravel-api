@@ -84,16 +84,16 @@ class AuthService
 
     /**
      * 通过手机号查找账号
-     * @param string      $mobile      手机号
+     * @param string      $phone      手机号
      * @param string|null $accountType 账号类型
      * @return Account|null
      */
-    public function findAccountByMobile(string $mobile, ?string $accountType = null): ?Account
+    public function findAccountByPhone(string $phone, ?string $accountType = null): ?Account
     {
         // 先通过手机号在社交网络表中查找
         $accountSocial = AccountSocial::query()
-            ->where('social_type', SocialTypeEnum::Mobile->value)
-            ->where('social_account', $mobile)
+            ->where('social_type', SocialTypeEnum::Phone->value)
+            ->where('social_account', $phone)
             ->first();
 
         if (!$accountSocial) {
@@ -154,7 +154,7 @@ class AuthService
             $accountSocial = AccountSocial::query()
                 ->whereIn('social_type', [
                     SocialTypeEnum::Email->value,
-                    SocialTypeEnum::Mobile->value
+                    SocialTypeEnum::Phone->value
                 ])
                 ->where('social_account', $identifier)
                 ->first();
@@ -277,7 +277,7 @@ class AuthService
      * @param Request    $request    请求对象
      * @param string     $identifier 登录标识符（用于日志记录）
      * @param array|null $extendData 扩展数据（用于日志记录）
-     * @param string     $loginType  登录类型：account 或 mobile
+     * @param string     $loginType  登录类型：account 或 phone
      * @return array ['user_data' => array, 'token' => array]
      */
     public function processLogin(Account $account, Request $request, string $identifier, ?array $extendData = null, string $loginType = 'account'): array

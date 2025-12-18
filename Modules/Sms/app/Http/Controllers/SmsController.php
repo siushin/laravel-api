@@ -43,17 +43,17 @@ class SmsController extends Controller
 
         try {
             // 调用服务类发送验证码
-            $result = $this->smsService->sendVerificationCode($params['mobile'], $params['type']);
+            $result = $this->smsService->sendVerificationCode($params['phone'], $params['type']);
 
             // 发送成功，记录成功日志（包含请求参数和返回结果）
             $logData = [
                 'request' => [
-                    'mobile' => $params['mobile'],
-                    'type'   => $params['type']->value,
+                    'phone' => $params['phone'],
+                    'type'  => $params['type']->value,
                 ],
                 'result'  => $result,
             ];
-            logging(LogActionEnum::send_sms->name, "发送短信验证码成功(mobile: {$params['mobile']}, type: {$params['type']->value})", $logData);
+            logging(LogActionEnum::send_sms->name, "发送短信验证码成功(phone: {$params['phone']}, type: {$params['type']->value})", $logData);
 
             return success([], '验证码发送成功');
         } catch (Exception $e) {
@@ -67,12 +67,12 @@ class SmsController extends Controller
             // 发送失败，记录失败日志到 sys_logs 表
             $extendData = [
                 'request' => [
-                    'mobile' => $params['mobile'],
-                    'type'   => $params['type']->value,
+                    'phone' => $params['phone'],
+                    'type'  => $params['type']->value,
                 ],
                 'error'   => $errorMessage,
             ];
-            logging(LogActionEnum::send_sms->name, "发送短信验证码失败(mobile: {$params['mobile']}, type: {$params['type']->value}, error: {$errorMessage})", $extendData);
+            logging(LogActionEnum::send_sms->name, "发送短信验证码失败(phone: {$params['phone']}, type: {$params['type']->value}, error: $errorMessage)", $extendData);
 
             // 重新抛出异常，让框架处理错误响应
             throw $e;

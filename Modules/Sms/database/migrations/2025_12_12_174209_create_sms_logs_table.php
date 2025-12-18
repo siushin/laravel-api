@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID');
             $table->enum('source_type', $sourceTypeList)->comment('访问来源[' . enum_to_string_chain(RequestSourceEnum::cases()) . ']');
             $table->enum('sms_type', $smsTypeList)->comment($smsTypeComment);
-            $table->string('mobile', 11)->comment('手机号');
+            $table->string('phone', 11)->comment('手机号');
             $table->string('code', 6)->nullable()->comment('验证码（仅开发环境可见）');
             $table->tinyInteger('status')->default(1)->comment('发送状态:1成功,0失败');
             $table->string('error_message')->nullable()->comment('错误信息');
@@ -33,7 +33,7 @@ return new class extends Migration {
             $table->timestamp('created_at')->comment('创建时间');
 
             $table->index('account_id');
-            $table->index('mobile');
+            $table->index('phone');
             $table->index('sms_type');
             $table->index('status');
             $table->index('created_at');

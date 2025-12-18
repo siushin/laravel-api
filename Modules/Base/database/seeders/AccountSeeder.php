@@ -24,7 +24,7 @@ class AccountSeeder extends Seeder
     public function run(): void
     {
         // 生成手机号的辅助函数
-        $generateMobileNumber = function () {
+        $generatePhoneNumber = function () {
             $firstChar = ['13', '14', '15', '16', '17', '18', '19'];
             $firstChar = $firstChar[array_rand($firstChar)];
             $randomNumber = mt_rand(1000000000, 9999999999);
@@ -63,8 +63,8 @@ class AccountSeeder extends Seeder
             AccountSocial::query()->create([
                 'id' => generateId(),
                 'user_id' => $account->id,
-                'social_type' => SocialTypeEnum::Mobile->value,
-                'social_account' => $generateMobileNumber(),
+                'social_type' => SocialTypeEnum::Phone->value,
+                'social_account' => $generatePhoneNumber(),
                 'social_name' => null,
                 'avatar' => null,
                 'is_verified' => fake()->boolean(30), // 30% 概率已验证
@@ -132,16 +132,16 @@ class AccountSeeder extends Seeder
             );
 
             // 创建或更新手机号社交账号信息
-            $adminMobile = env('APP_ADMIN_MOBILE');
-            if ($adminMobile) {
-                $mobileSocial = AccountSocial::query()
+            $adminPhone = env('APP_ADMIN_PHONE');
+            if ($adminPhone) {
+                $phoneSocial = AccountSocial::query()
                     ->where('user_id', $adminAccount->id)
-                    ->where('social_type', SocialTypeEnum::Mobile->value)
+                    ->where('social_type', SocialTypeEnum::Phone->value)
                     ->first();
 
-                if ($mobileSocial) {
-                    $mobileSocial->update([
-                        'social_account' => $adminMobile,
+                if ($phoneSocial) {
+                    $phoneSocial->update([
+                        'social_account' => $adminPhone,
                         'is_verified' => true,
                         'verified_at' => now(),
                     ]);
@@ -149,8 +149,8 @@ class AccountSeeder extends Seeder
                     AccountSocial::query()->create([
                         'id' => generateId(),
                         'user_id' => $adminAccount->id,
-                        'social_type' => SocialTypeEnum::Mobile->value,
-                        'social_account' => $adminMobile,
+                        'social_type' => SocialTypeEnum::Phone->value,
+                        'social_account' => $adminPhone,
                         'social_name' => null,
                         'avatar' => null,
                         'is_verified' => true,

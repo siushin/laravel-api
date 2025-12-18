@@ -10,6 +10,6 @@ enum SmsTypeEnum: string
     case Register      = 'register';        // 注册验证码
     case Login         = 'login';           // 登录验证码
     case ResetPassword = 'reset_password';  // 重置密码验证码
-    case BindMobile    = 'bind_mobile';     // 绑定手机号验证码
-    case ChangeMobile  = 'change_mobile';   // 更换手机号验证码
+    case BindPhone     = 'bind_phone';      // 绑定手机号验证码
+    case ChangePhone   = 'change_phone';    // 更换手机号验证码
 }
