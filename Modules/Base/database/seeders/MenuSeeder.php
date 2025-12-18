@@ -84,6 +84,27 @@ class MenuSeeder extends Seeder
             'updated_at'   => $now,
         ]);
 
+        $appManagementId = generateId();
+        DB::table('sys_menu')->insert([
+            'menu_id'      => $appManagementId,
+            'account_type' => $accountType,
+            'menu_name'    => '应用管理',
+            'menu_key'     => 'app.management',
+            'menu_path'    => '/app',
+            'menu_icon'    => 'AppstoreOutlined',
+            'menu_type'    => 'menu',
+            'parent_id'    => 0,
+            'component'    => null,
+            'redirect'     => '/app/market',
+            'layout'       => true,
+            'access'       => 'canAdmin',
+            'wrappers'     => null,
+            'sort'         => 4,
+            'status'       => 1,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+        ]);
+
         $systemId = generateId();
         DB::table('sys_menu')->insert([
             'menu_id'      => $systemId,
@@ -99,11 +120,53 @@ class MenuSeeder extends Seeder
             'layout'       => true,
             'access'       => 'canAdmin',
             'wrappers'     => null,
-            'sort'         => 4,
+            'sort'         => 5,
             'status'       => 1,
             'created_at'   => $now,
             'updated_at'   => $now,
         ]);
+
+        // 插入应用管理的子菜单
+        $appManagementChildren = [
+            [
+                'menu_name' => '应用市场',
+                'menu_key'  => 'app.market',
+                'menu_path' => '/app/market',
+                'menu_icon' => 'ShopOutlined',
+                'component' => './App/Market',
+                'sort'      => 1,
+            ],
+            [
+                'menu_name' => '我的应用',
+                'menu_key'  => 'app.my',
+                'menu_path' => '/app/my',
+                'menu_icon' => 'AppstoreOutlined',
+                'component' => './App/My',
+                'sort'      => 2,
+            ],
+        ];
+
+        foreach ($appManagementChildren as $child) {
+            DB::table('sys_menu')->insert([
+                'menu_id'      => generateId(),
+                'account_type' => $accountType,
+                'menu_name'    => $child['menu_name'],
+                'menu_key'     => $child['menu_key'],
+                'menu_path'    => $child['menu_path'],
+                'menu_icon'    => $child['menu_icon'],
+                'menu_type'    => 'menu',
+                'parent_id'    => $appManagementId,
+                'component'    => $child['component'],
+                'redirect'     => null,
+                'layout'       => true,
+                'access'       => 'canAdmin',
+                'wrappers'     => null,
+                'sort'         => $child['sort'],
+                'status'       => 1,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
 
         // 插入通知管理的子菜单
         $notificationChildren = [
