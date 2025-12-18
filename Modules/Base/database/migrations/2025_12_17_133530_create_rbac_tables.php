@@ -42,12 +42,12 @@ return new class extends Migration {
                 ->default(AccountTypeEnum::Admin->value)
                 ->comment($accountTypeComment);
             $table->string('menu_name', 50)->comment('菜单名称');
-            $table->string('name', 100)->nullable()->comment('菜单名称key（用于国际化，如：dashboard.workplace）');
+            $table->string('menu_key', 100)->nullable()->comment('菜单名称key（用于国际化，如：dashboard.workplace）');
             $table->string('menu_path', 200)->nullable()->comment('路由路径');
-            $table->string('component', 200)->nullable()->comment('组件路径（相对路径，如：./Dashboard/Workplace）');
             $table->string('menu_icon', 50)->nullable()->comment('图标名称');
             $table->string('menu_type', 20)->default('menu')->comment('类型: menu菜单, button按钮');
             $table->unsignedBigInteger('parent_id')->default(0)->comment('父菜单ID, 0表示顶级菜单');
+            $table->string('component', 200)->nullable()->comment('组件路径（相对路径，如：./Dashboard/Workplace）');
             $table->string('redirect', 200)->nullable()->comment('重定向路径');
             $table->boolean('layout')->nullable()->comment('是否使用布局: true使用, false不使用, null默认');
             $table->string('access', 100)->nullable()->comment('权限控制（如：canAdmin）');
@@ -66,7 +66,7 @@ return new class extends Migration {
             $table->index('status');
             $table->index('is_required');
             $table->index('sort');
-            $table->index('name');
+            $table->index('menu_key');
             $table->comment('菜单表');
         });
 
