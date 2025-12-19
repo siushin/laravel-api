@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Ip2Region;
 use Modules\Base\Models\AccountSocial;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -179,12 +181,13 @@ class LogService
     }
 
     /**
-     * 记录通用日志（兼容原有的logging函数）
+     * 记录常规日志（兼容原有的logging函数）
      * @param string   $actionType 操作类型（对应LogActionEnum）
      * @param string   $content    日志内容
      * @param array    $extendData 扩展数据
      * @param int|null $accountId  账号ID（可选，如果不提供会尝试从请求中获取）
      * @return bool
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      */
     public function logGeneral(string $actionType, string $content, array $extendData = [], ?int $accountId = null): bool
     {
@@ -228,7 +231,7 @@ class LogService
 
             return DB::table('sys_logs')->insert($data);
         } catch (Exception $e) {
-            Log::error('记录通用日志失败: ' . $e->getMessage());
+            Log::error('记录常规日志失败: ' . $e->getMessage());
             return false;
         }
     }

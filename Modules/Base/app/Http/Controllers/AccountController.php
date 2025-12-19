@@ -76,7 +76,7 @@ class AccountController extends Controller
             // 记录登录失败日志到 sys_login_log
             $this->logService->logLogin($request, $account?->id, $request['username'], 0, '账号或密码不正确');
 
-            // 记录通用日志（兼容原有逻辑）
+            // 记录常规日志（兼容原有逻辑）
             logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
             throw_exception('账号或密码不正确');
         }

@@ -390,7 +390,7 @@ class OperationLogMiddleware
             }
 
             // 获取请求参数（排除敏感信息、大型数据和临时中间件参数）
-            $params = $request->except([
+            $params = trimParam($request->except([
                 'password',
                 'confirm_password',
                 'current_password',
@@ -399,7 +399,7 @@ class OperationLogMiddleware
                 '_operation_log_start_time',
                 '_operation_log_module',
                 '_operation_log_action',
-            ]);
+            ]));
 
             // 处理文件上传：只记录文件名，不记录文件内容
             if ($request->hasFile('file')) {

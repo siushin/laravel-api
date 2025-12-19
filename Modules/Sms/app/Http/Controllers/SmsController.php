@@ -43,7 +43,7 @@ class SmsController extends Controller
     public function sendSms(Request $request): JsonResponse
     {
         // 校验参数
-        $params = $this->smsService->validateParams($request->all());
+        $params = $this->smsService->validateParams(trimParam($request->all()));
 
         try {
             // 调用服务类发送验证码

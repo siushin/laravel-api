@@ -304,7 +304,7 @@ class AuthService
         $logService = app(LogService::class);
         $logService->logLogin($request, $account->id, $account->username, 1, '登录成功');
 
-        // 记录通用日志（兼容原有逻辑）
+        // 记录常规日志（兼容原有逻辑）
         $logData = $extendData ?? ['username' => $identifier];
         logging(LogActionEnum::login->name, "用户登录系统(account: {$identifier})", $logData);
 

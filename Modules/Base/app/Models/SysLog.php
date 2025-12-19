@@ -64,7 +64,7 @@ class SysLog extends Model
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));
-        $user_list = \Modules\Base\Models\Account::query()
+        $user_list = Account::query()
             ->whereIn('id', $user_ids)
             ->with('profile')
             ->select(['username', 'id'])

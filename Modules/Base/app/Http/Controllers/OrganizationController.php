@@ -25,7 +25,7 @@ class OrganizationController extends Controller
     #[OperationAction(OperationActionEnum::index)]
     public function index(): JsonResponse
     {
-        $params = request()->all();
+        $params = trimParam(request()->all());
         return success(SysOrganization::getTreeData($params));
     }
 
@@ -38,7 +38,7 @@ class OrganizationController extends Controller
     #[OperationAction(OperationActionEnum::add)]
     public function add(): JsonResponse
     {
-        $params = request()->all();
+        $params = trimParam(request()->all());
         return success(SysOrganization::addOrganization($params));
     }
 
@@ -51,7 +51,7 @@ class OrganizationController extends Controller
     #[OperationAction(OperationActionEnum::update)]
     public function update(): JsonResponse
     {
-        $params = request()->only(['organization_id', 'organization_name', 'organization_pid']);
+        $params = trimParam(request()->only(['organization_id', 'organization_name', 'organization_pid']));
         return success(SysOrganization::updateOrganization($params));
     }
 
@@ -64,7 +64,7 @@ class OrganizationController extends Controller
     #[OperationAction(OperationActionEnum::delete)]
     public function delete(): JsonResponse
     {
-        $params = request()->only(['organization_id']);
+        $params = trimParam(request()->only(['organization_id']));
         return success(SysOrganization::deleteOrganization($params));
     }
 
@@ -77,7 +77,7 @@ class OrganizationController extends Controller
     #[OperationAction(OperationActionEnum::move)]
     public function move(): JsonResponse
     {
-        $params = request()->all();
+        $params = trimParam(request()->all());
         return success(SysOrganization::moveOrganization($params));
     }
 }

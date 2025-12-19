@@ -55,9 +55,21 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/dictionary/getPidData', [DictionaryController::class, 'getPidData']);
 
     // 日志管理
-    Route::post('/log/index', [LogController::class, 'index']);
-    Route::post('/log/getSourceTypeList', [LogController::class, 'getSourceTypeList']);
-    Route::post('/log/getActionList', [LogController::class, 'getActionList']);
+    Route::post('/log/index', [LogController::class, 'index']);  // 常规日志列表
+    Route::post('/log/operationLog', [LogController::class, 'operationLog']);  // 操作日志列表
+    Route::post('/log/loginLog', [LogController::class, 'loginLog']);  // 登录日志列表
+    Route::post('/log/auditLog', [LogController::class, 'auditLog']);  // 审计日志列表
+    Route::post('/log/getSourceTypeList', [LogController::class, 'getSourceTypeList']);  // 来源类型列表
+    Route::post('/log/getActionList', [LogController::class, 'getActionList']);  // 常规日志操作类型列表
+    Route::post('/log/getOperationActionList', [LogController::class, 'getOperationActionList']);  // 操作日志操作类型列表
+    Route::post('/log/getHttpMethodList', [LogController::class, 'getHttpMethodList']);  // HTTP方法列表
+    Route::post('/log/getBrowserList', [LogController::class, 'getBrowserList']);  // 浏览器列表
+    Route::post('/log/getOperatingSystemList', [LogController::class, 'getOperatingSystemList']);  // 操作系统列表
+    Route::post('/log/getDeviceTypeList', [LogController::class, 'getDeviceTypeList']);  // 设备类型列表
+    Route::post('/log/getAuditActionList', [LogController::class, 'getAuditActionList']);  // 审计操作类型列表
+    Route::post('/log/getResourceTypeList', [LogController::class, 'getResourceTypeList']);  // 资源类型列表
+    Route::post('/log/getModuleList', [LogController::class, 'getModuleList']);  // 操作日志模块名称列表
+    Route::post('/log/getResponseCodeList', [LogController::class, 'getResponseCodeList']);  // 操作日志响应状态码列表
 
     // 应用管理
     Route::post('/app/myApps', [AppController::class, 'getMyApps']);  // 获取我的应用列表

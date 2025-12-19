@@ -12,7 +12,7 @@ use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
- * 写入日志（通用日志）
+ * 写入日志（常规日志）
  * @param string $action_type
  * @param string $content
  * @param array  $extend_data
@@ -25,7 +25,7 @@ function logging(string $action_type, string $content, array $extend_data = []):
         $logService = app(LogService::class);
         return $logService->logGeneral($action_type, $content, $extend_data);
     } catch (Exception $e) {
-        Log::error('记录通用日志失败: ' . $e->getMessage());
+        Log::error('记录常规日志失败: ' . $e->getMessage());
         return false;
     }
 }

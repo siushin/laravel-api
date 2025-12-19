@@ -40,7 +40,7 @@ class FileController extends Controller
     #[OperationAction(OperationActionEnum::delete)]
     public function delete(Request $request): JsonResponse
     {
-        $params = $request->all();
+        $params = trimParam($request->all());
         $user_id = currentUserId();
         empty($user_id) && throw_exception('无效token，请重新登录');
         $params['user_id'] = $user_id;

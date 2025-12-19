@@ -28,7 +28,7 @@ return new class extends Migration {
         $auditActionComment = buildEnumComment(AuditActionEnum::cases(), '操作类型');
         $resourceTypeComment = buildEnumComment(ResourceTypeEnum::cases(), '资源类型');
 
-        // 通用日志表（用于记录各种业务操作日志，如：文件上传、消息推送、短信发送等）
+        // 常规日志表（用于记录各种业务操作日志，如：文件上传、消息推送、短信发送等）
         Schema::create('sys_logs', function (Blueprint $table) use ($sourceTypeComment) {
             $table->id('log_id')->comment('日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
@@ -53,7 +53,7 @@ return new class extends Migration {
             $table->index(['account_id', 'created_at']);
             $table->index(['action_type', 'created_at']);
 
-            $table->comment('通用日志表');
+            $table->comment('常规日志表');
         });
 
         // 操作日志表（用于记录HTTP请求相关的操作日志）
