@@ -2944,16 +2944,16 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "4.5.0",
+            "version": "5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "2ea9786632e6fac1aee601b6e426bcc723d8ce13"
+                "reference": "4d597c1aacdde1805a33c525b9758113ea0d90df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/2ea9786632e6fac1aee601b6e426bcc723d8ce13",
-                "reference": "2ea9786632e6fac1aee601b6e426bcc723d8ce13",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/4d597c1aacdde1805a33c525b9758113ea0d90df",
+                "reference": "4d597c1aacdde1805a33c525b9758113ea0d90df",
                 "shasum": ""
             },
             "require": {
@@ -2983,7 +2983,7 @@
                 "dealerdirect/phpcodesniffer-composer-installer": "dev-main",
                 "dompdf/dompdf": "^2.0 || ^3.0",
                 "friendsofphp/php-cs-fixer": "^3.2",
-                "mitoteam/jpgraph": "^10.3",
+                "mitoteam/jpgraph": "^10.5",
                 "mpdf/mpdf": "^8.1.1",
                 "phpcompatibility/php-compatibility": "^9.3",
                 "phpstan/phpstan": "^1.1 || ^2.0",
@@ -2995,7 +2995,7 @@
             },
             "suggest": {
                 "dompdf/dompdf": "Option for rendering PDF with PDF Writer",
-                "ext-intl": "PHP Internationalization Functions",
+                "ext-intl": "PHP Internationalization Functions, required for NumberFormat Wizard",
                 "mitoteam/jpgraph": "Option for rendering charts, or including charts with PDF or HTML Writers",
                 "mpdf/mpdf": "Option for rendering PDF with PDF Writer",
                 "tecnickcom/tcpdf": "Option for rendering PDF with PDF Writer"
@@ -3044,9 +3044,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/4.5.0"
+                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/5.3.0"
             },
-            "time": "2025-07-24T05:15:59+00:00"
+            "time": "2025-11-24T15:47:10+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -3814,22 +3814,22 @@
         },
         {
             "name": "siushin/laravel-tool",
-            "version": "v1.0.9",
+            "version": "v1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/laravel-tool.git",
-                "reference": "b4108d2bfb7c9357d9b24731caf0477c3002fdc1"
+                "reference": "475cabfe5b2041b10100383a29284eea8a38fcf3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/b4108d2bfb7c9357d9b24731caf0477c3002fdc1",
-                "reference": "b4108d2bfb7c9357d9b24731caf0477c3002fdc1",
+                "url": "https://api.github.com/repos/siushin/laravel-tool/zipball/475cabfe5b2041b10100383a29284eea8a38fcf3",
+                "reference": "475cabfe5b2041b10100383a29284eea8a38fcf3",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^12.0",
                 "php": "^8.3",
-                "phpoffice/phpspreadsheet": "^4.5",
+                "phpoffice/phpspreadsheet": "^5.0",
                 "siushin/util": "^1.0"
             },
             "type": "library",
@@ -3871,9 +3871,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/laravel-tool/issues",
-                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.9"
+                "source": "https://github.com/siushin/laravel-tool/tree/v1.0.10"
             },
-            "time": "2025-12-19T08:46:54+00:00"
+            "time": "2025-12-19T10:26:17+00:00"
         },
         {
             "name": "siushin/util",
