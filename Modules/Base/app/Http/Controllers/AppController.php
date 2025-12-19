@@ -23,7 +23,7 @@ class AppController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getMyApps(Request $request): JsonResponse
     {
         $modulesPath = base_path('Modules');

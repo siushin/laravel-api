@@ -24,7 +24,7 @@ class MenuController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getUserMenus(Request $request): JsonResponse
     {
         $user = $request->user();

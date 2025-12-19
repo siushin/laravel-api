@@ -86,7 +86,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getSourceTypeList(): JsonResponse
     {
         $list = [];
@@ -104,7 +104,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getActionList(): JsonResponse
     {
         $list = [];
@@ -122,7 +122,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getOperationActionList(): JsonResponse
     {
         $list = [];
@@ -140,7 +140,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getHttpMethodList(): JsonResponse
     {
         $list = [];
@@ -158,7 +158,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getBrowserList(): JsonResponse
     {
         $list = [];
@@ -176,7 +176,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getOperatingSystemList(): JsonResponse
     {
         $list = [];
@@ -194,7 +194,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getDeviceTypeList(): JsonResponse
     {
         $list = [];
@@ -212,7 +212,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getAuditActionList(): JsonResponse
     {
         $list = [];
@@ -230,7 +230,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getResourceTypeList(): JsonResponse
     {
         $list = [];
@@ -248,7 +248,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getModuleList(): JsonResponse
     {
         $modules = SysOperationLog::query()
@@ -274,7 +274,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getResponseCodeList(): JsonResponse
     {
         $responseCodes = SysOperationLog::query()

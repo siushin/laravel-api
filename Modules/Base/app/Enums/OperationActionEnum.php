@@ -20,7 +20,7 @@ enum OperationActionEnum: string
     case download    = '下载';
     case move        = '移动';
     case copy        = '复制';
-    case view        = '查看';
+    case query       = '查询';
     case search      = '搜索';
     case login       = '登录';
     case logout      = '登出';

@@ -179,7 +179,7 @@ class AccountController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::view)]
+    #[OperationAction(OperationActionEnum::query)]
     public function getCurrentUserInfo(Request $request): JsonResponse
     {
         $account = $request->user();

@@ -192,8 +192,8 @@ class OperationLogMiddleware
             'download'    => OperationActionEnum::download->value,
             'move'        => OperationActionEnum::move->value,
             'copy'        => OperationActionEnum::copy->value,
-            'view'        => OperationActionEnum::view->value,
-            'show'        => OperationActionEnum::view->value,
+            'view'        => OperationActionEnum::query->value,
+            'show'        => OperationActionEnum::query->value,
             'search'      => OperationActionEnum::search->value,
             'login'       => OperationActionEnum::login->value,
             'loginbycode' => OperationActionEnum::login->value,
@@ -228,8 +228,8 @@ class OperationLogMiddleware
             'download'    => OperationActionEnum::download->value,
             'move'        => OperationActionEnum::move->value,
             'copy'        => OperationActionEnum::copy->value,
-            'view'        => OperationActionEnum::view->value,
-            'show'        => OperationActionEnum::view->value,
+            'view'        => OperationActionEnum::query->value,
+            'show'        => OperationActionEnum::query->value,
             'search'      => OperationActionEnum::search->value,
             'login'       => OperationActionEnum::login->value,
             'logout'      => OperationActionEnum::logout->value,
@@ -308,8 +308,8 @@ class OperationLogMiddleware
             'download' => OperationActionEnum::download->value,
             'move'     => OperationActionEnum::move->value,
             'copy'     => OperationActionEnum::copy->value,
-            'view'     => OperationActionEnum::view->value,
-            'show'     => OperationActionEnum::view->value,
+            'view'     => OperationActionEnum::query->value,
+            'show'     => OperationActionEnum::query->value,
             'search'   => OperationActionEnum::search->value,
             'login'    => OperationActionEnum::login->value,
             'logout'   => OperationActionEnum::logout->value,
@@ -321,14 +321,14 @@ class OperationLogMiddleware
 
         // 根据HTTP方法推断
         $methodMap = [
-            'GET'    => OperationActionEnum::view->value,
+            'GET'    => OperationActionEnum::query->value,
             'POST'   => OperationActionEnum::add->value,
             'PUT'    => OperationActionEnum::update->value,
             'PATCH'  => OperationActionEnum::update->value,
             'DELETE' => OperationActionEnum::delete->value,
         ];
 
-        return $methodMap[strtoupper($method)] ?? OperationActionEnum::view->value;
+        return $methodMap[strtoupper($method)] ?? OperationActionEnum::query->value;
     }
 
     /**
