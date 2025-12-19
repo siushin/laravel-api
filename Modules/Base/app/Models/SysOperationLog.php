@@ -45,7 +45,7 @@ class SysOperationLog extends Model
             'path'          => 'like',
             'ip_address'    => 'like',
             'response_code' => '=',
-            'time_range'    => 'operated_at',
+            'date_range'    => 'operated_at',
             'keyword'       => ['path', 'module'],
         ]);
 

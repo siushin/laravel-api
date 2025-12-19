@@ -36,7 +36,7 @@ class SysLoginLog extends Model
             'browser' => '=',
             'operating_system' => '=',
             'device_type' => '=',
-            'time_range' => 'login_at',
+            'date_range' => 'login_at',
             'keyword' => ['username', 'ip_address', 'message'],
         ]);
 

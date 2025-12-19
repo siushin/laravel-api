@@ -37,10 +37,6 @@ class LogController extends Controller
     public function index(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        // 处理 time_range 参数，确保是字符串格式
-        if (isset($params['time_range']) && is_array($params['time_range'])) {
-            $params['time_range'] = implode(',', $params['time_range']);
-        }
         return success(SysLog::getPageData($params));
     }
 
@@ -69,10 +65,6 @@ class LogController extends Controller
     public function loginLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        // 处理 time_range 参数，确保是字符串格式
-        if (isset($params['time_range']) && is_array($params['time_range'])) {
-            $params['time_range'] = implode(',', $params['time_range']);
-        }
         return success(SysLoginLog::getPageData($params));
     }
 
@@ -87,10 +79,6 @@ class LogController extends Controller
     public function auditLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        // 处理 time_range 参数，确保是字符串格式
-        if (isset($params['time_range']) && is_array($params['time_range'])) {
-            $params['time_range'] = implode(',', $params['time_range']);
-        }
         return success(SysAuditLog::getPageData($params));
     }
 

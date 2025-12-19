@@ -60,7 +60,7 @@ class SysLog extends Model
             'source_type' => '=',
             'action_type' => '=',
             'keyword' => 'content',
-            'time_range' => 'created_at'
+            'date_range' => 'created_at'
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));

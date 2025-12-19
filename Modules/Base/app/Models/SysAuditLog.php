@@ -44,7 +44,7 @@ class SysAuditLog extends Model
             'action' => '=',
             'resource_type' => '=',
             'resource_id' => '=',
-            'time_range' => 'audited_at',
+            'date_range' => 'audited_at',
             'keyword' => ['module', 'description'],
         ]);
 
