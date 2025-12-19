@@ -4,6 +4,7 @@
     "description": "LaravelAPI 基础服务，勿删除！",
     "keywords": [],
     "priority": 0,
+    "source": "官方",
     "providers": [
         "Modules\\Base\\Providers\\BaseServiceProvider"
     ],

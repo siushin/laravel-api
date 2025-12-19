@@ -4,6 +4,7 @@
     "description": "LaravelAPI 短信服务",
     "keywords": [],
     "priority": 0,
+    "source": "官方",
     "providers": [
         "Modules\\Sms\\Providers\\SmsServiceProvider"
     ],

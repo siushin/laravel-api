@@ -28,6 +28,7 @@ class AppController extends Controller
     {
         $modulesPath = base_path('Modules');
         $apps = [];
+        $keyword = $request->input('keyword', '');
 
         if (!File::exists($modulesPath)) {
             return success([], '暂无应用');
@@ -65,9 +66,34 @@ class AppController extends Controller
                     'description' => $moduleData['description'] ?? '',
                     'keywords'    => $moduleData['keywords'] ?? [],
                     'priority'    => $moduleData['priority'] ?? 0,
+                    'source'      => $moduleData['source'] ?? '第三方',
                     'enabled'     => $isEnabled,
                     'path'        => $moduleName,
                 ];
+
+                // 如果有搜索关键词，进行筛选
+                if (!empty($keyword)) {
+                    $keywordLower = mb_strtolower($keyword, 'UTF-8');
+                    $matchAlias = mb_strpos(mb_strtolower($app['alias'], 'UTF-8'), $keywordLower) !== false;
+                    $matchName = mb_strpos(mb_strtolower($app['name'], 'UTF-8'), $keywordLower) !== false;
+                    $matchDescription = mb_strpos(mb_strtolower($app['description'], 'UTF-8'), $keywordLower) !== false;
+                    $matchKeywords = false;
+
+                    // 检查关键词数组
+                    if (is_array($app['keywords'])) {
+                        foreach ($app['keywords'] as $kw) {
+                            if (mb_strpos(mb_strtolower($kw, 'UTF-8'), $keywordLower) !== false) {
+                                $matchKeywords = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 如果都不匹配，跳过该应用
+                    if (!$matchAlias && !$matchName && !$matchDescription && !$matchKeywords) {
+                        continue;
+                    }
+                }
 
                 $apps[] = $app;
             } catch (Exception $e) {
