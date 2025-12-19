@@ -5,6 +5,7 @@ namespace Modules\Base\Http\Controllers;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountProfile;
 use Exception;
@@ -16,6 +17,8 @@ use Modules\Base\Services\AuthService;
 use Modules\Base\Services\LogService;
 use Modules\Sms\Enums\SmsTypeEnum;
 use Modules\Sms\Services\SmsService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
@@ -53,7 +56,7 @@ class AccountController extends Controller
      * 用户登录（用户名+密码）
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::login)]
@@ -73,11 +76,8 @@ class AccountController extends Controller
 
         // 验证账号和密码
         if (!$account || !$this->authService->verifyPassword($account, $request['password'])) {
-            // 记录登录失败日志到 sys_login_log
-            $this->logService->logLogin($request, $account?->id, $request['username'], 0, '账号或密码不正确');
-
-            // 记录常规日志（兼容原有逻辑）
-            logging(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
+            logLogin($request, $account?->id, $request['username'], 0, '账号或密码不正确');
+            logGeneral(LogActionEnum::fail_login->name, "尝试登录，登录失败(account: {$request['username']})", $extend_data);
             throw_exception('账号或密码不正确');
         }
 
@@ -91,7 +91,7 @@ class AccountController extends Controller
      * 用户登录（手机号+验证码）
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception|InvalidArgumentException
+     * @throws ContainerExceptionInterface|InvalidArgumentException|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::login)]
@@ -113,14 +113,13 @@ class AccountController extends Controller
 
         // 验证短信验证码
         if (!$this->smsService->verifyCode($phone, $code, SmsTypeEnum::Login)) {
-            // 记录登录失败日志到 sys_login_log
-            $this->logService->logLogin($request, null, $phone, 0, '验证码错误或已过期');
+            logLogin($request, null, $phone, 0, '验证码错误或已过期');
 
             $extend_data = [
                 'phone' => $phone,
                 'code'  => $code,
             ];
-            logging(LogActionEnum::fail_login->name, "尝试登录，验证码错误(phone: $phone)", $extend_data);
+            logGeneral(LogActionEnum::fail_login->name, "尝试登录，验证码错误(phone: $phone)", $extend_data);
             throw_exception('验证码错误或已过期');
         }
 
@@ -128,14 +127,13 @@ class AccountController extends Controller
         $account = $this->authService->findAccountByPhone($phone);
 
         if (!$account) {
-            // 记录登录失败日志到 sys_login_log
-            $this->logService->logLogin($request, null, $phone, 0, '该手机号未注册');
+            logLogin($request, null, $phone, 0, '该手机号未注册');
 
             $extend_data = [
                 'phone' => $phone,
                 'code'  => $code,
             ];
-            logging(LogActionEnum::fail_login->name, "尝试登录，账号不存在(phone: $phone)", $extend_data);
+            logGeneral(LogActionEnum::fail_login->name, "尝试登录，账号不存在(phone: $phone)", $extend_data);
             throw_exception('该手机号未注册');
         }
 
@@ -153,6 +151,7 @@ class AccountController extends Controller
      * 退出用户登录
      * @param Request $request
      * @return JsonResponse
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::logout)]
@@ -169,7 +168,7 @@ class AccountController extends Controller
 
         // 记录用户退出登录日志
         $extend_data = ['username' => $account->username];
-        logging('logout', "用户退出登录(account: $account->username)", $extend_data);
+        logGeneral('logout', "用户退出登录(account: $account->username)", $extend_data);
 
         return success([], '用户退出登录成功');
     }
@@ -215,7 +214,7 @@ class AccountController extends Controller
      * 用户注册
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception|InvalidArgumentException
+     * @throws ContainerExceptionInterface|InvalidArgumentException|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::add)]
@@ -303,7 +302,21 @@ class AccountController extends Controller
             'phone'    => $request['phone'],
             'code'     => $request['code'],
         ];
-        logging(LogActionEnum::login->name, "用户注册成功(account: {$request['username']})", $extend_data);
+        logGeneral(LogActionEnum::login->name, "用户注册成功(account: {$request['username']})", $extend_data);
+
+        // 记录审计日志
+        $accountData = $account->only(['id', 'username', 'account_type', 'status', 'created_at']);
+        logAudit(
+            $request,
+            $account->id, // 注册时，操作人就是新注册的用户自己
+            '账号管理',
+            OperationActionEnum::add->value,
+            ResourceTypeEnum::user->value,
+            $account->id,
+            null,
+            $accountData,
+            "用户注册: {$request['username']} (手机号: {$request['phone']})"
+        );
 
         return success([], '注册成功');
     }
@@ -312,7 +325,7 @@ class AccountController extends Controller
      * 重置密码
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception|InvalidArgumentException
+     * @throws ContainerExceptionInterface|InvalidArgumentException|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::update)]
@@ -346,7 +359,7 @@ class AccountController extends Controller
                 'phone' => $phone,
                 'code'  => $code,
             ];
-            logging(LogActionEnum::reset_password->name, "尝试重置密码，验证码错误(phone: $phone)", $extend_data);
+            logGeneral(LogActionEnum::reset_password->name, "尝试重置密码，验证码错误(phone: $phone)", $extend_data);
             throw_exception('验证码错误或已过期');
         }
 
@@ -358,7 +371,7 @@ class AccountController extends Controller
                 'phone' => $phone,
                 'code'  => $code,
             ];
-            logging(LogActionEnum::reset_password->name, "尝试重置密码，账号不存在(phone: $phone)", $extend_data);
+            logGeneral(LogActionEnum::reset_password->name, "尝试重置密码，账号不存在(phone: $phone)", $extend_data);
             throw_exception('该手机号未注册');
         }
 
@@ -376,7 +389,7 @@ class AccountController extends Controller
             'code'     => $code,
             'username' => $account->username,
         ];
-        logging(LogActionEnum::reset_password->name, "用户重置密码成功(phone: $phone)", $extend_data);
+        logGeneral(LogActionEnum::reset_password->name, "用户重置密码成功(phone: $phone)", $extend_data);
 
         return success([], '密码重置成功');
     }

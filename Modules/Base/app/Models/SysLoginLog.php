@@ -29,15 +29,15 @@ class SysLoginLog extends Model
     public static function getPageData(array $params = []): array
     {
         $data = self::fastGetPageData(self::query(), $params, [
-            'account_id' => '=',
-            'username' => 'like',
-            'status' => '=',
-            'ip_address' => 'like',
-            'browser' => '=',
+            'account_id'       => '=',
+            'username'         => 'like',
+            'status'           => '=',
+            'ip_address'       => 'like',
+            'browser'          => '=',
             'operating_system' => '=',
-            'device_type' => '=',
-            'date_range' => 'login_at',
-            'keyword' => ['username', 'ip_address', 'message'],
+            'device_type'      => '=',
+            'date_range'       => 'login_at',
+            'keyword'          => ['username', 'ip_address', 'message'],
         ]);
 
         // 关联账号信息

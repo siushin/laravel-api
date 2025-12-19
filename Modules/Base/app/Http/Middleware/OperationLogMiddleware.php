@@ -9,7 +9,6 @@ use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Log;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Services\LogService;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,16 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class OperationLogMiddleware
 {
-    /**
-     * 日志服务
-     */
-    private LogService $logService;
-
-    public function __construct(LogService $logService)
-    {
-        $this->logService = $logService;
-    }
-
     /**
      * Handle an incoming request.
      *
@@ -69,7 +58,7 @@ class OperationLogMiddleware
      * @param Route|null $route
      * @return array [module, action]
      */
-    private function extractModuleAndAction(Request $request, $route): array
+    private function extractModuleAndAction(Request $request, ?Route $route): array
     {
         $module = '';
         $action = '';
@@ -383,7 +372,7 @@ class OperationLogMiddleware
                             $accountId = $responseData['data']['id'];
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // 忽略解析错误，但记录日志以便调试
                     Log::debug('操作日志中间件：从响应中解析账号ID失败: ' . $e->getMessage());
                 }
@@ -418,7 +407,7 @@ class OperationLogMiddleware
             }
 
             // 记录操作日志
-            $this->logService->logOperation(
+            logOperation(
                 $request,
                 $accountId,
                 $module,

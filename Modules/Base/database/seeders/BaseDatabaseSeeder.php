@@ -12,10 +12,10 @@ class BaseDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            \Modules\Base\Database\Seeders\DictionarySeeder::class,
-            \Modules\Base\Database\Seeders\OrganizationSeeder::class,
-            \Modules\Base\Database\Seeders\AccountSeeder::class,
-            \Modules\Base\Database\Seeders\MenuSeeder::class,
+            DictionarySeeder::class,
+            OrganizationSeeder::class,
+            AccountSeeder::class,
+            MenuSeeder::class,
         ]);
     }
 }

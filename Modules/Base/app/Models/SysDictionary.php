@@ -5,8 +5,12 @@ namespace Modules\Base\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Cases\Json;
 use Modules\Base\Enums\LogActionEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
@@ -138,7 +142,7 @@ class SysDictionary extends Model
      * @param array $params
      * @param array $response_keys
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function addDictionary(array $params = [], array $response_keys = []): array
@@ -178,7 +182,21 @@ class SysDictionary extends Model
         $info = self::query()->create($params);
         !$info && throw_exception('添加数据字典失败');
         $info = $info->toArray();
-        logging(LogActionEnum::insert->name, "添加数据字典失败(dictionary_name: {$params['dictionary_name']})", $info);
+        logGeneral(LogActionEnum::insert->name, "添加数据字典失败(dictionary_name: {$params['dictionary_name']})", $info);
+
+        // 记录审计日志
+        logAudit(
+            request(),
+            currentUserId(),
+            '数据字典',
+            OperationActionEnum::add->value,
+            ResourceTypeEnum::other->value,
+            $info['dictionary_id'],
+            null,
+            $info,
+            "新增数据字典: {$params['dictionary_name']}"
+        );
+
         $response_keys = $response_keys ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
         return self::getArrayByKeys($info, $response_keys);
     }
@@ -187,7 +205,7 @@ class SysDictionary extends Model
      * 更新数据字典
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function updateDictionary(array $params = []): array
@@ -233,7 +251,21 @@ class SysDictionary extends Model
         !$bool && throw_exception('更新数据字典失败');
 
         $log_extend_data = compareArray($update_data, $old_data);
-        logging(LogActionEnum::update->name, "更新数据字典(dictionary_name: {$params['dictionary_name']})", $log_extend_data);
+        logGeneral(LogActionEnum::update->name, "更新数据字典(dictionary_name: {$params['dictionary_name']})", $log_extend_data);
+
+        // 记录审计日志
+        $new_data = $info->fresh()->toArray();
+        logAudit(
+            request(),
+            currentUserId(),
+            '数据字典',
+            OperationActionEnum::update->value,
+            ResourceTypeEnum::other->value,
+            $dictionary_id,
+            $old_data,
+            $new_data,
+            "更新数据字典: {$params['dictionary_name']}"
+        );
 
         return [];
     }
@@ -242,7 +274,7 @@ class SysDictionary extends Model
      * 删除数据字典
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function deleteDictionary(array $params = []): array
@@ -250,10 +282,24 @@ class SysDictionary extends Model
         self::checkEmptyParam($params, ['dictionary_id']);
         $info = self::query()->find($params['dictionary_id']);
         !$info && throw_exception('数据不存在');
+        $old_data = $info->toArray();
         $bool = $info->delete();
         !$bool && throw_exception('删除失败');
 
-        logging(LogActionEnum::delete->name, "删除数据字典(ID: {$info['dictionary_id']})", $info->toArray());
+        logGeneral(LogActionEnum::delete->name, "删除数据字典(ID: {$info['dictionary_id']})", $old_data);
+
+        // 记录审计日志
+        logAudit(
+            request(),
+            currentUserId(),
+            '数据字典',
+            OperationActionEnum::delete->value,
+            ResourceTypeEnum::other->value,
+            $params['dictionary_id'],
+            $old_data,
+            null,
+            "删除数据字典: {$old_data['dictionary_name']}"
+        );
 
         return [];
     }
@@ -262,7 +308,7 @@ class SysDictionary extends Model
      * 批量删除数据字典
      * @param array $params 请求参数（需包含 dictionary_ids）
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function batchDeleteDictionary(array $params): array
@@ -281,11 +327,27 @@ class SysDictionary extends Model
         $deletedCount = self::destroy($dictionary_ids);
         $deletedCount === 0 && throw_exception('删除失败，可能记录已不存在');
 
-        logging(
+        logGeneral(
             LogActionEnum::batchDelete->name,
             "批量删除数据字典(数量: $deletedCount, IDs: " . implode(',', $dictionary_ids) . ")",
             $records->toArray()
         );
+
+        // 记录审计日志
+        $recordsArray = $records->toArray();
+        foreach ($recordsArray as $record) {
+            logAudit(
+                request(),
+                currentUserId(),
+                '数据字典',
+                OperationActionEnum::batchDelete->value,
+                ResourceTypeEnum::other->value,
+                $record['dictionary_id'],
+                $record,
+                null,
+                "批量删除数据字典: {$record['dictionary_name']}"
+            );
+        }
 
         return [];
     }

@@ -42,8 +42,8 @@ class SysFileImage extends Model implements IFile
     {
         list($width, $height) = getimagesize($full_file_path);
         $data = [
-            'file_id' => $file_id,
-            'image_width' => $width,
+            'file_id'      => $file_id,
+            'image_width'  => $width,
             'image_height' => $height,
         ];
         // 图片信息 入库

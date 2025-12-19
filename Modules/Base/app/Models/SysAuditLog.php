@@ -5,7 +5,6 @@ namespace Modules\Base\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Base\Enums\AuditActionEnum;
 use Siushin\LaravelTool\Cases\Json;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;

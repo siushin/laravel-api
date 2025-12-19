@@ -3,7 +3,6 @@
 namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
-use Modules\Base\Enums\AuditActionEnum;
 use Modules\Base\Enums\BrowserEnum;
 use Modules\Base\Enums\DeviceTypeEnum;
 use Modules\Base\Enums\HttpMethodEnum;
@@ -217,10 +216,10 @@ class LogController extends Controller
     public function getAuditActionList(): JsonResponse
     {
         $list = [];
-        foreach (AuditActionEnum::cases() as $case) {
+        foreach (OperationActionEnum::cases() as $case) {
             $list[] = [
                 'label' => $case->value,
-                'value' => $case->name,
+                'value' => $case->value,
             ];
         }
         return success($list);

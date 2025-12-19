@@ -27,7 +27,7 @@ class DictionarySeeder extends Seeder
             $categories[] = [
                 'category_name' => $category->value,
                 'category_code' => $category->name,
-                'tpl_path' => 'tpl/Dictionary.xlsx',
+                'tpl_path'      => 'tpl/Dictionary.xlsx',
             ];
         }
         SysDictionaryCategory::query()->upsert(
@@ -38,7 +38,7 @@ class DictionarySeeder extends Seeder
 
         // 数据字典
         $dictionary_map = [
-            DictionaryCategoryEnum::UserType->name => RequestSourceEnum::cases(),
+            DictionaryCategoryEnum::UserType->name            => RequestSourceEnum::cases(),
             DictionaryCategoryEnum::AllowUploadFileType->name => UploadFileTypeEnum::cases(),
         ];
         $dictionary_data = [];
@@ -46,12 +46,12 @@ class DictionarySeeder extends Seeder
             $category_id = SysDictionaryCategory::checkCodeValidate(compact('category_code'));
             foreach ($dictionary_enums as $dictionary_item) {
                 $dictionary_data[] = [
-                    'category_id' => $category_id,
-                    'dictionary_name' => $dictionary_item->name,
+                    'category_id'      => $category_id,
+                    'dictionary_name'  => $dictionary_item->name,
                     'dictionary_value' => $dictionary_item->value,
-                    'parent_id' => 0,
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'parent_id'        => 0,
+                    'created_at'       => $now,
+                    'updated_at'       => $now,
                 ];
             }
         }

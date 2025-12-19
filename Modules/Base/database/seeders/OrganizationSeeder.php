@@ -23,25 +23,25 @@ class OrganizationSeeder extends Seeder
         $now = now();
         $data = [
             [
-                'organization_name' => '中国',
-                'organization_pid' => 0,
+                'organization_name'     => '中国',
+                'organization_pid'      => 0,
                 'full_organization_pid' => ',1,',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'            => $now,
+                'updated_at'            => $now,
             ],
             [
-                'organization_name' => '广东省',
-                'organization_pid' => 1,
+                'organization_name'     => '广东省',
+                'organization_pid'      => 1,
                 'full_organization_pid' => ',1,2,',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'            => $now,
+                'updated_at'            => $now,
             ],
             [
-                'organization_name' => '深圳市',
-                'organization_pid' => 2,
+                'organization_name'     => '深圳市',
+                'organization_pid'      => 2,
                 'full_organization_pid' => ',1,2,3,',
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'            => $now,
+                'updated_at'            => $now,
             ],
         ];
         DB::table('sys_organization')->insert($data);

@@ -59,8 +59,8 @@ class SysLog extends Model
         $data = self::fastGetPageData(self::query(), $params, [
             'source_type' => '=',
             'action_type' => '=',
-            'keyword' => 'content',
-            'date_range' => 'created_at'
+            'keyword'     => 'content',
+            'date_range'  => 'created_at'
         ]);
 
         $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));

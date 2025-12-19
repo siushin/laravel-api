@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Modules\Base\Enums\LogActionEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
+use Modules\Base\Services\LogService;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\LaravelTool\Utils\Tree;
 use Siushin\Util\Traits\ParamTool;
@@ -97,7 +100,20 @@ class SysOrganization extends Model
         $organization['full_organization_pid'] = $parent_full_organization_pid . $organization['organization_id'] . ',';
         $organization->save();
 
-        logging(LogActionEnum::insert->name, "新增组织架构($organization->organization_name)", $organization->toArray());
+        logGeneral(LogActionEnum::insert->name, "新增组织架构($organization->organization_name)", $organization->toArray());
+
+        // 记录审计日志
+        logAudit(
+            request(),
+            currentUserId(),
+            '组织架构',
+            OperationActionEnum::add->value,
+            ResourceTypeEnum::other->value,
+            $organization['organization_id'],
+            null,
+            $organization->toArray(),
+            "新增组织架构: {$organization->organization_name}"
+        );
 
         return $organization->toArray();
     }
@@ -124,7 +140,21 @@ class SysOrganization extends Model
         $info->save();
 
         $extend_data = compareArray($info->toArray(), $old_data);
-        logging(LogActionEnum::update->name, "更新组织架构($info->organization_name)", $extend_data);
+        logGeneral(LogActionEnum::update->name, "更新组织架构($info->organization_name)", $extend_data);
+
+        // 记录审计日志
+        $new_data = $info->fresh()->toArray();
+        logAudit(
+            request(),
+            currentUserId(),
+            '组织架构',
+            OperationActionEnum::update->value,
+            ResourceTypeEnum::other->value,
+            $organization_id,
+            $old_data,
+            $new_data,
+            "更新组织架构: {$info->organization_name}"
+        );
 
         return [];
     }
@@ -146,11 +176,25 @@ class SysOrganization extends Model
         $info->organization_pid == 0 && throw_exception('顶级组织架构不能删除');
 
         // 删除自己及所有下属组织架构数据
+        $old_data = $info->toArray();
         $delete_sub_ids = self::getSubOrganizationIds($info['full_organization_pid']);
         $delete_total = self::destroy($delete_sub_ids);
 
         $extend_data = compact('delete_sub_ids');
-        logging(LogActionEnum::delete->name, "删除组织架构($info->organization_name)", $extend_data);
+        logGeneral(LogActionEnum::delete->name, "删除组织架构($info->organization_name)", $extend_data);
+
+        // 记录审计日志
+        logAudit(
+            request(),
+            currentUserId(),
+            '组织架构',
+            OperationActionEnum::delete->value,
+            ResourceTypeEnum::other->value,
+            $organization_id,
+            $old_data,
+            null,
+            "删除组织架构: {$info->organization_name} (包含 {$delete_total} 个子组织)"
+        );
 
         return compact('organization_id', 'delete_total');
     }
@@ -215,7 +259,23 @@ class SysOrganization extends Model
                 ]);
 
             $extend_data = compact('newFullOrganizationId', 'oldFullOrganizationId');
-            logging(LogActionEnum::update->name, "移动组织架构($newOrganization->organization_name)", $extend_data);
+            logGeneral(LogActionEnum::update->name, "移动组织架构($newOrganization->organization_name)", $extend_data);
+
+            // 记录审计日志
+            $old_data = $organization->toArray();
+            $organization->refresh();
+            $new_data = $organization->toArray();
+            logAudit(
+                request(),
+                currentUserId(),
+                '组织架构',
+                OperationActionEnum::move->value,
+                ResourceTypeEnum::other->value,
+                $organization_id,
+                $old_data,
+                $new_data,
+                "移动组织架构: {$organization->organization_name} 到 {$newOrganization->organization_name}"
+            );
         });
 
         return [];

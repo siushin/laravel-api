@@ -3,12 +3,15 @@
 namespace Modules\Sms\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Sms\Services\SmsService;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use Modules\Base\Enums\LogActionEnum;
 
@@ -36,7 +39,7 @@ class SmsController extends Controller
      * 发送短信验证码
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception|InvalidArgumentException
+     * @throws InvalidArgumentException|ValidationException|ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::add)]
@@ -57,7 +60,7 @@ class SmsController extends Controller
                 ],
                 'result'  => $result,
             ];
-            logging(LogActionEnum::send_sms->name, "发送短信验证码成功(phone: {$params['phone']}, type: {$params['type']->value})", $logData);
+            logGeneral(LogActionEnum::send_sms->name, "发送短信验证码成功(phone: {$params['phone']}, type: {$params['type']->value})", $logData);
 
             return success([], '验证码发送成功');
         } catch (Exception $e) {
@@ -76,7 +79,7 @@ class SmsController extends Controller
                 ],
                 'error'   => $errorMessage,
             ];
-            logging(LogActionEnum::send_sms->name, "发送短信验证码失败(phone: {$params['phone']}, type: {$params['type']->value}, error: $errorMessage)", $extendData);
+            logGeneral(LogActionEnum::send_sms->name, "发送短信验证码失败(phone: {$params['phone']}, type: {$params['type']->value}, error: $errorMessage)", $extendData);
 
             // 重新抛出异常，让框架处理错误响应
             throw $e;

@@ -5,6 +5,8 @@ namespace Modules\Base\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Exception;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -144,8 +146,25 @@ class Account extends Authenticatable
         $info = self::query()->findOrFail($params['user_id']);
         !$info && throw_exception('账号不存在');
 
+        // 保存旧数据（排除密码字段）
+        $old_data = $info->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
+
         $info->password = Hash::make($params['password']);
         $info->save();
+
+        // 记录审计日志（不记录密码）
+        $new_data = $info->fresh()->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
+        logAudit(
+            request(),
+            currentUserId(),
+            '账号管理',
+            OperationActionEnum::update->value,
+            ResourceTypeEnum::user->value,
+            $params['user_id'],
+            $old_data,
+            $new_data,
+            "修改账号密码: {$info->username}"
+        );
 
         return [];
     }

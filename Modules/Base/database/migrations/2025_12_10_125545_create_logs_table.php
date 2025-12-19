@@ -9,7 +9,6 @@ use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\BrowserEnum;
 use Modules\Base\Enums\OperatingSystemEnum;
 use Modules\Base\Enums\DeviceTypeEnum;
-use Modules\Base\Enums\AuditActionEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
 
 return new class extends Migration {
@@ -25,7 +24,6 @@ return new class extends Migration {
         $browserComment = buildEnumComment(BrowserEnum::cases(), '浏览器名称');
         $operatingSystemComment = buildEnumComment(OperatingSystemEnum::cases(), '操作系统');
         $deviceTypeComment = buildEnumComment(DeviceTypeEnum::cases(), '设备类型');
-        $auditActionComment = buildEnumComment(AuditActionEnum::cases(), '操作类型');
         $resourceTypeComment = buildEnumComment(ResourceTypeEnum::cases(), '资源类型');
 
         // 常规日志表（用于记录各种业务操作日志，如：文件上传、消息推送、短信发送等）
@@ -126,11 +124,11 @@ return new class extends Migration {
         });
 
         // 审计日志表（用于记录敏感操作和重要数据变更）
-        Schema::create('sys_audit_log', function (Blueprint $table) use ($auditActionComment, $resourceTypeComment) {
+        Schema::create('sys_audit_log', function (Blueprint $table) use ($operationActionComment, $resourceTypeComment) {
             $table->id()->comment('审计日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('操作人ID（关联bs_account.id）');
             $table->string('module', 50)->comment('模块名称');
-            $table->string('action', 50)->comment($auditActionComment);
+            $table->string('action', 50)->comment($operationActionComment);
             $table->string('resource_type', 50)->nullable()->comment($resourceTypeComment);
             $table->unsignedBigInteger('resource_id')->nullable()->comment('资源ID');
             $table->json('before_data')->nullable()->comment('变更前数据（JSON格式）');

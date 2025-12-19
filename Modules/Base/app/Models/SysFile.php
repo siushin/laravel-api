@@ -11,6 +11,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Modules\Base\Enums\LogActionEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Enums\UploadFileTypeEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 
@@ -74,7 +78,7 @@ class SysFile extends Model
      * @param UploadedFile $file
      * @param string       $disk
      * @return array
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function uploadFile(UploadedFile $file, string $disk = self::DEFAULT_DISK): array
@@ -99,18 +103,18 @@ class SysFile extends Model
 
         // 存储文件信息到数据库
         $data = [
-            'file_name' => basename($full_file_path),
+            'file_name'        => basename($full_file_path),
             'origin_file_name' => $file->getClientOriginalName(),
-            'file_path' => $file_path,
-            'file_size' => $file->getSize(),
-            'mime_type' => mime_content_type($file->getPathname()),
-            'file_ext_name' => $extension,
-            'user_id' => currentUserId(),
-            'checksum' => hash_file('sha256', $file->getPathname()),
+            'file_path'        => $file_path,
+            'file_size'        => $file->getSize(),
+            'mime_type'        => mime_content_type($file->getPathname()),
+            'file_ext_name'    => $extension,
+            'user_id'          => currentUserId(),
+            'checksum'         => hash_file('sha256', $file->getPathname()),
         ];
         $result = self::query()->create($data);
 
-        logging(LogActionEnum::upload_file->name, "上传文件({$result['file_name']})", $result->toArray());
+        logGeneral(LogActionEnum::upload_file->name, "上传文件({$result['file_name']})", $result->toArray());
 
         // 根据文件类型分发执行附属模型
         if (method_exists($extra_file_obj, 'uploadFileExtraAfterHook')) {
@@ -208,13 +212,43 @@ class SysFile extends Model
             }
 
             // 删除文件表数据（软删除）
+            $old_data = $file_info->toArray();
+            $file_id = $file_info->file_id;
             $file_info->delete();
+
+            // 记录审计日志
+            logAudit(
+                request(),
+                currentUserId(),
+                '文件管理',
+                OperationActionEnum::delete->value,
+                ResourceTypeEnum::file->value,
+                $file_id,
+                $old_data,
+                null,
+                "删除文件: {$old_data['origin_file_name']} (移至回收站)"
+            );
         } else {
             // 删除源文件
             $deleted = Storage::disk(self::DEFAULT_DISK)->delete($from);
             !$deleted && throw_exception("文件删除失败");
             // 删除文件（真实删除）
+            $old_data = $file_info->toArray();
+            $file_id = $file_info->file_id;
             $file_info->forceDelete();
+
+            // 记录审计日志
+            logAudit(
+                request(),
+                currentUserId(),
+                '文件管理',
+                OperationActionEnum::delete->value,
+                ResourceTypeEnum::file->value,
+                $file_id,
+                $old_data,
+                null,
+                "永久删除文件: {$old_data['origin_file_name']}"
+            );
         }
 
         return [];
@@ -225,7 +259,7 @@ class SysFile extends Model
      * @param int  $user_id
      * @param bool $real_delete
      * @return void
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     public static function cleanupFileByUserId(int $user_id, bool $real_delete = false): void
@@ -241,6 +275,6 @@ class SysFile extends Model
                     self::deleteFile($file->toArray());
                 }
             });
-        logging(LogActionEnum::batchDelete->name, "批量删除文件{$count}个", compact('file_ids'));
+        logGeneral(LogActionEnum::batchDelete->name, "批量删除文件{$count}个", compact('file_ids'));
     }
 }
