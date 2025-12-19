@@ -2,6 +2,8 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,6 +12,7 @@ use Nwidart\Modules\Facades\Module;
 
 /**
  * 控制器：应用管理
+ * @module 应用管理
  */
 class AppController extends Controller
 {
@@ -20,6 +23,7 @@ class AppController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getMyApps(Request $request): JsonResponse
     {
         $modulesPath = base_path('Modules');

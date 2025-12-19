@@ -2,6 +2,8 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,6 +13,7 @@ use Modules\Base\Enums\AccountTypeEnum;
 
 /**
  * 控制器：菜单
+ * @module 菜单管理
  */
 class MenuController extends Controller
 {
@@ -21,6 +24,7 @@ class MenuController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getUserMenus(Request $request): JsonResponse
     {
         $user = $request->user();

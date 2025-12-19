@@ -2,6 +2,8 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\AccountTypeEnum;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountProfile;
@@ -21,6 +23,7 @@ use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 /**
  * 控制器：账号
+ * @module 账号管理
  */
 class AccountController extends Controller
 {
@@ -53,6 +56,7 @@ class AccountController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::login)]
     public function login(Request $request): JsonResponse
     {
         // 验证请求数据（登录账号可以是用户名、邮箱或手机号）
@@ -90,6 +94,7 @@ class AccountController extends Controller
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::login)]
     public function loginByCode(Request $request): JsonResponse
     {
         // 验证请求数据
@@ -150,6 +155,7 @@ class AccountController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::logout)]
     public function logout(Request $request): JsonResponse
     {
         $account = $request->user();
@@ -174,6 +180,7 @@ class AccountController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getCurrentUserInfo(Request $request): JsonResponse
     {
         $account = $request->user();
@@ -187,6 +194,7 @@ class AccountController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::update)]
     public function refreshToken(Request $request): JsonResponse
     {
         $account = $request->user();
@@ -207,9 +215,10 @@ class AccountController extends Controller
      * 用户注册
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::add)]
     public function register(Request $request): JsonResponse
     {
         // 验证请求数据
@@ -306,6 +315,7 @@ class AccountController extends Controller
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::update)]
     public function resetPassword(Request $request): JsonResponse
     {
         // 验证请求数据
@@ -378,6 +388,7 @@ class AccountController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::update)]
     public function changePassword(Request $request): JsonResponse
     {
         // 验证请求参数

@@ -2,6 +2,8 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Models\SysLog;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -9,6 +11,10 @@ use Illuminate\Http\Request;
 use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
+/**
+ * 控制器：日志
+ * @module 日志管理
+ */
 class LogController extends Controller
 {
     /**
@@ -18,6 +24,7 @@ class LogController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::index)]
     public function index(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -29,6 +36,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getSourceTypeList(): JsonResponse
     {
         return success(enum_to_array(RequestSourceEnum::cases()));
@@ -39,6 +47,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getActionList(): JsonResponse
     {
         $all_action_list = enum_to_array(LogActionEnum::cases(), 'array');

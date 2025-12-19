@@ -1,6 +1,7 @@
 <?php
 
 use Modules\Base\Http\Middleware\AccessAuth;
+use Modules\Base\Http\Middleware\OperationLogMiddleware;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 将AccessAuth中间件追加到API路由组（在CORS之后执行）
         $middleware->api(append: [
             AccessAuth::class,
+            OperationLogMiddleware::class,
         ]);
         // 跳过所有CSRF保护
         $middleware->validateCsrfTokens(except: ['*']);

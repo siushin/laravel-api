@@ -35,7 +35,7 @@ function getEnumComment(UnitEnum $case): ?string
  * 构建枚举字段的注释字符串
  * @param array  $enumCases 枚举cases数组
  * @param string $typeName  类型名称（如：账号类型、组织架构类型等）
- * @return string 格式：类型名[value:描述,value:描述,...]
+ * @return string 格式：类型名[key:value,key:value,...] 或 类型名[value:描述,value:描述,...]（如果有注释）
  * @throws ReflectionException
  * @author siushin<siushin@163.com>
  */
@@ -44,11 +44,15 @@ function buildEnumComment(array $enumCases, string $typeName): string
     $commentParts = [];
     foreach ($enumCases as $case) {
         $description = getEnumComment($case);
-        $value = ($case instanceof BackedEnum) ? $case->value : $case->name;
+        $enumKey = $case->name; // 枚举名称（如：index, create）
+        $enumValue = ($case instanceof BackedEnum) ? $case->value : $case->name; // 枚举值
+
+        // 如果有注释（旧格式），使用 value:描述 格式（向后兼容）
         if ($description) {
-            $commentParts[] = $value . ':' . $description;
+            $commentParts[] = $enumValue . ':' . $description;
         } else {
-            $commentParts[] = $value;
+            // 新格式：key:value（枚举名称:枚举值）
+            $commentParts[] = $enumKey . ':' . $enumValue;
         }
     }
     return $typeName . '[' . implode(',', $commentParts) . ']';

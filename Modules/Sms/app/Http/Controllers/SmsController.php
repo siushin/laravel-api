@@ -3,6 +3,8 @@
 namespace Modules\Sms\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,6 +14,7 @@ use Modules\Base\Enums\LogActionEnum;
 
 /**
  * 控制器：短信服务
+ * @module 短信服务
  */
 class SmsController extends Controller
 {
@@ -36,6 +39,7 @@ class SmsController extends Controller
      * @throws Exception|InvalidArgumentException
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::add)]
     public function sendSms(Request $request): JsonResponse
     {
         // 校验参数

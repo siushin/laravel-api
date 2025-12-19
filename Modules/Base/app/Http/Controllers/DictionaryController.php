@@ -2,6 +2,8 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Modules\Base\Attributes\OperationAction;
+use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Models\SysDictionary;
 use Modules\Base\Models\SysDictionaryCategory;
 use Exception;
@@ -12,6 +14,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * 控制器：字典
+ * @module 数据字典
  */
 class DictionaryController extends Controller
 {
@@ -24,6 +27,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::index)]
     public function index(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -38,6 +42,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function all(Request $request, array $fields = []): JsonResponse
     {
         $params = $request->all();
@@ -51,6 +56,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::add)]
     public function add(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -64,6 +70,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::update)]
     public function update(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -77,6 +84,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::delete)]
     public function delete(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -90,6 +98,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::batchDelete)]
     public function batchDelete(Request $request): JsonResponse
     {
         $params = $request->all();
@@ -103,6 +112,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::download)]
     public function getTplFile(Request $request): BinaryFileResponse
     {
         $params = $request->all();
@@ -117,6 +127,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
+    #[OperationAction(OperationActionEnum::view)]
     public function getPidData(Request $request): JsonResponse
     {
         $params = $request->all();
