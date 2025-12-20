@@ -32,27 +32,6 @@ function logGeneral(string $action_type, string $content, array $extend_data = [
 }
 
 /**
- * 记录登录日志
- * @param Request     $request    请求对象
- * @param int|null    $account_id 账号ID
- * @param string|null $username   用户名
- * @param int         $status     登录状态：1成功，0失败
- * @param string|null $message    登录信息/错误信息
- * @return bool
- * @author siushin<siushin@163.com>
- */
-function logLogin(Request $request, ?int $account_id = null, ?string $username = null, int $status = 1, ?string $message = null): bool
-{
-    try {
-        $logService = app(LogService::class);
-        return $logService->logLogin($request, $account_id, $username, $status, $message);
-    } catch (Exception $e) {
-        Log::error('记录登录日志失败: ' . $e->getMessage());
-        return false;
-    }
-}
-
-/**
  * 记录操作日志
  * @param Request    $request        请求对象
  * @param int|null   $account_id     账号ID
@@ -118,6 +97,27 @@ function logAudit(
         return $logService->logAudit($request, $account_id, $module, $action, $resource_type, $resource_id, $before_data, $after_data, $description);
     } catch (Exception $e) {
         Log::error('记录审计日志失败: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * 记录登录日志
+ * @param Request     $request    请求对象
+ * @param int|null    $account_id 账号ID
+ * @param string|null $username   用户名
+ * @param int         $status     登录状态：1成功，0失败
+ * @param string|null $message    登录信息/错误信息
+ * @return bool
+ * @author siushin<siushin@163.com>
+ */
+function logLogin(Request $request, ?int $account_id = null, ?string $username = null, int $status = 1, ?string $message = null): bool
+{
+    try {
+        $logService = app(LogService::class);
+        return $logService->logLogin($request, $account_id, $username, $status, $message);
+    } catch (Exception $e) {
+        Log::error('记录登录日志失败: ' . $e->getMessage());
         return false;
     }
 }

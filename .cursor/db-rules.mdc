@@ -14,6 +14,8 @@ scope:
 
 **如果需要对比新旧数据，找出差异部分，进行新增、更新、删除操作的，必须使用助手函数 `compareDbDataDiff()`。**
 
+**所有分页数据、列表数据查询时，都必须支持 `account_id` 的完全匹配查询。**
+
 ## 2. 主键ID生成规范
 
 ### 2.1 必须使用 generateId() 函数
@@ -39,6 +41,14 @@ scope:
 - **禁止**：手动编写循环对比新旧数据的逻辑
 - **必须**：使用 `compareDbDataDiff()` 助手函数自动计算差异
 - **适用范围**：所有需要批量处理数据变更的场景（如批量更新关联数据、同步数据等）
+
+### 2.4 account_id 查询支持规范
+
+**重要**：所有分页数据、列表数据查询时，都必须支持 `account_id` 的完全匹配查询。
+
+- **必须**：在使用 `fastGetPageData()` 或 `fastGetAllData()` 等方法时，必须在查询配置数组中包含 `'account_id' => '='`
+- **适用范围**：所有使用封装的分页/列表查询方法的场景
+- **目的**：确保普通用户只能查看自己的数据，管理员可以按账号ID筛选数据
 
 ## 3. 正确示例
 
@@ -132,6 +142,47 @@ foreach ($diff['delete'] as $item) {
 // ... 手动处理逻辑
 ```
 
+### 3.5 分页/列表查询中支持 account_id 示例
+
+```php
+// 正确：在 fastGetPageData() 中必须包含 account_id 的完全匹配查询
+public static function getPageData(array $params = []): array
+{
+    $data = self::fastGetPageData(self::query(), $params, [
+        'account_id'   => '=',  // 必须：支持 account_id 的完全匹配查询
+        'source_type'  => '=',
+        'action_type'  => '=',
+        'ip_address'   => 'like',
+        'content'      => 'like',
+        'keyword'      => 'content',
+        'date_range'   => 'created_at',
+    ]);
+    return $data;
+}
+
+// 正确：在 fastGetAllData() 中也要包含 account_id
+public static function getAllData(array $params = [], array $fields = []): array
+{
+    $data = self::fastGetAllData(self::query(), $params, [
+        'account_id'   => '=',  // 必须：支持 account_id 的完全匹配查询
+        'category_id'  => '=',
+        'status'        => '=',
+    ], $fields);
+    return $data;
+}
+
+// 错误：缺少 account_id 查询支持
+public static function getPageData(array $params = []): array
+{
+    $data = self::fastGetPageData(self::query(), $params, [
+        // 'account_id' => '=',  // 错误：缺少 account_id 查询支持
+        'source_type'  => '=',
+        'action_type'  => '=',
+    ]);
+    return $data;
+}
+```
+
 ## 4. 重要提醒
 
 - **所有主键ID字段**，在创建记录时都必须使用 `generateId()` 函数
@@ -140,3 +191,5 @@ foreach ($diff['delete'] as $item) {
 - 确保每个需要主键ID的创建操作都包含 `'id' => generateId()`
 - **所有需要对比新旧数据差异的场景**，都必须使用 `compareDbDataDiff()` 助手函数
 - 不要手动编写数据对比逻辑，应使用 `compareDbDataDiff()` 自动计算新增、更新、删除的差异
+- **所有分页/列表查询方法**，都必须支持 `account_id` 的完全匹配查询（`'account_id' => '='`）
+- 确保普通用户只能查看自己的数据，管理员可以按账号ID筛选数据

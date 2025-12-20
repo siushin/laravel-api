@@ -1,9 +1,9 @@
 ---
 alwaysApply: true
 scope:
-  filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
-  aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
-  version: "1.0.0"  # 规则版本(便于迭代)
+    filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
+    aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
+    version: "1.0.0"  # 规则版本(便于迭代)
 ---
 
 # 【API接口模块】规则约束
@@ -14,9 +14,19 @@ scope:
 
 所有搜索数据接口遵循命名规则：`get + 列表接口方法名 + SearchData`
 
-### 1.2 接口列表
+### 1.2 注释格式规范
 
-- `getIndexSearchData()` - 常规日志搜索数据
-- `getOperationLogSearchData()` - 操作日志搜索数据
-- `getLoginLogSearchData()` - 登录日志搜索数据
-- `getAuditLogSearchData()` - 审计日志搜索数据
+**所有搜索数据接口方法的注释必须使用固定格式**：
+
+```php
+/**
+ * 获取搜索框数据：{模块名称}
+ * @return JsonResponse
+ * @author siushin<siushin@163.com>
+ */
+```
+
+**格式说明**：
+
+- 注释第一行必须为：`获取搜索框数据：{模块名称}`
+- `{模块名称}` 为对应的业务模块名称（如：常规日志、操作日志、登录日志、审计日志等）

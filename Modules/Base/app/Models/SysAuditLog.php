@@ -24,7 +24,7 @@ class SysAuditLog extends Model
     {
         return [
             'before_data' => Json::class,
-            'after_data' => Json::class,
+            'after_data'  => Json::class,
         ];
     }
 
@@ -38,13 +38,14 @@ class SysAuditLog extends Model
     public static function getPageData(array $params = []): array
     {
         $data = self::fastGetPageData(self::query(), $params, [
-            'account_id' => '=',
-            'module' => 'like',
-            'action' => '=',
+            'account_id'    => '=',
+            'module'        => 'like',
+            'action'        => '=',
             'resource_type' => '=',
-            'resource_id' => '=',
-            'date_range' => 'audited_at',
-            'keyword' => ['module', 'description'],
+            'keyword'       => ['before_data', 'after_data', 'description'],
+            'resource_id'   => '=',
+            'ip_address'    => 'like',
+            'date_range'    => 'audited_at',
         ]);
 
         // 关联账号信息

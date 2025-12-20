@@ -30,14 +30,13 @@ class SysLoginLog extends Model
     {
         $data = self::fastGetPageData(self::query(), $params, [
             'account_id'       => '=',
-            'username'         => 'like',
+            'keyword'          => ['username', 'ip_location', 'message'],
             'status'           => '=',
             'ip_address'       => 'like',
+            'date_range'       => 'login_at',
             'browser'          => '=',
             'operating_system' => '=',
             'device_type'      => '=',
-            'date_range'       => 'login_at',
-            'keyword'          => ['username', 'ip_address', 'message'],
         ]);
 
         // 关联账号信息

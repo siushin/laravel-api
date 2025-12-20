@@ -20,50 +20,57 @@ use Siushin\LaravelTool\Enums\SocialTypeEnum;
 class LogService
 {
     /**
-     * 记录登录日志
-     * @param Request     $request   请求对象
-     * @param int|null    $accountId 账号ID
-     * @param string|null $username  用户名
-     * @param int         $status    登录状态：1成功，0失败
-     * @param string|null $message   登录信息/错误信息
+     * 记录常规日志（兼容原有的logging函数）
+     * @param string   $actionType 操作类型（对应LogActionEnum）
+     * @param string   $content    日志内容
+     * @param array    $extendData 扩展数据
+     * @param int|null $accountId  账号ID（可选，如果不提供会尝试从请求中获取）
      * @return bool
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      */
-    public function logLogin(Request $request, ?int $accountId = null, ?string $username = null, int $status = 1, ?string $message = null): bool
+    public function logGeneral(string $actionType, string $content, array $extendData = [], ?int $accountId = null): bool
     {
         try {
-            $ipAddress = $request->ip();
-            $userAgent = $request->userAgent() ?? '';
+            $request = request();
 
-            // 解析User-Agent获取浏览器和操作系统信息
-            $browserInfo = $this->parseUserAgent($userAgent);
+            // 如果没有提供account_id，尝试从请求中获取
+            if (!$accountId) {
+                $accountId = currentUserId() ?? null;
+
+                // 如果仍然为空，且 extend_data 中包含 phone，尝试通过手机号查找
+                if (!$accountId && !empty($extendData['phone'])) {
+                    $accountSocial = AccountSocial::query()
+                        ->where('social_type', SocialTypeEnum::Phone->value)
+                        ->where('social_account', $extendData['phone'])
+                        ->first();
+
+                    if ($accountSocial) {
+                        $accountId = $accountSocial->user_id;
+                    }
+                }
+            }
+
+            $sourceType = $request->get('request_source') ?? RequestSourceEnum::guest->value;
+            $ipAddress = $request->ip();
 
             // 获取IP归属地
             $ipLocation = $this->getIpLocation($ipAddress);
 
-            // 如果没有提供消息，根据状态生成默认消息
-            if (!$message) {
-                $message = $status === 1 ? '登录成功' : '登录失败';
-            }
-
             $data = [
-                'id'               => generateId(),
-                'account_id'       => $accountId,
-                'username'         => $username,
-                'status'           => $status,
-                'ip_address'       => $ipAddress,
-                'ip_location'      => $ipLocation,
-                'browser'          => $browserInfo['browser'],
-                'browser_version'  => $browserInfo['browser_version'],
-                'operating_system' => $browserInfo['os'],
-                'device_type'      => $browserInfo['device_type'],
-                'user_agent'       => $userAgent,
-                'message'          => $message,
-                'login_at'         => now(),
+                'log_id'      => generateId(),
+                'account_id'  => $accountId,
+                'source_type' => $sourceType,
+                'action_type' => $actionType,
+                'content'     => $content,
+                'ip_address'  => $ipAddress,
+                'ip_location' => $ipLocation,
+                'extend_data' => !empty($extendData) ? json_encode($extendData, JSON_UNESCAPED_UNICODE) : null,
+                'created_at'  => now(),
             ];
 
-            return DB::table('sys_login_log')->insert($data);
+            return DB::table('sys_logs')->insert($data);
         } catch (Exception $e) {
-            Log::error('记录登录日志失败: ' . $e->getMessage());
+            Log::error('记录常规日志失败: ' . $e->getMessage());
             return false;
         }
     }
@@ -181,57 +188,50 @@ class LogService
     }
 
     /**
-     * 记录常规日志（兼容原有的logging函数）
-     * @param string   $actionType 操作类型（对应LogActionEnum）
-     * @param string   $content    日志内容
-     * @param array    $extendData 扩展数据
-     * @param int|null $accountId  账号ID（可选，如果不提供会尝试从请求中获取）
+     * 记录登录日志
+     * @param Request     $request   请求对象
+     * @param int|null    $accountId 账号ID
+     * @param string|null $username  用户名
+     * @param int         $status    登录状态：1成功，0失败
+     * @param string|null $message   登录信息/错误信息
      * @return bool
-     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      */
-    public function logGeneral(string $actionType, string $content, array $extendData = [], ?int $accountId = null): bool
+    public function logLogin(Request $request, ?int $accountId = null, ?string $username = null, int $status = 1, ?string $message = null): bool
     {
         try {
-            $request = request();
-
-            // 如果没有提供account_id，尝试从请求中获取
-            if (!$accountId) {
-                $accountId = currentUserId() ?? null;
-
-                // 如果仍然为空，且 extend_data 中包含 phone，尝试通过手机号查找
-                if (!$accountId && !empty($extendData['phone'])) {
-                    $accountSocial = AccountSocial::query()
-                        ->where('social_type', SocialTypeEnum::Phone->value)
-                        ->where('social_account', $extendData['phone'])
-                        ->first();
-
-                    if ($accountSocial) {
-                        $accountId = $accountSocial->user_id;
-                    }
-                }
-            }
-
-            $sourceType = $request->get('request_source') ?? RequestSourceEnum::guest->value;
             $ipAddress = $request->ip();
+            $userAgent = $request->userAgent() ?? '';
+
+            // 解析User-Agent获取浏览器和操作系统信息
+            $browserInfo = $this->parseUserAgent($userAgent);
 
             // 获取IP归属地
             $ipLocation = $this->getIpLocation($ipAddress);
 
+            // 如果没有提供消息，根据状态生成默认消息
+            if (!$message) {
+                $message = $status === 1 ? '登录成功' : '登录失败';
+            }
+
             $data = [
-                'log_id'      => generateId(),
-                'account_id'  => $accountId,
-                'source_type' => $sourceType,
-                'action_type' => $actionType,
-                'content'     => $content,
-                'ip_address'  => $ipAddress,
-                'ip_location' => $ipLocation,
-                'extend_data' => !empty($extendData) ? json_encode($extendData, JSON_UNESCAPED_UNICODE) : null,
-                'created_at'  => now(),
+                'id'               => generateId(),
+                'account_id'       => $accountId,
+                'username'         => $username,
+                'status'           => $status,
+                'ip_address'       => $ipAddress,
+                'ip_location'      => $ipLocation,
+                'browser'          => $browserInfo['browser'],
+                'browser_version'  => $browserInfo['browser_version'],
+                'operating_system' => $browserInfo['os'],
+                'device_type'      => $browserInfo['device_type'],
+                'user_agent'       => $userAgent,
+                'message'          => $message,
+                'login_at'         => now(),
             ];
 
-            return DB::table('sys_logs')->insert($data);
+            return DB::table('sys_login_log')->insert($data);
         } catch (Exception $e) {
-            Log::error('记录常规日志失败: ' . $e->getMessage());
+            Log::error('记录登录日志失败: ' . $e->getMessage());
             return false;
         }
     }

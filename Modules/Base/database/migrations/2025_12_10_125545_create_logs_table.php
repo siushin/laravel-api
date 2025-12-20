@@ -62,7 +62,7 @@ return new class extends Migration {
             $table->string('module', 50)->comment('模块名称');
             $table->string('action', 50)->comment($operationActionComment);
             $table->string('method', 10)->comment($httpMethodComment);
-            $table->text('path')->comment('请求路径');
+            $table->text('path')->comment('请求URL');
             $table->text('params')->nullable()->comment('请求参数（JSON格式）');
             $table->ipAddress()->comment('IP地址');
             $table->string('ip_location')->nullable()->comment('IP归属地');
@@ -87,40 +87,6 @@ return new class extends Migration {
             $table->index(['module', 'operated_at']);
 
             $table->comment('操作日志表');
-        });
-
-        // 登录日志表（用于记录用户登录/登出日志）
-        Schema::create('sys_login_log', function (Blueprint $table) use ($browserComment, $operatingSystemComment, $deviceTypeComment) {
-            $table->id()->comment('登录日志ID');
-            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
-            $table->string('username', 50)->nullable()->comment('用户名（冗余字段，便于查询）');
-            $table->tinyInteger('status')->default(0)->comment('登录状态: 1成功, 0失败');
-            $table->ipAddress('ip_address')->comment('IP地址');
-            $table->string('ip_location')->nullable()->comment('IP归属地/登录地点');
-            $table->string('browser', 50)->nullable()->comment($browserComment);
-            $table->string('browser_version', 20)->nullable()->comment('浏览器版本');
-            $table->string('operating_system', 50)->nullable()->comment($operatingSystemComment);
-            $table->string('device_type', 20)->nullable()->comment($deviceTypeComment);
-            $table->text('user_agent')->nullable()->comment('User-Agent原始字符串');
-            $table->string('message', 500)->nullable()->comment('登录信息/错误信息（如：登录成功、密码错误）');
-            $table->timestamp('login_at')->useCurrent()->comment('登录时间');
-
-            $table->foreign('account_id')
-                ->references('id')
-                ->on('bs_account')
-                ->onDelete('set null')
-                ->onUpdate('cascade');
-
-            $table->index('account_id');
-            $table->index('username');
-            $table->index('status');
-            $table->index('ip_address');
-            $table->index('login_at');
-            $table->index(['account_id', 'login_at']);
-            $table->index(['status', 'login_at']);
-            $table->index(['ip_address', 'login_at']);
-
-            $table->comment('登录日志表');
         });
 
         // 审计日志表（用于记录敏感操作和重要数据变更）
@@ -158,6 +124,40 @@ return new class extends Migration {
 
             $table->comment('审计日志表');
         });
+
+        // 登录日志表（用于记录用户登录/登出日志）
+        Schema::create('sys_login_log', function (Blueprint $table) use ($browserComment, $operatingSystemComment, $deviceTypeComment) {
+            $table->id()->comment('登录日志ID');
+            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
+            $table->string('username', 50)->nullable()->comment('用户名（冗余字段，便于查询）');
+            $table->tinyInteger('status')->default(0)->comment('登录状态: 1成功, 0失败');
+            $table->ipAddress('ip_address')->comment('IP地址');
+            $table->string('ip_location')->nullable()->comment('IP归属地');
+            $table->string('browser', 50)->nullable()->comment($browserComment);
+            $table->string('browser_version', 20)->nullable()->comment('浏览器版本');
+            $table->string('operating_system', 50)->nullable()->comment($operatingSystemComment);
+            $table->string('device_type', 20)->nullable()->comment($deviceTypeComment);
+            $table->text('user_agent')->nullable()->comment('User-Agent');
+            $table->string('message', 500)->nullable()->comment('登录信息/错误信息（如：登录成功、密码错误）');
+            $table->timestamp('login_at')->useCurrent()->comment('登录时间');
+
+            $table->foreign('account_id')
+                ->references('id')
+                ->on('bs_account')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
+
+            $table->index('account_id');
+            $table->index('username');
+            $table->index('status');
+            $table->index('ip_address');
+            $table->index('login_at');
+            $table->index(['account_id', 'login_at']);
+            $table->index(['status', 'login_at']);
+            $table->index(['ip_address', 'login_at']);
+
+            $table->comment('登录日志表');
+        });
     }
 
     /**
@@ -165,9 +165,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        Schema::dropIfExists('sys_logs');
+        Schema::dropIfExists('sys_operation_log');
         Schema::dropIfExists('sys_audit_log');
         Schema::dropIfExists('sys_login_log');
-        Schema::dropIfExists('sys_operation_log');
-        Schema::dropIfExists('sys_logs');
     }
 };

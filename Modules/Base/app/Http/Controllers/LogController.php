@@ -11,7 +11,7 @@ use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\OperatingSystemEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Models\SysAuditLog;
-use Modules\Base\Models\SysLog;
+use Modules\Base\Models\SysGeneralLog;
 use Modules\Base\Models\SysLoginLog;
 use Modules\Base\Models\SysOperationLog;
 use Exception;
@@ -33,10 +33,10 @@ class LogController extends Controller
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::index)]
-    public function index(Request $request): JsonResponse
+    public function generalLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysLog::getPageData($params));
+        return success(SysGeneralLog::getPageData($params));
     }
 
     /**
@@ -54,20 +54,6 @@ class LogController extends Controller
     }
 
     /**
-     * 登录日志列表（分页）
-     * @param Request $request
-     * @return JsonResponse
-     * @throws Exception
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::index)]
-    public function loginLog(Request $request): JsonResponse
-    {
-        $params = trimParam($request->all());
-        return success(SysLoginLog::getPageData($params));
-    }
-
-    /**
      * 审计日志列表（分页）
      * @param Request $request
      * @return JsonResponse
@@ -82,302 +68,26 @@ class LogController extends Controller
     }
 
     /**
-     * 来源类型列表
+     * 登录日志列表（分页）
+     * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getSourceTypeList(): JsonResponse
+    #[OperationAction(OperationActionEnum::index)]
+    public function loginLog(Request $request): JsonResponse
     {
-        $list = [];
-        foreach (RequestSourceEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
+        $params = trimParam($request->all());
+        return success(SysLoginLog::getPageData($params));
     }
 
     /**
-     * 日志操作类型列表（常规日志）
+     * 获取搜索框数据：常规日志
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::query)]
-    public function getActionList(): JsonResponse
-    {
-        $list = [];
-        foreach (LogActionEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->name,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 操作类型列表（操作日志）
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getOperationActionList(): JsonResponse
-    {
-        $list = [];
-        foreach (OperationActionEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * HTTP方法列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getHttpMethodList(): JsonResponse
-    {
-        $list = [];
-        foreach (HttpMethodEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 浏览器列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getBrowserList(): JsonResponse
-    {
-        $list = [];
-        foreach (BrowserEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 操作系统列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getOperatingSystemList(): JsonResponse
-    {
-        $list = [];
-        foreach (OperatingSystemEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 设备类型列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getDeviceTypeList(): JsonResponse
-    {
-        $list = [];
-        foreach (DeviceTypeEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 审计操作类型列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getAuditActionList(): JsonResponse
-    {
-        $list = [];
-        foreach (OperationActionEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 资源类型列表
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getResourceTypeList(): JsonResponse
-    {
-        $list = [];
-        foreach (ResourceTypeEnum::cases() as $case) {
-            $list[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 获取操作日志模块名称列表（去重）
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getModuleList(): JsonResponse
-    {
-        $modules = SysOperationLog::query()
-            ->distinct()
-            ->whereNotNull('module')
-            ->where('module', '!=', '')
-            ->orderBy('module')
-            ->pluck('module')
-            ->toArray();
-
-        $list = [];
-        foreach ($modules as $module) {
-            $list[] = [
-                'label' => $module,
-                'value' => $module,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 获取操作日志响应状态码列表（去重）
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getResponseCodeList(): JsonResponse
-    {
-        $responseCodes = SysOperationLog::query()
-            ->distinct()
-            ->whereNotNull('response_code')
-            ->orderBy('response_code')
-            ->pluck('response_code')
-            ->toArray();
-
-        $list = [];
-        foreach ($responseCodes as $code) {
-            $list[] = [
-                'label' => (string)$code,
-                'value' => $code,
-            ];
-        }
-        return success($list);
-    }
-
-    /**
-     * 获取操作日志搜索框所需的所有选项数据
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getOperationLogSearchOptions(): JsonResponse
-    {
-        // 模块名称列表（去重）
-        $modules = SysOperationLog::query()
-            ->distinct()
-            ->whereNotNull('module')
-            ->where('module', '!=', '')
-            ->orderBy('module')
-            ->pluck('module')
-            ->toArray();
-
-        $moduleList = [];
-        foreach ($modules as $module) {
-            $moduleList[] = [
-                'label' => $module,
-                'value' => $module,
-            ];
-        }
-
-        // 操作类型列表
-        $operationActionList = [];
-        foreach (OperationActionEnum::cases() as $case) {
-            $operationActionList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        // HTTP方法列表
-        $httpMethodList = [];
-        foreach (HttpMethodEnum::cases() as $case) {
-            $httpMethodList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        // 响应状态码列表（去重）
-        $responseCodes = SysOperationLog::query()
-            ->distinct()
-            ->whereNotNull('response_code')
-            ->orderBy('response_code')
-            ->pluck('response_code')
-            ->toArray();
-
-        $responseCodeList = [];
-        foreach ($responseCodes as $code) {
-            $responseCodeList[] = [
-                'label' => (string)$code,
-                'value' => $code,
-            ];
-        }
-
-        // 访问来源列表
-        $sourceTypeList = [];
-        foreach (RequestSourceEnum::cases() as $case) {
-            $sourceTypeList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        return success([
-            'module' => $moduleList,
-            'action' => $operationActionList,
-            'method' => $httpMethodList,
-            'response_code' => $responseCodeList,
-            'source_type' => $sourceTypeList,
-        ]);
-    }
-
-    /**
-     * 获取常规日志搜索框所需的所有选项数据
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getIndexSearchData(): JsonResponse
+    public function getGeneralLogSearchData(): JsonResponse
     {
         // 操作类型列表（常规日志）
         $actionList = [];
@@ -404,7 +114,7 @@ class LogController extends Controller
     }
 
     /**
-     * 获取操作日志搜索框所需的所有选项数据
+     * 获取搜索框数据：操作日志
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
@@ -472,65 +182,16 @@ class LogController extends Controller
         }
 
         return success([
-            'module' => $moduleList,
-            'action' => $operationActionList,
-            'method' => $httpMethodList,
+            'module'        => $moduleList,
+            'action'        => $operationActionList,
+            'method'        => $httpMethodList,
             'response_code' => $responseCodeList,
-            'source_type' => $sourceTypeList,
+            'source_type'   => $sourceTypeList,
         ]);
     }
 
     /**
-     * 获取登录日志搜索框所需的所有选项数据
-     * @return JsonResponse
-     * @author siushin<siushin@163.com>
-     */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getLoginLogSearchData(): JsonResponse
-    {
-        // 浏览器列表
-        $browserList = [];
-        foreach (BrowserEnum::cases() as $case) {
-            $browserList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        // 操作系统列表
-        $osList = [];
-        foreach (OperatingSystemEnum::cases() as $case) {
-            $osList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        // 设备类型列表
-        $deviceTypeList = [];
-        foreach (DeviceTypeEnum::cases() as $case) {
-            $deviceTypeList[] = [
-                'label' => $case->value,
-                'value' => $case->value,
-            ];
-        }
-
-        // 登录状态列表（固定值）
-        $statusList = [
-            ['label' => '成功', 'value' => 1],
-            ['label' => '失败', 'value' => 0],
-        ];
-
-        return success([
-            'browser' => $browserList,
-            'operating_system' => $osList,
-            'device_type' => $deviceTypeList,
-            'status' => $statusList,
-        ]);
-    }
-
-    /**
-     * 获取审计日志搜索框所需的所有选项数据
+     * 获取搜索框数据：审计日志
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
@@ -573,9 +234,58 @@ class LogController extends Controller
         }
 
         return success([
-            'module' => $moduleList,
-            'action' => $actionList,
+            'module'        => $moduleList,
+            'action'        => $actionList,
             'resource_type' => $resourceTypeList,
+        ]);
+    }
+
+    /**
+     * 获取搜索框数据：登录日志
+     * @return JsonResponse
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::query)]
+    public function getLoginLogSearchData(): JsonResponse
+    {
+        // 浏览器列表
+        $browserList = [];
+        foreach (BrowserEnum::cases() as $case) {
+            $browserList[] = [
+                'label' => $case->value,
+                'value' => $case->value,
+            ];
+        }
+
+        // 操作系统列表
+        $osList = [];
+        foreach (OperatingSystemEnum::cases() as $case) {
+            $osList[] = [
+                'label' => $case->value,
+                'value' => $case->value,
+            ];
+        }
+
+        // 设备类型列表
+        $deviceTypeList = [];
+        foreach (DeviceTypeEnum::cases() as $case) {
+            $deviceTypeList[] = [
+                'label' => $case->value,
+                'value' => $case->value,
+            ];
+        }
+
+        // 登录状态列表（固定值）
+        $statusList = [
+            ['label' => '成功', 'value' => 1],
+            ['label' => '失败', 'value' => 0],
+        ];
+
+        return success([
+            'browser'          => $browserList,
+            'operating_system' => $osList,
+            'device_type'      => $deviceTypeList,
+            'status'           => $statusList,
         ]);
     }
 }

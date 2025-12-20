@@ -13,9 +13,9 @@ use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
 /**
- * 模型：系统日志
+ * 模型：常规日志
  */
-class SysLog extends Model
+class SysGeneralLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
@@ -57,30 +57,38 @@ class SysLog extends Model
     public static function getPageData(array $params = []): array
     {
         $data = self::fastGetPageData(self::query(), $params, [
+            'account_id'  => '=',
             'source_type' => '=',
             'action_type' => '=',
-            'keyword'     => 'content',
-            'date_range'  => 'created_at'
+            'keyword'     => 'content|ip_location',
+            'ip_address'  => 'like',
+            'date_range'  => 'created_at',
         ]);
 
-        $user_ids = array_values(array_unique(array_column($data['data'], 'user_id')));
-        $user_list = Account::query()
-            ->whereIn('id', $user_ids)
-            ->with('profile')
-            ->select(['username', 'id'])
-            ->get()
-            ->toArray();
-        $user_list = array_column($user_list, null, 'id');
+        $accountIds = array_values(array_unique(array_filter(array_column($data['data'], 'account_id'))));
+        if (!empty($accountIds)) {
+            $accounts = Account::query()
+                ->whereIn('id', $accountIds)
+                ->with('profile')
+                ->select(['username', 'id'])
+                ->get()
+                ->toArray();
+            $accountList = array_column($accounts, null, 'id');
 
-        foreach ($data['data'] as &$item) {
-            if (isset($user_list[$item['user_id']])) {
-                $nickname = $user_list[$item['user_id']]['profile']['nickname'] ?? '';
-                $username = $user_list[$item['user_id']]['username'];
-                $item['username'] = $nickname ? "{$nickname}({$username})" : $username;
-            } else {
+            foreach ($data['data'] as &$item) {
+                if (isset($accountList[$item['account_id']])) {
+                    $account = $accountList[$item['account_id']];
+                    $nickname = $account['profile']['nickname'] ?? '';
+                    $username = $account['username'];
+                    $item['username'] = $nickname ? "{$nickname}({$username})" : $username;
+                } else {
+                    $item['username'] = '';
+                }
+            }
+        } else {
+            foreach ($data['data'] as &$item) {
                 $item['username'] = '';
             }
-            unset($item['user_id']);
         }
 
         return $data;

@@ -39,14 +39,14 @@ class SysOperationLog extends Model
         $data = self::fastGetPageData(self::query(), $params, [
             'account_id'    => '=',
             'source_type'   => '=',
-            'module'        => 'like',
+            'module'        => '=',
             'action'        => '=',
             'method'        => '=',
             'path'          => 'like',
             'ip_address'    => 'like',
             'response_code' => '=',
             'date_range'    => 'operated_at',
-            'keyword'       => ['path', 'module'],
+            'keyword'       => ['params', 'ip_location', 'user_agent'],
         ]);
 
         // 关联账号信息
