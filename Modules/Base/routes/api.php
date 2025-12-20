@@ -70,6 +70,11 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/log/getResourceTypeList', [LogController::class, 'getResourceTypeList']);  // 资源类型列表
     Route::post('/log/getModuleList', [LogController::class, 'getModuleList']);  // 操作日志模块名称列表
     Route::post('/log/getResponseCodeList', [LogController::class, 'getResponseCodeList']);  // 操作日志响应状态码列表
+    Route::post('/log/getOperationLogSearchOptions', [LogController::class, 'getOperationLogSearchOptions']);  // 操作日志搜索框选项（整合接口）
+    Route::post('/log/getIndexSearchData', [LogController::class, 'getIndexSearchData']);  // 常规日志搜索数据
+    Route::post('/log/getOperationLogSearchData', [LogController::class, 'getOperationLogSearchData']);  // 操作日志搜索数据
+    Route::post('/log/getLoginLogSearchData', [LogController::class, 'getLoginLogSearchData']);  // 登录日志搜索数据
+    Route::post('/log/getAuditLogSearchData', [LogController::class, 'getAuditLogSearchData']);  // 审计日志搜索数据
 
     // 应用管理
     Route::post('/app/myApps', [AppController::class, 'getMyApps']);  // 获取我的应用列表

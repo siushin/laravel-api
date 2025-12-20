@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+scope:
+  filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
+  aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
+  version: "1.0.0"  # 规则版本(便于迭代)
+---

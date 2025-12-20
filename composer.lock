@@ -3877,21 +3877,24 @@
         },
         {
             "name": "siushin/util",
-            "version": "v1.0.2",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/php-util.git",
-                "reference": "4274df44a2a210d119268f1d7558e72a53a25657"
+                "reference": "5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/php-util/zipball/4274df44a2a210d119268f1d7558e72a53a25657",
-                "reference": "4274df44a2a210d119268f1d7558e72a53a25657",
+                "url": "https://api.github.com/repos/siushin/php-util/zipball/5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb",
+                "reference": "5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "php": "^8.3"
+            },
+            "require-dev": {
+                "beyondcode/laravel-dump-server": "^2.1"
             },
             "type": "library",
             "autoload": {
@@ -3923,9 +3926,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/php-util/issues",
-                "source": "https://github.com/siushin/php-util/tree/v1.0.2"
+                "source": "https://github.com/siushin/php-util/tree/v1.0.4"
             },
-            "time": "2025-12-19T08:37:53+00:00"
+            "time": "2025-12-20T06:29:11+00:00"
         },
         {
             "name": "symfony/clock",

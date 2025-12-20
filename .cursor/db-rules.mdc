@@ -1,0 +1,142 @@
+---
+alwaysApply: true
+scope:
+  filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
+  aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
+  version: "1.0.0"  # 规则版本(便于迭代)
+---
+
+# 【数据库模块】规则约束
+
+## 1. 核心原则
+
+**所有主键ID，都必须使用助手函数 `generateId()` 来指定生成。**
+
+**如果需要对比新旧数据，找出差异部分，进行新增、更新、删除操作的，必须使用助手函数 `compareDbDataDiff()`。**
+
+## 2. 主键ID生成规范
+
+### 2.1 必须使用 generateId() 函数
+
+- **禁止**：直接使用数据库自增（AUTO_INCREMENT）或手动指定ID值
+- **必须**：使用 `generateId()` 助手函数生成主键ID
+- **适用范围**：所有需要指定主键ID的数据创建操作
+
+### 2.2 使用场景
+
+以下场景必须使用 `generateId()`：
+
+1. **Model::create() 创建记录时**
+2. **Model::query()->create() 创建记录时**
+3. **Factory 定义中**
+4. **Seeder 数据填充时**
+5. **任何需要手动指定主键ID的场景**
+
+### 2.3 数据差异对比
+
+**重要**：如果需要对比新旧数据，找出差异部分，进行新增、更新、删除操作的，必须使用助手函数 `compareDbDataDiff()`。
+
+- **禁止**：手动编写循环对比新旧数据的逻辑
+- **必须**：使用 `compareDbDataDiff()` 助手函数自动计算差异
+- **适用范围**：所有需要批量处理数据变更的场景（如批量更新关联数据、同步数据等）
+
+## 3. 正确示例
+
+### 3.1 控制器中创建记录
+
+```php
+// 正确：使用 generateId() 生成主键ID
+AccountProfile::create([
+    'id'       => generateId(),  // 必须使用 generateId()
+    'user_id'  => $account->id,
+    'nickname' => $request['username'],
+]);
+
+// 错误：不使用 generateId()
+AccountProfile::create([
+    // 'id' => ...,  // 错误：缺少主键ID
+    'user_id'  => $account->id,
+    'nickname' => $request['username'],
+]);
+```
+
+### 3.2 Factory 中定义
+
+```php
+// 正确：使用 generateId() 生成主键ID
+public function definition(): array
+{
+    return [
+        'id'          => generateId(),  // 必须使用 generateId()
+        'username'    => fake()->unique()->word(),
+        'password'    => static::$password ??= Hash::make('123456'),
+        'account_type' => fake()->randomElement(AccountTypeEnum::cases()),
+    ];
+}
+```
+
+### 3.3 Seeder 中填充数据
+
+```php
+// 正确：使用 generateId() 生成主键ID
+AccountProfile::query()->create([
+    'id' => generateId(),  // 必须使用 generateId()
+    'user_id' => $account->id,
+    'nickname' => $generateRandomName(),
+    'gender' => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
+    'avatar' => null,
+]);
+
+AccountSocial::query()->create([
+    'id' => generateId(),  // 必须使用 generateId()
+    'user_id' => $account->id,
+    'social_type' => SocialTypeEnum::Phone->value,
+    'social_account' => $generatePhoneNumber(),
+]);
+```
+
+### 3.4 数据差异对比示例
+
+```php
+// 正确：使用 compareDbDataDiff() 对比新旧数据
+$oldData = UserRole::where('user_id', $userId)->get()->toArray();
+$newData = $request->input('roles');  // 新的角色数据
+
+// 使用助手函数自动计算差异
+$diff = compareDbDataDiff($oldData, $newData, 'role_id');
+
+// 执行新增操作
+foreach ($diff['create'] as $item) {
+    UserRole::create([
+        'id' => generateId(),
+        'user_id' => $userId,
+        'role_id' => $item['role_id'],
+    ]);
+}
+
+// 执行更新操作
+foreach ($diff['update'] as $item) {
+    UserRole::where('id', $item['id'])->update($item);
+}
+
+// 执行删除操作
+foreach ($diff['delete'] as $item) {
+    UserRole::where('id', $item['id'])->delete();
+}
+
+// 错误：手动编写循环对比逻辑
+// $oldIds = array_column($oldData, 'role_id');
+// $newIds = array_column($newData, 'role_id');
+// $toCreate = array_diff($newIds, $oldIds);
+// $toDelete = array_diff($oldIds, $newIds);
+// ... 手动处理逻辑
+```
+
+## 4. 重要提醒
+
+- **所有主键ID字段**，在创建记录时都必须使用 `generateId()` 函数
+- 不要依赖数据库的 AUTO_INCREMENT 功能
+- 不要手动指定ID值（如硬编码数字）
+- 确保每个需要主键ID的创建操作都包含 `'id' => generateId()`
+- **所有需要对比新旧数据差异的场景**，都必须使用 `compareDbDataDiff()` 助手函数
+- 不要手动编写数据对比逻辑，应使用 `compareDbDataDiff()` 自动计算新增、更新、删除的差异

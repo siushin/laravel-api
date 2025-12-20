@@ -167,6 +167,7 @@ class AccountController extends Controller
         }
 
         // 记录用户退出登录日志
+        logLogin($request, $account->id, $account->username, 1, '用户退出登录');
         $extend_data = ['username' => $account->username];
         logGeneral('logout', "用户退出登录(account: $account->username)", $extend_data);
 
@@ -390,6 +391,20 @@ class AccountController extends Controller
             'username' => $account->username,
         ];
         logGeneral(LogActionEnum::reset_password->name, "用户重置密码成功(phone: $phone)", $extend_data);
+
+        // 记录审计日志（Account::updatePassword 已经记录了，这里补充重置密码的审计日志）
+        $accountData = $account->only(['id', 'username', 'account_type', 'status', 'updated_at']);
+        logAudit(
+            $request,
+            $account->id,
+            '账号管理',
+            OperationActionEnum::update->value,
+            ResourceTypeEnum::user->value,
+            $account->id,
+            null,
+            $accountData,
+            "重置密码: $account->username (手机号: {$phone})"
+        );
 
         return success([], '密码重置成功');
     }

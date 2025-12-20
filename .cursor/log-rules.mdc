@@ -1,0 +1,358 @@
+---
+alwaysApply: true
+scope:
+  filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
+  aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
+  version: "1.0.0"  # 规则版本(便于迭代)
+---
+
+# 【日志模块】规则约束
+
+## 1. 核心原则
+
+优先使用项目封装的**助手函数**记录日志，禁止直接调用原生日志方法。
+
+**重要提醒**：
+
+- 在需要记录日志的地方，必须添加相应的日志记录
+- 如有需要，应自动增加延伸信息（如请求参数、返回结果、业务ID等）
+- **必须充分利用控制器注解信息**：
+  - 控制器的 `@module` 注解值应作为 `$module` 参数传递给 `logOperation()` 和 `logAudit()`
+  - 控制器方法的 `#[OperationAction(OperationActionEnum::xxx)]` 属性中的操作类型应作为 `$action` 参数传递给 `logOperation()` 和 `logAudit()`
+
+## 2. 日志函数规范
+
+### 2.1 助手函数列表
+
+- `logGeneral()` - 记录常规业务日志
+- `logLogin()` - 记录登录/登出日志
+- `logOperation()` - 记录操作日志（需要传入模块名称和操作类型）
+- `logAudit()` - 记录审计日志（需要传入模块名称和操作类型）
+- `generateDataChangeLog()` - 生成变更数据前后对比的文本日志（用于记录数据变更详情）
+
+### 2.2 控制器注解信息的使用
+
+**必须遵循以下规则**：
+
+1. **模块名称（`@module`）**：
+   - 控制器类注释中的 `@module` 注解值必须作为 `logOperation()` 和 `logAudit()` 的 `$module` 参数
+   - 示例：`@module 账号管理` → `logOperation($request, ..., '账号管理', ...)`
+
+2. **操作类型（`#[OperationAction]`）**：
+   - 控制器方法上的 `#[OperationAction(OperationActionEnum::xxx)]` 属性值必须作为 `logOperation()` 和 `logAudit()` 的 `$action` 参数
+   - 示例：`#[OperationAction(OperationActionEnum::update)]` → `logOperation($request, ..., OperationActionEnum::update->value, ...)`
+
+3. **延伸信息**：
+   - 所有日志记录应包含必要的延伸信息（如业务ID、请求参数、返回结果、错误信息等）
+   - 延伸信息应通过 `$extend_data` 参数（对于 `logGeneral`）或相应参数（对于其他日志函数）传递
+
+4. **变更数据前后对比**：
+   - 需要记录变更数据前后对比的文本日志时，必须使用 `generateDataChangeLog()` 助手函数
+   - 该函数会自动生成格式化的变更对比文本，包含新增、修改、删除的详细信息
+   - 生成的变更日志文本应作为 `logAudit()` 的 `$description` 参数或 `logGeneral()` 的 `$content` 参数
+
+## 3. 日志内容要求
+
+### 3.1 必填信息
+
+- **操作用户**: 必须包含操作用户信息（如 `$username`、`$account_id`）
+- **业务ID**: 必须包含业务标识（如订单ID、用户ID等）
+- **操作时间**: 默认自动携带，无需手动添加
+- **模块名称**: 必须从控制器的 `@module` 注解获取（如 `@module 账号管理`）
+- **操作类型**: 必须从控制器方法的 `#[OperationAction(OperationActionEnum::xxx)]` 属性获取（如 `#[OperationAction(OperationActionEnum::update)]`）
+
+### 3.2 敏感信息处理
+
+- 禁止直接记录敏感信息（密码、身份证号等）
+- 敏感字段需脱敏处理（如替换为 `***`）
+
+### 3.3 异常日志要求
+
+- 异常日志必须包含 `$e->getMessage()` 和 `$e->getTraceAsString()` 异常栈信息
+
+### 3.4 变更数据前后对比日志要求
+
+- **必须使用 `generateDataChangeLog()` 助手函数**生成变更数据前后对比的文本日志
+- 变更日志应包含：
+  - 变更的字段名称
+  - 变更前的值
+  - 变更后的值
+  - 新增、修改、删除的数据项
+- 生成的变更日志文本应传递给相应的日志函数（如 `logAudit()` 的 `$description` 参数）
+
+## 4. 正确示例
+
+### 4.1 业务逻辑成功后的日志记录
+
+```php
+/**
+ * 控制器：订单
+ * @module 订单管理
+ */
+class OrderController extends Controller
+{
+    /**
+     * 更新订单
+     */
+    #[OperationAction(OperationActionEnum::update)]
+    public function updateOrder(Request $request, $orderId)
+    {
+        $order = Order::find($orderId);
+        $order->status = $request->input('status');
+        $order->save();
+
+        // 业务逻辑成功后，尾部记录操作日志
+        // 注意：module参数使用控制器的@module注解值，action参数使用方法的OperationAction属性值
+        logOperation(
+            $request,
+            currentUserId(),
+            '订单管理',  // 来自 @module 订单管理
+            OperationActionEnum::update->value,  // 来自 #[OperationAction(OperationActionEnum::update)]
+            $request->method(),
+            $request->path(),
+            $request->all(),
+            200,
+            null
+        );
+
+        return success($order);
+    }
+}
+```
+
+```php
+/**
+ * 控制器：用户
+ * @module 用户管理
+ */
+class UserController extends Controller
+{
+    /**
+     * 更新用户角色
+     */
+    #[OperationAction(OperationActionEnum::update)]
+    public function updateUserRole(Request $request, $userId)
+    {
+        $user = User::find($userId);
+        $beforeData = $user->only(['role_id', 'permissions']);
+
+        $user->role_id = $request->input('role_id');
+        $user->save();
+
+        $afterData = $user->only(['role_id', 'permissions']);
+
+        // 使用 generateDataChangeLog() 生成变更数据前后对比的文本日志
+        $changeLog = generateDataChangeLog($beforeData, $afterData, "修改用户角色: {$user->username}");
+
+        // 业务逻辑成功后，尾部记录审计日志
+        // 注意：module参数使用控制器的@module注解值，action参数使用方法的OperationAction属性值
+        logAudit(
+            $request,
+            currentUserId(),
+            '用户管理',  // 来自 @module 用户管理
+            OperationActionEnum::update->value,  // 来自 #[OperationAction(OperationActionEnum::update)]
+            ResourceTypeEnum::user->value,
+            $userId,
+            $beforeData,
+            $afterData,
+            $changeLog  // 使用 generateDataChangeLog() 生成的变更日志文本
+        );
+
+        return success($user);
+    }
+}
+```
+
+### 4.2 异常区域的异常日志记录
+
+```php
+/**
+ * 控制器：订单
+ * @module 订单管理
+ */
+class OrderController extends Controller
+{
+    /**
+     * 处理订单
+     */
+    #[OperationAction(OperationActionEnum::update)]
+    public function processOrder(Request $request, $orderId)
+    {
+        try {
+            $order = Order::findOrFail($orderId);
+
+            // 业务逻辑处理
+            $order->process();
+            $order->save();
+
+            // 业务逻辑成功后，尾部记录操作日志
+            // 注意：module参数使用控制器的@module注解值，action参数使用方法的OperationAction属性值
+            logOperation(
+                $request,
+                currentUserId(),
+                '订单管理',  // 来自 @module 订单管理
+                OperationActionEnum::update->value,  // 来自 #[OperationAction(OperationActionEnum::update)]
+                $request->method(),
+                $request->path(),
+                ['order_id' => $orderId],  // 延伸信息：包含业务ID
+                200,
+                null
+            );
+
+            return success($order);
+        } catch (Exception $e) {
+            // 异常区域记录异常日志
+            // 注意：异常日志也应包含延伸信息（错误消息、异常栈等）
+            logGeneral(
+                LogActionEnum::error->name,
+                "订单处理失败: {$e->getMessage()}",
+                [
+                    'order_id' => $orderId,  // 延伸信息：业务ID
+                    'error' => $e->getMessage(),  // 延伸信息：错误消息
+                    'trace' => $e->getTraceAsString()  // 延伸信息：异常栈
+                ],
+                currentUserId()
+            );
+
+            throw $e;
+        }
+    }
+}
+```
+
+```php
+/**
+ * 控制器：账号
+ * @module 账号管理
+ */
+class AccountController extends Controller
+{
+    /**
+     * 用户登录
+     */
+    #[OperationAction(OperationActionEnum::login)]
+    public function login(Request $request)
+    {
+        try {
+            $credentials = $request->only(['username', 'password']);
+            $user = Auth::attempt($credentials);
+
+            if ($user) {
+                // 登录成功，记录登录日志
+                logLogin(
+                    $request,
+                    $user->id,  // 延伸信息：账号ID
+                    $user->username,  // 延伸信息：用户名
+                    1,  // 状态：成功
+                    '登录成功'
+                );
+
+                // 登录成功后，也应记录常规日志（包含延伸信息）
+                logGeneral(
+                    LogActionEnum::login->name,
+                    "用户登录成功(account: {$user->username})",
+                    ['username' => $user->username],  // 延伸信息：用户名
+                    $user->id
+                );
+
+                return success(['token' => $user->createToken('auth')->plainTextToken]);
+            } else {
+                // 登录失败，记录失败日志
+                logLogin(
+                    $request,
+                    null,
+                    $credentials['username'] ?? '',  // 延伸信息：尝试登录的用户名
+                    0,  // 状态：失败
+                    '用户名或密码错误'
+                );
+
+                // 登录失败后，也应记录常规日志
+                logGeneral(
+                    LogActionEnum::fail_login->name,
+                    "尝试登录，登录失败(account: {$credentials['username']})",
+                    ['username' => $credentials['username']],  // 延伸信息：尝试登录的用户名
+                    null
+                );
+
+                return error('登录失败');
+            }
+        } catch (Exception $e) {
+            // 异常区域记录异常日志
+            // 注意：异常日志必须包含完整的延伸信息（错误消息、异常栈等）
+            logGeneral(
+                LogActionEnum::error->name,
+                "登录异常: {$e->getMessage()}",
+                [
+                    'username' => $request->input('username'),  // 延伸信息：用户名
+                    'error' => $e->getMessage(),  // 延伸信息：错误消息
+                    'trace' => $e->getTraceAsString()  // 延伸信息：异常栈
+                ],
+                null
+            );
+
+            throw $e;
+        }
+    }
+}
+```
+
+### 4.3 变更数据前后对比日志示例
+
+```php
+/**
+ * 控制器：用户
+ * @module 用户管理
+ */
+class UserController extends Controller
+{
+    /**
+     * 批量更新用户权限
+     */
+    #[OperationAction(OperationActionEnum::update)]
+    public function updateUserPermissions(Request $request, $userId)
+    {
+        $user = User::find($userId);
+        $beforeData = $user->permissions->toArray();  // 变更前的权限数据
+
+        // 更新权限
+        $user->permissions()->sync($request->input('permission_ids'));
+        $user->refresh();
+        $afterData = $user->permissions->toArray();  // 变更后的权限数据
+
+        // 使用 generateDataChangeLog() 生成变更数据前后对比的文本日志
+        $changeLog = generateDataChangeLog(
+            $beforeData,
+            $afterData,
+            "批量更新用户权限: {$user->username}"
+        );
+
+        // 记录审计日志，使用生成的变更日志文本
+        logAudit(
+            $request,
+            currentUserId(),
+            '用户管理',  // 来自 @module 用户管理
+            OperationActionEnum::update->value,  // 来自 #[OperationAction(OperationActionEnum::update)]
+            ResourceTypeEnum::user->value,
+            $userId,
+            $beforeData,
+            $afterData,
+            $changeLog  // 使用 generateDataChangeLog() 生成的变更日志文本
+        );
+
+        // 也可以记录常规日志，包含变更详情
+        logGeneral(
+            LogActionEnum::update->name,
+            $changeLog,  // 使用 generateDataChangeLog() 生成的变更日志文本
+            [
+                'user_id' => $userId,
+                'username' => $user->username,
+                'before' => $beforeData,
+                'after' => $afterData,
+            ],
+            currentUserId()
+        );
+
+        return success($user);
+    }
+}
+```

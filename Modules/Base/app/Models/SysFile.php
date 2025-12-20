@@ -116,6 +116,19 @@ class SysFile extends Model
 
         logGeneral(LogActionEnum::upload_file->name, "上传文件({$result['file_name']})", $result->toArray());
 
+        // 记录审计日志
+        logAudit(
+            request(),
+            currentUserId(),
+            '文件管理',
+            OperationActionEnum::upload->value,
+            ResourceTypeEnum::file->value,
+            $result->file_id,
+            null,
+            $result->only(['file_id', 'file_name', 'origin_file_name', 'file_path', 'file_size', 'mime_type', 'file_ext_name', 'user_id']),
+            "上传文件: {$result['origin_file_name']} (大小: " . formatBytes($result['file_size']) . ")"
+        );
+
         // 根据文件类型分发执行附属模型
         if (method_exists($extra_file_obj, 'uploadFileExtraAfterHook')) {
             $extra_file_obj::uploadFileExtraAfterHook($result->file_id, $full_file_path);
@@ -276,5 +289,18 @@ class SysFile extends Model
                 }
             });
         logGeneral(LogActionEnum::batchDelete->name, "批量删除文件{$count}个", compact('file_ids'));
+
+        // 记录审计日志
+        logAudit(
+            request(),
+            $user_id,
+            '文件管理',
+            OperationActionEnum::delete->value,
+            ResourceTypeEnum::file->value,
+            null,
+            null,
+            null,
+            "清空文件: 共删除 $count 个文件"
+        );
     }
 }
