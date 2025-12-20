@@ -16,6 +16,7 @@ class BaseDatabaseSeeder extends Seeder
             OrganizationSeeder::class,
             AccountSeeder::class,
             MenuSeeder::class,
+            RbacSeeder::class,
             LogSeeder::class,
         ]);
     }

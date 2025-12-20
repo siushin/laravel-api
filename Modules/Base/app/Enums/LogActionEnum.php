@@ -8,6 +8,7 @@ namespace Modules\Base\Enums;
 enum LogActionEnum: string
 {
     case login          = '登录';
+    case logout         = '退出登录';
     case fail_login     = '登录失败';
     case insert         = '新增数据';
     case update         = '更新数据';

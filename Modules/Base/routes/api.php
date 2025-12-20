@@ -8,6 +8,7 @@ use Modules\Base\Http\Controllers\MenuController;
 use Modules\Base\Http\Controllers\OrganizationController;
 use Modules\Base\Http\Controllers\AccountController;
 use Modules\Base\Http\Controllers\AppController;
+use Modules\Base\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 // 公共路由
@@ -30,6 +31,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // API鉴权 管理员 路由组
 Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
+    // 管理员管理
+    Route::post('/admin/index', [AdminController::class, 'index']);
+    Route::post('/admin/add', [AdminController::class, 'add']);
+    Route::post('/admin/update', [AdminController::class, 'update']);
+    Route::post('/admin/delete', [AdminController::class, 'delete']);
+
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
     Route::post('/file/delete', [FileController::class, 'delete']);     // 删除文件

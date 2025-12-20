@@ -3,7 +3,6 @@
 namespace Modules\Base\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Modules\Base\Enums\BrowserEnum;
 use Modules\Base\Enums\DeviceTypeEnum;
 use Modules\Base\Enums\HttpMethodEnum;
@@ -33,7 +32,6 @@ class LogSeeder extends Seeder
         // 获取所有账号ID（用于关联日志）
         $accountIds = Account::query()->pluck('id')->toArray();
         if (empty($accountIds)) {
-            $this->command->warn('没有找到账号数据，请先运行 AccountSeeder');
             return;
         }
 
@@ -41,8 +39,6 @@ class LogSeeder extends Seeder
         $this->seedOperationLogs($accountIds);
         $this->seedAuditLogs($accountIds);
         $this->seedLoginLogs($accountIds);
-
-        $this->command->info('日志数据填充完成！');
     }
 
     /**
@@ -54,7 +50,6 @@ class LogSeeder extends Seeder
     private function seedGeneralLogs(array $accountIds): void
     {
         $logs = [];
-        $now = now();
         $sourceTypes = array_map(fn($case) => $case->value, RequestSourceEnum::cases());
         $actionTypes = array_map(fn($case) => $case->name, LogActionEnum::cases());
 
@@ -70,14 +65,14 @@ class LogSeeder extends Seeder
             $extendData = $this->generateExtendData($actionType);
 
             $logs[] = [
-                'account_id'   => $accountId,
-                'source_type'  => $sourceType,
-                'action_type'  => $actionType,
-                'content'      => $content,
-                'ip_address'   => fake()->ipv4(),
-                'ip_location'  => $this->generateIpLocation(),
-                'extend_data'  => json_encode($extendData, JSON_UNESCAPED_UNICODE),
-                'created_at'   => $createdAt,
+                'account_id'  => $accountId,
+                'source_type' => $sourceType,
+                'action_type' => $actionType,
+                'content'     => $content,
+                'ip_address'  => fake()->ipv4(),
+                'ip_location' => $this->generateIpLocation(),
+                'extend_data' => json_encode($extendData, JSON_UNESCAPED_UNICODE),
+                'created_at'  => $createdAt,
             ];
 
             // 批量插入，每100条插入一次
@@ -128,13 +123,13 @@ class LogSeeder extends Seeder
                 'action'        => $action,
                 'resource_type' => $resourceType,
                 'resource_id'   => $resourceId,
-                'before_data'  => json_encode($beforeData, JSON_UNESCAPED_UNICODE),
-                'after_data'   => json_encode($afterData, JSON_UNESCAPED_UNICODE),
-                'description'  => $description,
-                'ip_address'   => fake()->ipv4(),
-                'ip_location'  => $this->generateIpLocation(),
-                'user_agent'   => fake()->userAgent(),
-                'audited_at'   => $auditedAt,
+                'before_data'   => json_encode($beforeData, JSON_UNESCAPED_UNICODE),
+                'after_data'    => json_encode($afterData, JSON_UNESCAPED_UNICODE),
+                'description'   => $description,
+                'ip_address'    => fake()->ipv4(),
+                'ip_location'   => $this->generateIpLocation(),
+                'user_agent'    => fake()->userAgent(),
+                'audited_at'    => $auditedAt,
             ];
 
             // 批量插入，每100条插入一次
@@ -206,19 +201,19 @@ class LogSeeder extends Seeder
             $executionTime = fake()->numberBetween(10, 5000);
 
             $logs[] = [
-                'account_id'    => $accountId,
-                'source_type'   => fake()->randomElement($sourceTypes),
-                'module'        => $module,
-                'action'        => $action,
-                'method'        => $method,
-                'path'          => $path,
-                'params'        => $params,
-                'ip_address'    => fake()->ipv4(),
-                'ip_location'   => $this->generateIpLocation(),
-                'user_agent'    => fake()->userAgent(),
-                'response_code' => $responseCode,
+                'account_id'     => $accountId,
+                'source_type'    => fake()->randomElement($sourceTypes),
+                'module'         => $module,
+                'action'         => $action,
+                'method'         => $method,
+                'path'           => $path,
+                'params'         => $params,
+                'ip_address'     => fake()->ipv4(),
+                'ip_location'    => $this->generateIpLocation(),
+                'user_agent'     => fake()->userAgent(),
+                'response_code'  => $responseCode,
                 'execution_time' => $executionTime,
-                'operated_at'   => $operatedAt,
+                'operated_at'    => $operatedAt,
             ];
 
             // 批量插入，每100条插入一次
@@ -273,10 +268,10 @@ class LogSeeder extends Seeder
                 : fake()->randomElement(['密码错误', '账号不存在', '账号已被禁用', '验证码错误']);
 
             $logs[] = [
-                'account_id'      => $status === 1 ? $accountId : null, // 失败时可能没有账号ID
+                'account_id'       => $status === 1 ? $accountId : null, // 失败时可能没有账号ID
                 'username'         => $username,
                 'status'           => $status,
-                'ip_address'      => fake()->ipv4(),
+                'ip_address'       => fake()->ipv4(),
                 'ip_location'      => $this->generateIpLocation(),
                 'browser'          => $browser,
                 'browser_version'  => $browserVersion,
@@ -305,7 +300,7 @@ class LogSeeder extends Seeder
     /**
      * 生成日志内容
      * @param string $actionType
-     * @param int $accountId
+     * @param int    $accountId
      * @return string
      * @author siushin<siushin@163.com>
      */
@@ -320,14 +315,14 @@ class LogSeeder extends Seeder
             'reset_password' => "重置密码成功(account_id: {$accountId})",
             'batchDelete'    => "批量删除数据成功，共删除 " . fake()->numberBetween(5, 50) . " 条记录",
             'export_excel'   => "导出Excel文件成功，文件名: " . fake()->word() . ".xlsx",
-            'export_pdf'    => "导出PDF文件成功，文件名: " . fake()->word() . ".pdf",
-            'export_csv'    => "导出CSV文件成功，文件名: " . fake()->word() . ".csv",
-            'export_txt'    => "导出TXT文件成功，文件名: " . fake()->word() . ".txt",
-            'export_zip'    => "导出ZIP文件成功，文件名: " . fake()->word() . ".zip",
-            'upload_file'   => "上传文件成功，文件名: " . fake()->word() . "." . fake()->fileExtension(),
-            'push_message'  => "推送消息成功，接收人: " . fake()->numberBetween(1, 100) . " 人",
-            'send_sms'      => "发送短信成功，手机号: " . fake()->phoneNumber(),
-            'send_email'    => "发送邮件成功，邮箱: " . fake()->email(),
+            'export_pdf'     => "导出PDF文件成功，文件名: " . fake()->word() . ".pdf",
+            'export_csv'     => "导出CSV文件成功，文件名: " . fake()->word() . ".csv",
+            'export_txt'     => "导出TXT文件成功，文件名: " . fake()->word() . ".txt",
+            'export_zip'     => "导出ZIP文件成功，文件名: " . fake()->word() . ".zip",
+            'upload_file'    => "上传文件成功，文件名: " . fake()->word() . "." . fake()->fileExtension(),
+            'push_message'   => "推送消息成功，接收人: " . fake()->numberBetween(1, 100) . " 人",
+            'send_sms'       => "发送短信成功，手机号: " . fake()->phoneNumber(),
+            'send_email'     => "发送邮件成功，邮箱: " . fake()->email(),
         ];
 
         return $contents[$actionType] ?? "执行操作：{$actionType}";
@@ -421,11 +416,11 @@ class LogSeeder extends Seeder
                     break;
                 case '角色':
                     $beforeData = [
-                        'role_name' => fake()->word(),
+                        'role_name'   => fake()->word(),
                         'permissions' => fake()->words(3),
                     ];
                     $afterData = [
-                        'role_name' => fake()->word(),
+                        'role_name'   => fake()->word(),
                         'permissions' => fake()->words(5),
                     ];
                     break;
@@ -446,14 +441,14 @@ class LogSeeder extends Seeder
         } elseif (in_array($action, ['新增', '添加'])) {
             // 新增操作：只有变更后数据
             $afterData = [
-                'name'  => fake()->word(),
+                'name'   => fake()->word(),
                 'value'  => fake()->sentence(),
                 'status' => fake()->randomElement([0, 1]),
             ];
         } elseif (in_array($action, ['删除'])) {
             // 删除操作：只有变更前数据
             $beforeData = [
-                'name'  => fake()->word(),
+                'name'   => fake()->word(),
                 'value'  => fake()->sentence(),
                 'status' => fake()->randomElement([0, 1]),
             ];
@@ -467,21 +462,21 @@ class LogSeeder extends Seeder
      * @param string $module
      * @param string $action
      * @param string $resourceType
-     * @param int $resourceId
+     * @param int    $resourceId
      * @return string
      * @author siushin<siushin@163.com>
      */
     private function generateAuditDescription(string $module, string $action, string $resourceType, int $resourceId): string
     {
         $descriptions = [
-            '新增' => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
-            '添加' => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
-            '更新' => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
-            '编辑' => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
-            '删除' => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
+            '新增'     => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
+            '添加'     => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
+            '更新'     => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
+            '编辑'     => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
+            '删除'     => "在{$module}模块中{$action}了{$resourceType}，资源ID: {$resourceId}",
             '批量删除' => "在{$module}模块中{$action}了{$resourceType}，共删除 " . fake()->numberBetween(5, 50) . " 条记录",
-            '导出' => "在{$module}模块中{$action}了{$resourceType}数据，导出文件: " . fake()->word() . ".xlsx",
-            '导入' => "在{$module}模块中{$action}了{$resourceType}数据，导入文件: " . fake()->word() . ".xlsx",
+            '导出'     => "在{$module}模块中{$action}了{$resourceType}数据，导出文件: " . fake()->word() . ".xlsx",
+            '导入'     => "在{$module}模块中{$action}了{$resourceType}数据，导入文件: " . fake()->word() . ".xlsx",
         ];
 
         return $descriptions[$action] ?? "在{$module}模块中执行了{$action}操作，资源类型: {$resourceType}，资源ID: {$resourceId}";
