@@ -105,6 +105,27 @@ class MenuSeeder extends Seeder
             'updated_at'   => $now,
         ]);
 
+        $organizationId = generateId();
+        DB::table('sys_menu')->insert([
+            'menu_id'      => $organizationId,
+            'account_type' => $accountType,
+            'menu_name'    => '组织架构管理',
+            'menu_key'     => 'organization.management',
+            'menu_path'    => '/organization',
+            'menu_icon'    => 'ApartmentOutlined',
+            'menu_type'    => 'menu',
+            'parent_id'    => 0,
+            'component'    => null,
+            'redirect'     => '/organization/company',
+            'layout'       => true,
+            'access'       => 'canAdmin',
+            'wrappers'     => null,
+            'sort'         => 5,
+            'status'       => 1,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+        ]);
+
         $systemId = generateId();
         DB::table('sys_menu')->insert([
             'menu_id'      => $systemId,
@@ -120,7 +141,7 @@ class MenuSeeder extends Seeder
             'layout'       => true,
             'access'       => 'canAdmin',
             'wrappers'     => null,
-            'sort'         => 5,
+            'sort'         => 6,
             'status'       => 1,
             'created_at'   => $now,
             'updated_at'   => $now,
@@ -218,7 +239,145 @@ class MenuSeeder extends Seeder
             ]);
         }
 
-        // 插入系统管理的子菜单
+        // 插入组织架构管理的子菜单
+        $organizationChildren = [
+            [
+                'menu_name' => '公司管理',
+                'menu_key'  => 'organization.company',
+                'menu_path' => '/organization/company',
+                'menu_icon' => 'BankOutlined',
+                'component' => './Organization/Company',
+                'sort'      => 1,
+            ],
+            [
+                'menu_name' => '部门管理',
+                'menu_key'  => 'organization.department',
+                'menu_path' => '/organization/department',
+                'menu_icon' => 'PartitionOutlined',
+                'component' => './Organization/Department',
+                'sort'      => 2,
+            ],
+            [
+                'menu_name' => '职位管理',
+                'menu_key'  => 'organization.position',
+                'menu_path' => '/organization/position',
+                'menu_icon' => 'SolutionOutlined',
+                'component' => './Organization/Position',
+                'sort'      => 3,
+            ],
+            [
+                'menu_name' => '岗位管理',
+                'menu_key'  => 'organization.job',
+                'menu_path' => '/organization/job',
+                'menu_icon' => 'IdcardOutlined',
+                'component' => './Organization/Job',
+                'sort'      => 4,
+            ],
+        ];
+
+        foreach ($organizationChildren as $child) {
+            DB::table('sys_menu')->insert([
+                'menu_id'      => generateId(),
+                'account_type' => $accountType,
+                'menu_name'    => $child['menu_name'],
+                'menu_key'     => $child['menu_key'],
+                'menu_path'    => $child['menu_path'],
+                'menu_icon'    => $child['menu_icon'],
+                'menu_type'    => 'menu',
+                'parent_id'    => $organizationId,
+                'component'    => $child['component'],
+                'redirect'     => null,
+                'layout'       => true,
+                'access'       => 'canAdmin',
+                'wrappers'     => null,
+                'sort'         => $child['sort'],
+                'status'       => 1,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
+
+        // 插入角色权限父菜单（作为系统管理的子菜单）
+        $rbacId = generateId();
+        DB::table('sys_menu')->insert([
+            'menu_id'      => $rbacId,
+            'account_type' => $accountType,
+            'menu_name'    => '角色权限',
+            'menu_key'     => 'system.rbac',
+            'menu_path'    => '/system/rbac',
+            'menu_icon'    => 'SafetyOutlined',
+            'menu_type'    => 'menu',
+            'parent_id'    => $systemId,
+            'component'    => null,
+            'redirect'     => '/system/rbac/role',
+            'layout'       => true,
+            'access'       => 'canAdmin',
+            'wrappers'     => null,
+            'sort'         => 1,
+            'status'       => 1,
+            'created_at'   => $now,
+            'updated_at'   => $now,
+        ]);
+
+        // 插入角色权限的子菜单
+        $rbacChildren = [
+            [
+                'menu_name' => '角色管理',
+                'menu_key'  => 'system.rbac.role',
+                'menu_path' => '/system/rbac/role',
+                'menu_icon' => 'ProfileOutlined',
+                'component' => './System/Role',
+                'sort'      => 1,
+            ],
+            [
+                'menu_name' => '菜单管理',
+                'menu_key'  => 'system.rbac.menu',
+                'menu_path' => '/system/rbac/menu',
+                'menu_icon' => 'BlockOutlined',
+                'component' => './System/Menu',
+                'sort'      => 2,
+            ],
+            [
+                'menu_name' => '用户角色关联',
+                'menu_key'  => 'system.rbac.userRole',
+                'menu_path' => '/system/rbac/user-role',
+                'menu_icon' => 'UsergroupAddOutlined',
+                'component' => './System/UserRole',
+                'sort'      => 3,
+            ],
+            [
+                'menu_name' => '角色菜单关联',
+                'menu_key'  => 'system.rbac.roleMenu',
+                'menu_path' => '/system/rbac/role-menu',
+                'menu_icon' => 'UnorderedListOutlined',
+                'component' => './System/RoleMenu',
+                'sort'      => 4,
+            ],
+        ];
+
+        foreach ($rbacChildren as $child) {
+            DB::table('sys_menu')->insert([
+                'menu_id'      => generateId(),
+                'account_type' => $accountType,
+                'menu_name'    => $child['menu_name'],
+                'menu_key'     => $child['menu_key'],
+                'menu_path'    => $child['menu_path'],
+                'menu_icon'    => $child['menu_icon'],
+                'menu_type'    => 'menu',
+                'parent_id'    => $rbacId,
+                'component'    => $child['component'],
+                'redirect'     => null,
+                'layout'       => true,
+                'access'       => 'canAdmin',
+                'wrappers'     => null,
+                'sort'         => $child['sort'],
+                'status'       => 1,
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
+
+        // 插入系统管理的其他子菜单
         $systemChildren = [
             [
                 'menu_name' => '管理员管理',
@@ -226,23 +385,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/system/admin',
                 'menu_icon' => 'UserOutlined',
                 'component' => './System/Admin',
-                'sort'      => 1,
-            ],
-            [
-                'menu_name' => '角色管理',
-                'menu_key'  => 'system.role',
-                'menu_path' => '/system/role',
-                'menu_icon' => 'ProfileOutlined',
-                'component' => './System/Role',
                 'sort'      => 2,
-            ],
-            [
-                'menu_name' => '菜单管理',
-                'menu_key'  => 'system.menu',
-                'menu_path' => '/system/menu',
-                'menu_icon' => 'BlockOutlined',
-                'component' => './System/Menu',
-                'sort'      => 3,
             ],
             [
                 'menu_name' => '组织架构',
@@ -250,7 +393,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/system/organization',
                 'menu_icon' => 'ApartmentOutlined',
                 'component' => './System/Organization',
-                'sort'      => 4,
+                'sort'      => 3,
             ],
             [
                 'menu_name' => '数据字典',
@@ -258,7 +401,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/system/dict',
                 'menu_icon' => 'BookOutlined',
                 'component' => './System/Dict',
-                'sort'      => 5,
+                'sort'      => 4,
             ],
             [
                 'menu_name' => '系统日志',
@@ -266,7 +409,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/system/log',
                 'menu_icon' => 'FileTextOutlined',
                 'component' => './System/Log',
-                'sort'      => 6,
+                'sort'      => 5,
             ],
         ];
 

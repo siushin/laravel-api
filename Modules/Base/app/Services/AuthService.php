@@ -100,7 +100,7 @@ class AuthService
             return null;
         }
 
-        $accountQuery = Account::query()->where('id', $accountSocial->user_id);
+        $accountQuery = Account::query()->where('id', $accountSocial->account_id);
 
         // 根据账号类型筛选
         if ($accountType) {
@@ -128,7 +128,7 @@ class AuthService
             return null;
         }
 
-        $accountQuery = Account::query()->where('id', $accountSocial->user_id);
+        $accountQuery = Account::query()->where('id', $accountSocial->account_id);
 
         // 根据账号类型筛选
         if ($accountType) {
@@ -160,7 +160,7 @@ class AuthService
                 ->first();
 
             if ($accountSocial) {
-                $accountQuery = Account::query()->where('id', $accountSocial->user_id);
+                $accountQuery = Account::query()->where('id', $accountSocial->account_id);
                 // 根据账号类型筛选
                 if ($accountType) {
                     $accountQuery->where('account_type', $accountType);
@@ -230,7 +230,7 @@ class AuthService
         } elseif ($account->account_type === AccountTypeEnum::User) {
             $typeInfo = $account->customerInfo;
             if ($typeInfo) {
-                // User表只有id和user_id，没有其他业务字段，无需合并
+                // User表只有id和account_id，没有其他业务字段，无需合并
             }
         }
 

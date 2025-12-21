@@ -73,11 +73,11 @@ return new class extends Migration {
         // 用户角色关联表
         Schema::create('sys_user_role', function (Blueprint $table) {
             $table->id()->comment('关联ID');
-            $table->unsignedBigInteger('user_id')->comment('用户ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->comment('账号ID（关联bs_account.id）');
             $table->unsignedBigInteger('role_id')->comment('角色ID');
             $table->timestamps();
 
-            $table->foreign('user_id')
+            $table->foreign('account_id')
                 ->references('id')
                 ->on('bs_account')
                 ->onDelete('cascade')
@@ -89,12 +89,12 @@ return new class extends Migration {
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            // 同一用户不能重复分配同一角色
+            // 同一账号不能重复分配同一角色
             // 注意：应用层需要校验用户账号类型与角色账号类型一致
             // admin用户只能分配account_type='admin'的角色
             // user用户只能分配account_type='user'的角色
-            $table->unique(['user_id', 'role_id'], 'uk_user_role');
-            $table->index('user_id');
+            $table->unique(['account_id', 'role_id'], 'uk_user_role');
+            $table->index('account_id');
             $table->index('role_id');
             $table->comment('用户角色关联表');
         });

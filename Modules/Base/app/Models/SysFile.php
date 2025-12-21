@@ -38,7 +38,7 @@ class SysFile extends Model
 
     protected $fillable = [
         'file_name', 'origin_file_name', 'file_path', 'file_size', 'mime_type', 'file_ext_name',
-        'user_id', 'checksum',
+        'account_id', 'checksum',
     ];
 
     private static array $allowImages = [
@@ -109,7 +109,7 @@ class SysFile extends Model
             'file_size'        => $file->getSize(),
             'mime_type'        => mime_content_type($file->getPathname()),
             'file_ext_name'    => $extension,
-            'user_id'          => currentUserId(),
+            'account_id'          => currentUserId(),
             'checksum'         => hash_file('sha256', $file->getPathname()),
         ];
         $result = self::query()->create($data);
@@ -125,7 +125,7 @@ class SysFile extends Model
             ResourceTypeEnum::file->value,
             $result->file_id,
             null,
-            $result->only(['file_id', 'file_name', 'origin_file_name', 'file_path', 'file_size', 'mime_type', 'file_ext_name', 'user_id']),
+            $result->only(['file_id', 'file_name', 'origin_file_name', 'file_path', 'file_size', 'mime_type', 'file_ext_name', 'account_id']),
             "上传文件: {$result['origin_file_name']} (大小: " . formatBytes($result['file_size']) . ")"
         );
 
@@ -184,7 +184,7 @@ class SysFile extends Model
      */
     public static function deleteFile(array $params): array
     {
-        self::checkEmptyParam($params, ['user_id', 'file_path']);
+        self::checkEmptyParam($params, ['account_id', 'file_path']);
         $real_delete = $params['real_delete'] ?? false;
 
         // 文件信息
@@ -194,14 +194,14 @@ class SysFile extends Model
             return [];
         }
 
-        $params['user_id'] != $file_info->user_id && throw_exception('您没有权限删除此文件');
+        $params['account_id'] != $file_info->account_id && throw_exception('您没有权限删除此文件');
 
         $from = ltrim($file_info->file_path, '/');
 
         if (!$real_delete) {
             // 将文件移至回收站目录（带日期，用户）
             $date = date('Ymd');
-            $recycle_path = "recycle/$date/$file_info->user_id/";
+            $recycle_path = "recycle/$date/$file_info->account_id/";
             $to = $recycle_path . basename($file_info->file_path);
 
             Storage::disk(self::DEFAULT_PRIVATE)->makeDirectory($recycle_path);
@@ -269,18 +269,18 @@ class SysFile extends Model
 
     /**
      * 清空文件（只能清空属于自己的）
-     * @param int  $user_id
+     * @param int  $account_id
      * @param bool $real_delete
      * @return void
      * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
-    public static function cleanupFileByUserId(int $user_id, bool $real_delete = false): void
+    public static function cleanupFileByAccountId(int $account_id, bool $real_delete = false): void
     {
         // TODO 写入redis 缓存，走异步后台删除
-        $count = self::where('user_id', $user_id)->count();
-        $file_ids = self::where('user_id', $user_id)->pluck('file_id')->toArray();
-        self::where('user_id', $user_id)->select('user_id', 'file_path')
+        $count = self::where('account_id', $account_id)->count();
+        $file_ids = self::where('account_id', $account_id)->pluck('file_id')->toArray();
+        self::where('account_id', $account_id)->select('account_id', 'file_path')
             ->orderBy('file_id')
             ->chunk(100, function (Collection $files) use ($real_delete) {
                 foreach ($files as $file) {
@@ -293,7 +293,7 @@ class SysFile extends Model
         // 记录审计日志
         logAudit(
             request(),
-            $user_id,
+            $account_id,
             '文件管理',
             OperationActionEnum::delete->value,
             ResourceTypeEnum::file->value,

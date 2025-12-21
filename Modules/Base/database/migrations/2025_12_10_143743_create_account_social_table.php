@@ -15,7 +15,7 @@ return new class extends Migration {
 
         Schema::create('bs_account_social', function (Blueprint $table) use ($socialTypeComment) {
             $table->id()->comment('社交网络ID');
-            $table->unsignedBigInteger('user_id')->comment('账号ID');
+            $table->unsignedBigInteger('account_id')->comment('账号ID');
             $table->string('social_type', 20)
                 ->comment($socialTypeComment);
             $table->string('social_account', 100)->comment('社交账号');
@@ -25,8 +25,8 @@ return new class extends Migration {
             $table->timestamp('verified_at')->nullable()->comment('验证时间');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
-            $table->index(['user_id', 'social_type']);
+            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->index(['account_id', 'social_type']);
             $table->unique(['social_type', 'social_account'], 'account_social_unique');
             $table->comment('账号社交网络表');
         });

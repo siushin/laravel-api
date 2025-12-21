@@ -10,6 +10,40 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        /**
+         * 关系图说明：
+         *
+         * 公司 (Company)
+         * │
+         * ├── 一级部门 (Department)
+         * │       │
+         * │       ├── 二级部门 (Sub-department)
+         * │       │       │
+         * │       │       ├── 职位 A (Position)
+         * │       │       │       ├── 岗位 1 (Post)
+         * │       │       │       ├── 岗位 2 (Post)
+         * │       │       │       └── 岗位 3 (Post)
+         * │       │       │
+         * │       │       └── 职位 B (Position)
+         * │       │               ├── 岗位 4 (Post)
+         * │       │               └── 岗位 5 (Post)
+         * │       │
+         * │       └── 职位 C (Position)
+         * │
+         * └── 另一个一级部门
+         * └── ...
+         */
+
+        /**
+         * 实体关系说明：
+         *
+         * 公司 1:n 部门
+         * 部门 1:n 职位（一个部门可以有多个职位级别）
+         * 职位 1:n 岗位（一个职位级别下可以有多个具体岗位）
+         * 岗位 n:1 部门（岗位属于某个部门）
+         * 岗位 n:1 职位（岗位对应某个职位级别）
+         */
+
         // 公司表
         Schema::create('sys_company', function (Blueprint $table) {
             $table->id('company_id')->comment('公司ID');
@@ -64,6 +98,8 @@ return new class extends Migration {
         });
 
         // 职位表
+        // 示例1：高级工程师、经理、总监、专员
+        // 示例2：P5 初级工程师、P6 中级工程师、P7 高级工程师、P8 专家、M1 经理、M2 总监
         Schema::create('sys_position', function (Blueprint $table) {
             $table->id('position_id')->comment('职位ID');
             $table->string('position_name')->comment('职位名称');
@@ -84,10 +120,11 @@ return new class extends Migration {
 
             $table->index('department_id');
             $table->index('position_code');
-            $table->comment('职位表');
+            $table->comment('职位表（部门内的具体岗位）');
         });
 
         // 岗位表
+        // 示例：Java开发工程师、销售专员、财务主管
         Schema::create('sys_post', function (Blueprint $table) {
             $table->id('post_id')->comment('岗位ID');
             $table->string('post_name')->comment('岗位名称');
@@ -116,7 +153,7 @@ return new class extends Migration {
             $table->index('position_id');
             $table->index('department_id');
             $table->index('post_code');
-            $table->comment('岗位表');
+            $table->comment('岗位表（具体工作职责）');
         });
     }
 

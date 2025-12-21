@@ -23,7 +23,7 @@ class Admin extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
+        'account_id',
         'company_id',
         'department_id',
         'is_super',
@@ -35,7 +35,7 @@ class Admin extends Model
      */
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Account::class, 'user_id');
+        return $this->belongsTo(Account::class, 'account_id');
     }
 
     /**
@@ -94,7 +94,7 @@ class Admin extends Model
                 $adminInfo = $account->adminInfo;
                 return [
                     'id' => $account->id,
-                    'user_id' => $account->id,
+                    'account_id' => $account->id,
                     'username' => $account->username,
                     'account_type' => $account->account_type->value,
                     'status' => $account->status,
@@ -146,7 +146,7 @@ class Admin extends Model
 
             // 创建管理员信息
             $admin = new self();
-            $admin->user_id = $account->id;
+            $admin->account_id = $account->id;
             $admin->is_super = $params['is_super'] ?? 0;
             $admin->company_id = $params['company_id'] ?? null;
             $admin->department_id = $params['department_id'] ?? null;
@@ -205,7 +205,7 @@ class Admin extends Model
             $account->save();
 
             // 更新管理员信息
-            $admin = self::query()->where('user_id', $account->id)->first();
+            $admin = self::query()->where('account_id', $account->id)->first();
             if ($admin) {
                 if (isset($params['is_super'])) {
                     $admin->is_super = $params['is_super'];

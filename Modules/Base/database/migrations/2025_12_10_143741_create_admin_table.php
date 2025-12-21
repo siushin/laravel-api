@@ -12,13 +12,13 @@ return new class extends Migration {
     {
         Schema::create('bs_admin', function (Blueprint $table) {
             $table->id()->comment('管理员ID');
-            $table->unsignedBigInteger('user_id')->unique()->comment('用户ID');
+            $table->unsignedBigInteger('account_id')->unique()->comment('账号ID');
             $table->unsignedBigInteger('company_id')->nullable()->comment('所属公司ID');
             $table->unsignedBigInteger('department_id')->nullable()->comment('所属部门ID');
             $table->tinyInteger('is_super')->default(0)->comment('是否超级管理员：1是，0否');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
             $table->index('company_id');
             $table->index('department_id');
             $table->comment('管理员表');

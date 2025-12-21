@@ -45,7 +45,7 @@ class LogService
                         ->first();
 
                     if ($accountSocial) {
-                        $accountId = $accountSocial->user_id;
+                        $accountId = $accountSocial->account_id;
                     }
                 }
             }

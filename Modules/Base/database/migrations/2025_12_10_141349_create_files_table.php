@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->unsignedInteger('file_size')->comment('文件大小（以字节为单位）');
             $table->char('mime_type')->comment('文件的MIME类型');
             $table->char('file_ext_name')->comment('文件扩展名');
-            $table->unsignedBigInteger('user_id')->default(0)->comment('用户ID（上传人）');
+            $table->unsignedBigInteger('account_id')->default(0)->comment('账号ID（上传人）');
             $table->string('checksum', 64)->comment('文件的校验和（SHA-256哈希值）');
             $table->timestamps();
             $table->softDeletes();

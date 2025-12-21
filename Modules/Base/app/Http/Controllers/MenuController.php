@@ -49,7 +49,7 @@ class MenuController extends Controller
             // 普通用户根据角色获取菜单
             $menuIds = DB::table('sys_user_role')
                 ->join('sys_role_menu', 'sys_user_role.role_id', '=', 'sys_role_menu.role_id')
-                ->where('sys_user_role.user_id', $user->id)
+                ->where('sys_user_role.account_id', $user->id)
                 ->pluck('sys_role_menu.menu_id')
                 ->toArray();
 

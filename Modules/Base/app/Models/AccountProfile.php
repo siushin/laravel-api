@@ -14,7 +14,7 @@ class AccountProfile extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
+        'account_id',
         'nickname',
         'gender',
         'avatar',
@@ -34,6 +34,6 @@ class AccountProfile extends Model
      */
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Account::class, 'user_id');
+        return $this->belongsTo(Account::class, 'account_id');
     }
 }

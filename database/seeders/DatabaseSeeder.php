@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Base\Database\Seeders\BaseDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,6 +13,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 调用 Base 模块的 seeder
-        $this->call(\Modules\Base\Database\Seeders\BaseDatabaseSeeder::class);
+        $this->call(BaseDatabaseSeeder::class);
     }
 }

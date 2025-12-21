@@ -311,18 +311,18 @@ class RbacSeeder extends Seeder
     /**
      * 为账号分配角色
      */
-    private function assignRoleToAccount($userId, $roleId, $now): void
+    private function assignRoleToAccount($accountId, $roleId, $now): void
     {
         // 检查是否已存在关联
         $exists = DB::table('sys_user_role')
-            ->where('user_id', $userId)
+            ->where('account_id', $accountId)
             ->where('role_id', $roleId)
             ->exists();
 
         if (!$exists) {
             DB::table('sys_user_role')->insert([
                 'id' => generateId(),
-                'user_id' => $userId,
+                'account_id' => $accountId,
                 'role_id' => $roleId,
                 'created_at' => $now,
                 'updated_at' => $now,

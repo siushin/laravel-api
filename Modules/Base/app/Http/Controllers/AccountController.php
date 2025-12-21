@@ -285,13 +285,13 @@ class AccountController extends Controller
         // 创建账号资料记录
         AccountProfile::create([
             'id'       => generateId(),
-            'user_id'  => $account->id,
+            'account_id'  => $account->id,
             'nickname' => $request['username'],
         ]);
 
         // 创建手机号社交账号记录
         AccountSocial::create([
-            'user_id'        => $account->id,
+            'account_id'        => $account->id,
             'social_type'    => SocialTypeEnum::Phone->value,
             'social_account' => $request['phone'],
             'is_verified'    => false,
@@ -378,7 +378,7 @@ class AccountController extends Controller
 
         // 更新密码
         $params = [
-            'user_id'  => $account->id,
+            'account_id'  => $account->id,
             'password' => $request->input('password'),
         ];
 
@@ -444,7 +444,7 @@ class AccountController extends Controller
 
         // 更新密码
         $params = [
-            'user_id'  => $account->id,
+            'account_id'  => $account->id,
             'password' => $request->input('password'),
         ];
 

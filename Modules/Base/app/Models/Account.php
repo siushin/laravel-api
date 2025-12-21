@@ -141,9 +141,9 @@ class Account extends Authenticatable
      */
     public static function updatePassword(array $params): array
     {
-        self::checkEmptyParam($params, ['user_id', 'password']);
+        self::checkEmptyParam($params, ['account_id', 'password']);
 
-        $info = self::query()->findOrFail($params['user_id']);
+        $info = self::query()->findOrFail($params['account_id']);
         !$info && throw_exception('账号不存在');
 
         // 保存旧数据（排除密码字段）
@@ -160,7 +160,7 @@ class Account extends Authenticatable
             '账号管理',
             OperationActionEnum::update->value,
             ResourceTypeEnum::user->value,
-            $params['user_id'],
+            $params['account_id'],
             $old_data,
             $new_data,
             "修改账号密码: {$info->username}"
@@ -171,13 +171,13 @@ class Account extends Authenticatable
 
     /**
      * 根据账号IDs获取用户名（键值对 - 列表）
-     * @param array $user_ids
+     * @param array $account_ids
      * @return Collection
      * @author siushin<siushin@163.com>
      */
-    public static function getUsernameByIDs(array $user_ids): Collection
+    public static function getUsernameByIDs(array $account_ids): Collection
     {
-        return self::query()->whereIn('id', $user_ids)->pluck('username', 'id');
+        return self::query()->whereIn('id', $account_ids)->pluck('username', 'id');
     }
 
     /**
@@ -186,7 +186,7 @@ class Account extends Authenticatable
      */
     public function adminInfo(): HasOne
     {
-        return $this->hasOne(Admin::class, 'user_id');
+        return $this->hasOne(Admin::class, 'account_id');
     }
 
     /**
@@ -195,7 +195,7 @@ class Account extends Authenticatable
      */
     public function customerInfo(): HasOne
     {
-        return $this->hasOne(User::class, 'user_id');
+        return $this->hasOne(User::class, 'account_id');
     }
 
     /**
@@ -204,7 +204,7 @@ class Account extends Authenticatable
      */
     public function profile(): HasOne
     {
-        return $this->hasOne(AccountProfile::class, 'user_id');
+        return $this->hasOne(AccountProfile::class, 'account_id');
     }
 
     /**
@@ -213,7 +213,7 @@ class Account extends Authenticatable
      */
     public function socialAccounts(): HasMany
     {
-        return $this->hasMany(AccountSocial::class, 'user_id');
+        return $this->hasMany(AccountSocial::class, 'account_id');
     }
 
     /**

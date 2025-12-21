@@ -41,9 +41,9 @@ class FileController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        $user_id = currentUserId();
-        empty($user_id) && throw_exception('无效token，请重新登录');
-        $params['user_id'] = $user_id;
+        $account_id = currentUserId();
+        empty($account_id) && throw_exception('无效token，请重新登录');
+        $params['account_id'] = $account_id;
         return success(SysFile::deleteFile($params), '删除文件成功');
     }
 
@@ -56,9 +56,9 @@ class FileController extends Controller
     #[OperationAction(OperationActionEnum::delete)]
     public function cleanup(): JsonResponse
     {
-        $user_id = currentUserId();
-        empty($user_id) && throw_exception('无效token，请重新登录');
-        SysFile::cleanupFileByUserId($user_id, true);
+        $account_id = currentUserId();
+        empty($account_id) && throw_exception('无效token，请重新登录');
+        SysFile::cleanupFileByAccountId($account_id, true);
         return success([], '清空文件成功');
     }
 }

@@ -12,10 +12,10 @@ return new class extends Migration {
     {
         Schema::create('bs_user', function (Blueprint $table) {
             $table->id()->comment('用户ID');
-            $table->unsignedBigInteger('user_id')->unique()->comment('账号ID');
+            $table->unsignedBigInteger('account_id')->unique()->comment('账号ID');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
             $table->comment('用户表');
         });
     }
