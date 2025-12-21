@@ -16,7 +16,7 @@ class SysOperationLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
-    protected $table = 'sys_operation_log';
+    protected $table = 'gpa_operation_log';
 
     protected $guarded = [];
 

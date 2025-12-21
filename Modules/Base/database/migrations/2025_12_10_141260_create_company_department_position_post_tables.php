@@ -45,7 +45,7 @@ return new class extends Migration {
          */
 
         // 公司表
-        Schema::create('sys_company', function (Blueprint $table) {
+        Schema::create('gpa_company', function (Blueprint $table) {
             $table->id('company_id')->comment('公司ID');
             $table->string('company_name')->comment('公司名称');
             $table->string('company_code')->nullable()->comment('公司编码');
@@ -62,7 +62,7 @@ return new class extends Migration {
             // 关联组织架构表
             $table->foreign('organization_id')
                 ->references('organization_id')
-                ->on('sys_organization')
+                ->on('gpa_organization')
                 ->onDelete('set null');
 
             $table->index('organization_id');
@@ -71,7 +71,7 @@ return new class extends Migration {
         });
 
         // 部门表
-        Schema::create('sys_department', function (Blueprint $table) {
+        Schema::create('gpa_department', function (Blueprint $table) {
             $table->id('department_id')->comment('部门ID');
             $table->string('department_name')->comment('部门名称');
             $table->string('department_code')->nullable()->comment('部门编码');
@@ -88,7 +88,7 @@ return new class extends Migration {
             // 关联公司表
             $table->foreign('company_id')
                 ->references('company_id')
-                ->on('sys_company')
+                ->on('gpa_company')
                 ->onDelete('set null');
 
             $table->index('company_id');
@@ -100,7 +100,7 @@ return new class extends Migration {
         // 职位表
         // 示例1：高级工程师、经理、总监、专员
         // 示例2：P5 初级工程师、P6 中级工程师、P7 高级工程师、P8 专家、M1 经理、M2 总监
-        Schema::create('sys_position', function (Blueprint $table) {
+        Schema::create('gpa_position', function (Blueprint $table) {
             $table->id('position_id')->comment('职位ID');
             $table->string('position_name')->comment('职位名称');
             $table->string('position_code')->nullable()->comment('职位编码');
@@ -115,7 +115,7 @@ return new class extends Migration {
             // 关联部门表
             $table->foreign('department_id')
                 ->references('department_id')
-                ->on('sys_department')
+                ->on('gpa_department')
                 ->onDelete('set null');
 
             $table->index('department_id');
@@ -125,7 +125,7 @@ return new class extends Migration {
 
         // 岗位表
         // 示例：Java开发工程师、销售专员、财务主管
-        Schema::create('sys_post', function (Blueprint $table) {
+        Schema::create('gpa_post', function (Blueprint $table) {
             $table->id('post_id')->comment('岗位ID');
             $table->string('post_name')->comment('岗位名称');
             $table->string('post_code')->nullable()->comment('岗位编码');
@@ -141,13 +141,13 @@ return new class extends Migration {
             // 关联职位表
             $table->foreign('position_id')
                 ->references('position_id')
-                ->on('sys_position')
+                ->on('gpa_position')
                 ->onDelete('set null');
 
             // 关联部门表
             $table->foreign('department_id')
                 ->references('department_id')
-                ->on('sys_department')
+                ->on('gpa_department')
                 ->onDelete('set null');
 
             $table->index('position_id');
@@ -162,10 +162,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_post');
-        Schema::dropIfExists('sys_position');
-        Schema::dropIfExists('sys_department');
-        Schema::dropIfExists('sys_company');
+        Schema::dropIfExists('gpa_post');
+        Schema::dropIfExists('gpa_position');
+        Schema::dropIfExists('gpa_department');
+        Schema::dropIfExists('gpa_company');
     }
 };
 

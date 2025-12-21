@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sys_dictionary_category', function (Blueprint $table) {
+        Schema::create('gpa_dictionary_category', function (Blueprint $table) {
             $table->id('category_id')->comment('数据字典分类ID');
             $table->string('category_name')->comment('数据字典分类名');
             $table->string('category_code')->comment('数据字典编码');
@@ -23,13 +23,13 @@ return new class extends Migration {
             $table->comment('数据字典分类表');
         });
 
-        Schema::create('sys_dictionary', function (Blueprint $table) {
+        Schema::create('gpa_dictionary', function (Blueprint $table) {
             $table->id('dictionary_id')->comment('数据字典ID');
             $table->unsignedBigInteger('category_id')->comment('字典类型ID');
             $table->foreign('category_id')->references('category_id')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete()
-                ->on('sys_dictionary_category');
+                ->on('gpa_dictionary_category');
             $table->string('dictionary_name')->comment('名称');
             $table->string('dictionary_value')->comment('值');
             $table->unsignedBigInteger('parent_id')->default(0)->comment('父ID');
@@ -46,7 +46,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_dictionary_category');
-        Schema::dropIfExists('sys_dictionary');
+        Schema::dropIfExists('gpa_dictionary_category');
+        Schema::dropIfExists('gpa_dictionary');
     }
 };

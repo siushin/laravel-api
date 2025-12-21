@@ -68,14 +68,14 @@ class RbacSeeder extends Seeder
         $roleIds = [];
         foreach ($roles as $role) {
             // 检查角色是否已存在
-            $exists = DB::table('sys_role')
+            $exists = DB::table('gpa_role')
                 ->where('account_type', $adminType)
                 ->where('role_code', $role['role_code'])
                 ->exists();
 
             if (!$exists) {
                 $roleId = generateId();
-                DB::table('sys_role')->insert([
+                DB::table('gpa_role')->insert([
                     'role_id' => $roleId,
                     'account_type' => $adminType,
                     'role_name' => $role['role_name'],
@@ -89,7 +89,7 @@ class RbacSeeder extends Seeder
                 $roleIds[$role['role_code']] = $roleId;
             } else {
                 // 如果已存在，获取角色ID
-                $existingRole = DB::table('sys_role')
+                $existingRole = DB::table('gpa_role')
                     ->where('account_type', $adminType)
                     ->where('role_code', $role['role_code'])
                     ->first();
@@ -127,14 +127,14 @@ class RbacSeeder extends Seeder
         $roleIds = [];
         foreach ($roles as $role) {
             // 检查角色是否已存在
-            $exists = DB::table('sys_role')
+            $exists = DB::table('gpa_role')
                 ->where('account_type', $userType)
                 ->where('role_code', $role['role_code'])
                 ->exists();
 
             if (!$exists) {
                 $roleId = generateId();
-                DB::table('sys_role')->insert([
+                DB::table('gpa_role')->insert([
                     'role_id' => $roleId,
                     'account_type' => $userType,
                     'role_name' => $role['role_name'],
@@ -148,7 +148,7 @@ class RbacSeeder extends Seeder
                 $roleIds[$role['role_code']] = $roleId;
             } else {
                 // 如果已存在，获取角色ID
-                $existingRole = DB::table('sys_role')
+                $existingRole = DB::table('gpa_role')
                     ->where('account_type', $userType)
                     ->where('role_code', $role['role_code'])
                     ->first();
@@ -167,7 +167,7 @@ class RbacSeeder extends Seeder
         $adminType = AccountTypeEnum::Admin->value;
 
         // 获取所有 Admin 类型的菜单
-        $menus = DB::table('sys_menu')
+        $menus = DB::table('gpa_menu')
             ->where('account_type', $adminType)
             ->where('status', 1)
             ->get();
@@ -208,7 +208,7 @@ class RbacSeeder extends Seeder
         $userType = AccountTypeEnum::User->value;
 
         // 获取所有 User 类型的菜单（如果有的话）
-        $menus = DB::table('sys_menu')
+        $menus = DB::table('gpa_menu')
             ->where('account_type', $userType)
             ->where('status', 1)
             ->get();
@@ -238,7 +238,7 @@ class RbacSeeder extends Seeder
         $roleMenuData = [];
         foreach ($menus as $menu) {
             // 检查是否已存在关联
-            $exists = DB::table('sys_role_menu')
+            $exists = DB::table('gpa_role_menu')
                 ->where('role_id', $roleId)
                 ->where('menu_id', $menu->menu_id)
                 ->exists();
@@ -255,7 +255,7 @@ class RbacSeeder extends Seeder
         }
 
         if (!empty($roleMenuData)) {
-            DB::table('sys_role_menu')->insert($roleMenuData);
+            DB::table('gpa_role_menu')->insert($roleMenuData);
         }
     }
 
@@ -314,13 +314,13 @@ class RbacSeeder extends Seeder
     private function assignRoleToAccount($accountId, $roleId, $now): void
     {
         // 检查是否已存在关联
-        $exists = DB::table('sys_user_role')
+        $exists = DB::table('gpa_user_role')
             ->where('account_id', $accountId)
             ->where('role_id', $roleId)
             ->exists();
 
         if (!$exists) {
-            DB::table('sys_user_role')->insert([
+            DB::table('gpa_user_role')->insert([
                 'id' => generateId(),
                 'account_id' => $accountId,
                 'role_id' => $roleId,

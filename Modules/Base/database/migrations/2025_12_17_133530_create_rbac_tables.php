@@ -14,7 +14,7 @@ return new class extends Migration {
         $accountTypeComment = buildEnumComment(AccountTypeEnum::cases(), '账号类型');
 
         // 角色表
-        Schema::create('sys_role', function (Blueprint $table) use ($accountTypeComment) {
+        Schema::create('gpa_role', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('role_id')->comment('角色ID');
             $table->string('account_type', 20)
                 ->default(AccountTypeEnum::Admin->value)
@@ -36,7 +36,7 @@ return new class extends Migration {
         });
 
         // 菜单表
-        Schema::create('sys_menu', function (Blueprint $table) use ($accountTypeComment) {
+        Schema::create('gpa_menu', function (Blueprint $table) use ($accountTypeComment) {
             $table->id('menu_id')->comment('菜单ID');
             $table->string('account_type', 20)
                 ->default(AccountTypeEnum::Admin->value)
@@ -71,7 +71,7 @@ return new class extends Migration {
         });
 
         // 用户角色关联表
-        Schema::create('sys_user_role', function (Blueprint $table) {
+        Schema::create('gpa_user_role', function (Blueprint $table) {
             $table->id()->comment('关联ID');
             $table->unsignedBigInteger('account_id')->comment('账号ID（关联bs_account.id）');
             $table->unsignedBigInteger('role_id')->comment('角色ID');
@@ -85,7 +85,7 @@ return new class extends Migration {
 
             $table->foreign('role_id')
                 ->references('role_id')
-                ->on('sys_role')
+                ->on('gpa_role')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -100,7 +100,7 @@ return new class extends Migration {
         });
 
         // 角色菜单关联表
-        Schema::create('sys_role_menu', function (Blueprint $table) {
+        Schema::create('gpa_role_menu', function (Blueprint $table) {
             $table->id()->comment('关联ID');
             $table->unsignedBigInteger('role_id')->comment('角色ID');
             $table->unsignedBigInteger('menu_id')->comment('菜单ID');
@@ -108,13 +108,13 @@ return new class extends Migration {
 
             $table->foreign('role_id')
                 ->references('role_id')
-                ->on('sys_role')
+                ->on('gpa_role')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
             $table->foreign('menu_id')
                 ->references('menu_id')
-                ->on('sys_menu')
+                ->on('gpa_menu')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -133,9 +133,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_role_menu');
-        Schema::dropIfExists('sys_user_role');
-        Schema::dropIfExists('sys_menu');
-        Schema::dropIfExists('sys_role');
+        Schema::dropIfExists('gpa_role_menu');
+        Schema::dropIfExists('gpa_user_role');
+        Schema::dropIfExists('gpa_menu');
+        Schema::dropIfExists('gpa_role');
     }
 };

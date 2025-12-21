@@ -20,7 +20,7 @@ class SysGeneralLog extends Model
     use HasFactory, ParamTool, ModelTool;
 
     protected $primaryKey = 'log_id';
-    protected $table      = 'sys_logs';
+    protected $table      = 'gpa_logs';
 
     protected $guarded = [];
 

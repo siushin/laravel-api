@@ -71,7 +71,7 @@ class SmsController extends Controller
                 $errorMessage = $errorData['message'] ?? $errorMessage;
             }
 
-            // 发送失败，记录失败日志到 sys_logs 表
+            // 发送失败，记录失败日志到 gpa_logs 表
             $extendData = [
                 'request' => [
                     'phone' => $params['phone'],

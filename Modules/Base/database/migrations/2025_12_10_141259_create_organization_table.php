@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         $organizationTypeComment = buildEnumComment(OrganizationTypeEnum::cases(), '组织架构类型');
 
-        Schema::create('sys_organization', function (Blueprint $table) use ($organizationTypeComment) {
+        Schema::create('gpa_organization', function (Blueprint $table) use ($organizationTypeComment) {
             $table->id('organization_id')->comment('组织架构ID');
             $table->char('organization_name')->comment('组织架构名称');
             $table->unsignedBigInteger('organization_pid')->comment('上级组织架构ID');
@@ -32,6 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_organization');
+        Schema::dropIfExists('gpa_organization');
     }
 };

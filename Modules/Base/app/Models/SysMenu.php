@@ -13,7 +13,7 @@ class SysMenu extends Model
     use SoftDeletes;
 
     protected $primaryKey = 'menu_id';
-    protected $table      = 'sys_menu';
+    protected $table      = 'gpa_menu';
 
     protected $fillable = [
         'menu_id',

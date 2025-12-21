@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('sys_files', function (Blueprint $table) {
+        Schema::create('gpa_files', function (Blueprint $table) {
             $table->id('file_id')->comment('文件ID');
             $table->char('file_name')->comment('文件名');
             $table->char('origin_file_name')->comment('原始文件名');
@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->comment('文件表');
         });
 
-        Schema::create('sys_file_images', function (Blueprint $table) {
+        Schema::create('gpa_file_images', function (Blueprint $table) {
             $table->id('image_id')->comment('图片ID');
             $table->unsignedBigInteger('file_id')->comment('文件ID');
             $table->unsignedInteger('image_width')->comment('图片宽度（px）');
@@ -36,7 +36,7 @@ return new class extends Migration {
             // 设置级联删除
             $table->foreign('file_id')
                 ->references('file_id')
-                ->on('sys_files')
+                ->on('gpa_files')
                 ->onDelete('cascade');
 
             $table->comment('文件-附属信息-图片表');
@@ -48,7 +48,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_files');
-        Schema::dropIfExists('sys_file_images');
+        Schema::dropIfExists('gpa_files');
+        Schema::dropIfExists('gpa_file_images');
     }
 };

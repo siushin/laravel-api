@@ -21,7 +21,7 @@ class MenuSeeder extends Seeder
 
         // 先插入父菜单
         $workbenchId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $workbenchId,
             'account_type' => $accountType,
             'menu_name'    => '工作台',
@@ -43,7 +43,7 @@ class MenuSeeder extends Seeder
         ]);
 
         $userManagementId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $userManagementId,
             'account_type' => $accountType,
             'menu_name'    => '用户管理',
@@ -64,7 +64,7 @@ class MenuSeeder extends Seeder
         ]);
 
         $notificationId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $notificationId,
             'account_type' => $accountType,
             'menu_name'    => '通知管理',
@@ -85,7 +85,7 @@ class MenuSeeder extends Seeder
         ]);
 
         $appManagementId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $appManagementId,
             'account_type' => $accountType,
             'menu_name'    => '应用管理',
@@ -106,7 +106,7 @@ class MenuSeeder extends Seeder
         ]);
 
         $organizationId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $organizationId,
             'account_type' => $accountType,
             'menu_name'    => '组织架构管理',
@@ -127,7 +127,7 @@ class MenuSeeder extends Seeder
         ]);
 
         $systemId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $systemId,
             'account_type' => $accountType,
             'menu_name'    => '系统管理',
@@ -168,7 +168,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($appManagementChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -218,7 +218,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($notificationChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -276,7 +276,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($organizationChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -299,7 +299,7 @@ class MenuSeeder extends Seeder
 
         // 插入角色权限父菜单（作为系统管理的子菜单）
         $rbacId = generateId();
-        DB::table('sys_menu')->insert([
+        DB::table('gpa_menu')->insert([
             'menu_id'      => $rbacId,
             'account_type' => $accountType,
             'menu_name'    => '角色权限',
@@ -356,7 +356,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($rbacChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -414,7 +414,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($systemChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -472,7 +472,7 @@ class MenuSeeder extends Seeder
         ];
 
         foreach ($userManagementChildren as $child) {
-            DB::table('sys_menu')->insert([
+            DB::table('gpa_menu')->insert([
                 'menu_id'      => generateId(),
                 'account_type' => $accountType,
                 'menu_name'    => $child['menu_name'],
@@ -503,7 +503,7 @@ class MenuSeeder extends Seeder
     private function associateMenusToBaseModule(): void
     {
         // 查找Base模块
-        $baseModule = DB::table('sys_module')
+        $baseModule = DB::table('gpa_module')
             ->where('module_identifier', 'base')
             ->orWhere('module_name', 'Base')
             ->first();
@@ -511,7 +511,7 @@ class MenuSeeder extends Seeder
         if (!$baseModule) {
             // 如果Base模块不存在，创建它
             $baseModuleId = generateId();
-            DB::table('sys_module')->insert([
+            DB::table('gpa_module')->insert([
                 'module_id'          => $baseModuleId,
                 'module_identifier'  => 'base',
                 'module_name'        => 'Base',
@@ -527,7 +527,7 @@ class MenuSeeder extends Seeder
         }
 
         // 获取所有Base模块的Admin菜单
-        $menuIds = DB::table('sys_menu')
+        $menuIds = DB::table('gpa_menu')
             ->where('account_type', AccountTypeEnum::Admin->value)
             ->pluck('menu_id')
             ->toArray();
@@ -537,7 +537,7 @@ class MenuSeeder extends Seeder
         $moduleMenuData = [];
         foreach ($menuIds as $menuId) {
             // 检查是否已存在关联
-            $exists = DB::table('sys_module_menu')
+            $exists = DB::table('gpa_module_menu')
                 ->where('module_id', $baseModuleId)
                 ->where('menu_id', $menuId)
                 ->exists();
@@ -554,7 +554,7 @@ class MenuSeeder extends Seeder
         }
 
         if (!empty($moduleMenuData)) {
-            DB::table('sys_module_menu')->insert($moduleMenuData);
+            DB::table('gpa_module_menu')->insert($moduleMenuData);
         }
     }
 }

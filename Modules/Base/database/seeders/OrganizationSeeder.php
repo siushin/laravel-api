@@ -19,11 +19,11 @@ class OrganizationSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0'); // 关闭外键检查
 
         // 清空表
-        DB::table('sys_post')->truncate();
-        DB::table('sys_position')->truncate();
-        DB::table('sys_department')->truncate();
-        DB::table('sys_company')->truncate();
-        DB::table('sys_organization')->truncate();
+        DB::table('gpa_post')->truncate();
+        DB::table('gpa_position')->truncate();
+        DB::table('gpa_department')->truncate();
+        DB::table('gpa_company')->truncate();
+        DB::table('gpa_organization')->truncate();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1'); // 开启外键检查
 
@@ -94,7 +94,7 @@ class OrganizationSeeder extends Seeder
                 'updated_at'            => $now,
             ],
         ];
-        DB::table('sys_organization')->insert($organizationData);
+        DB::table('gpa_organization')->insert($organizationData);
 
         // 生成公司ID
         $companyShenzhenId = generateId();  // 深圳科技有限公司
@@ -146,7 +146,7 @@ class OrganizationSeeder extends Seeder
                 'updated_at'      => $now,
             ],
         ];
-        DB::table('sys_company')->insert($companyData);
+        DB::table('gpa_company')->insert($companyData);
 
         // 生成部门ID（深圳科技有限公司）
         $deptTechRdId = generateId();        // 技术研发部
@@ -262,7 +262,7 @@ class OrganizationSeeder extends Seeder
                 'updated_at'      => $now,
             ],
         ];
-        DB::table('sys_department')->insert($departmentData);
+        DB::table('gpa_department')->insert($departmentData);
 
         // 生成职位ID
         $posFrontSeniorId = generateId();    // 高级前端工程师
@@ -390,7 +390,7 @@ class OrganizationSeeder extends Seeder
                 'updated_at'       => $now,
             ],
         ];
-        DB::table('sys_position')->insert($positionData);
+        DB::table('gpa_position')->insert($positionData);
 
         // 生成岗位ID
         $postReactDevId = generateId();       // React前端开发
@@ -523,6 +523,6 @@ class OrganizationSeeder extends Seeder
                 'updated_at'        => $now,
             ],
         ];
-        DB::table('sys_post')->insert($postData);
+        DB::table('gpa_post')->insert($postData);
     }
 }

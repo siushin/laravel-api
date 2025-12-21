@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         // 模块表
-        Schema::create('sys_module', function (Blueprint $table) {
+        Schema::create('gpa_module', function (Blueprint $table) {
             $table->id('module_id')->comment('模块ID');
             $table->string('module_identifier', 50)->unique()->comment('模块标识（用于表名前缀，如：sms, base）');
             $table->string('module_name', 50)->comment('模块名称（对应module.json中的name）');
@@ -41,7 +41,7 @@ return new class extends Migration {
         });
 
         // 模块菜单关联表
-        Schema::create('sys_module_menu', function (Blueprint $table) {
+        Schema::create('gpa_module_menu', function (Blueprint $table) {
             $table->id()->comment('关联ID');
             $table->unsignedBigInteger('module_id')->comment('模块ID');
             $table->unsignedBigInteger('menu_id')->comment('菜单ID');
@@ -49,13 +49,13 @@ return new class extends Migration {
 
             $table->foreign('module_id')
                 ->references('module_id')
-                ->on('sys_module')
+                ->on('gpa_module')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
             $table->foreign('menu_id')
                 ->references('menu_id')
-                ->on('sys_menu')
+                ->on('gpa_menu')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
@@ -72,7 +72,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_module_menu');
-        Schema::dropIfExists('sys_module');
+        Schema::dropIfExists('gpa_module_menu');
+        Schema::dropIfExists('gpa_module');
     }
 };

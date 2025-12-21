@@ -47,10 +47,10 @@ class MenuController extends Controller
                 ->toArray();
         } else {
             // 普通用户根据角色获取菜单
-            $menuIds = DB::table('sys_user_role')
-                ->join('sys_role_menu', 'sys_user_role.role_id', '=', 'sys_role_menu.role_id')
-                ->where('sys_user_role.account_id', $user->id)
-                ->pluck('sys_role_menu.menu_id')
+            $menuIds = DB::table('gpa_user_role')
+                ->join('gpa_role_menu', 'gpa_user_role.role_id', '=', 'gpa_role_menu.role_id')
+                ->where('gpa_user_role.account_id', $user->id)
+                ->pluck('gpa_role_menu.menu_id')
                 ->toArray();
 
             // 获取必须选中的菜单（is_required = 1）

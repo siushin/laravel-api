@@ -15,7 +15,7 @@ class SysFileImage extends Model implements IFile
     use HasFactory;
 
     protected $primaryKey = 'image_id';
-    protected $table      = 'sys_file_images';
+    protected $table      = 'gpa_file_images';
 
     protected $guarded = [];
 

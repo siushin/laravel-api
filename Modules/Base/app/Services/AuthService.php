@@ -299,7 +299,7 @@ class AuthService
         // 添加用户权限（根据账号类型动态返回）
         $userData['currentAuthority'] = $account->account_type;
 
-        // 记录登录日志到 sys_login_log
+        // 记录登录日志到 gpa_login_log
         logLogin($request, $account->id, $account->username, 1, '登录成功');
 
         // 记录常规日志（兼容原有逻辑）

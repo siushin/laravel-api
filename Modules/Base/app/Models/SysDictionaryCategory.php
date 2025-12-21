@@ -16,7 +16,7 @@ class SysDictionaryCategory extends Model
     use HasFactory, ParamTool, ModelTool;
 
     protected $primaryKey = 'category_id';
-    protected $table      = 'sys_dictionary_category';
+    protected $table      = 'gpa_dictionary_category';
 
     protected $guarded = [];
 

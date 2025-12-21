@@ -16,7 +16,7 @@ class SysAuditLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
-    protected $table = 'sys_audit_log';
+    protected $table = 'gpa_audit_log';
 
     protected $guarded = [];
 

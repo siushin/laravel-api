@@ -22,7 +22,7 @@ class SysOrganization extends Model
     use HasFactory, ParamTool, ModelTool;
 
     protected $primaryKey = 'organization_id';
-    protected $table      = 'sys_organization';
+    protected $table      = 'gpa_organization';
 
     protected $fillable = [
         'organization_id', 'organization_name', 'organization_pid', 'full_organization_pid',

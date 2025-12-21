@@ -22,7 +22,7 @@ class SysDictionary extends Model
     use HasFactory, ParamTool, ModelTool;
 
     protected $primaryKey = 'dictionary_id';
-    protected $table      = 'sys_dictionary';
+    protected $table      = 'gpa_dictionary';
 
     protected $fillable = [
         'dictionary_id', 'category_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'extend_data'

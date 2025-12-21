@@ -15,7 +15,7 @@ class SysLoginLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
-    protected $table = 'sys_login_log';
+    protected $table = 'gpa_login_log';
 
     protected $guarded = [];
 

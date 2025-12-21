@@ -68,7 +68,7 @@ class LogService
                 'created_at'  => now(),
             ];
 
-            return DB::table('sys_logs')->insert($data);
+            return DB::table('gpa_logs')->insert($data);
         } catch (Exception $e) {
             Log::error('记录常规日志失败: ' . $e->getMessage());
             return false;
@@ -125,7 +125,7 @@ class LogService
                 'operated_at'    => now(),
             ];
 
-            return DB::table('sys_operation_log')->insert($data);
+            return DB::table('gpa_operation_log')->insert($data);
         } catch (Exception $e) {
             Log::error('记录操作日志失败: ' . $e->getMessage());
             return false;
@@ -180,7 +180,7 @@ class LogService
                 'audited_at'    => now(),
             ];
 
-            return DB::table('sys_audit_log')->insert($data);
+            return DB::table('gpa_audit_log')->insert($data);
         } catch (Exception $e) {
             Log::error('记录审计日志失败: ' . $e->getMessage());
             return false;
@@ -229,7 +229,7 @@ class LogService
                 'login_at'         => now(),
             ];
 
-            return DB::table('sys_login_log')->insert($data);
+            return DB::table('gpa_login_log')->insert($data);
         } catch (Exception $e) {
             Log::error('记录登录日志失败: ' . $e->getMessage());
             return false;

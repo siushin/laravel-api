@@ -27,7 +27,7 @@ return new class extends Migration {
         $resourceTypeComment = buildEnumComment(ResourceTypeEnum::cases(), '资源类型');
 
         // 常规日志表（用于记录各种业务操作日志，如：文件上传、消息推送、短信发送等）
-        Schema::create('sys_logs', function (Blueprint $table) use ($sourceTypeComment) {
+        Schema::create('gpa_logs', function (Blueprint $table) use ($sourceTypeComment) {
             $table->id('log_id')->comment('日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
             $table->string('source_type', 50)->comment($sourceTypeComment);
@@ -55,7 +55,7 @@ return new class extends Migration {
         });
 
         // 操作日志表（用于记录HTTP请求相关的操作日志）
-        Schema::create('sys_operation_log', function (Blueprint $table) use ($sourceTypeComment, $operationActionComment, $httpMethodComment) {
+        Schema::create('gpa_operation_log', function (Blueprint $table) use ($sourceTypeComment, $operationActionComment, $httpMethodComment) {
             $table->id()->comment('操作日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
             $table->string('source_type', 50)->comment($sourceTypeComment);
@@ -90,7 +90,7 @@ return new class extends Migration {
         });
 
         // 审计日志表（用于记录敏感操作和重要数据变更）
-        Schema::create('sys_audit_log', function (Blueprint $table) use ($operationActionComment, $resourceTypeComment) {
+        Schema::create('gpa_audit_log', function (Blueprint $table) use ($operationActionComment, $resourceTypeComment) {
             $table->id()->comment('审计日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('操作人ID（关联bs_account.id）');
             $table->string('module', 50)->comment('模块名称');
@@ -126,7 +126,7 @@ return new class extends Migration {
         });
 
         // 登录日志表（用于记录用户登录/登出日志）
-        Schema::create('sys_login_log', function (Blueprint $table) use ($browserComment, $operatingSystemComment, $deviceTypeComment) {
+        Schema::create('gpa_login_log', function (Blueprint $table) use ($browserComment, $operatingSystemComment, $deviceTypeComment) {
             $table->id()->comment('登录日志ID');
             $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
             $table->string('username', 50)->nullable()->comment('用户名（冗余字段，便于查询）');
@@ -165,9 +165,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sys_logs');
-        Schema::dropIfExists('sys_operation_log');
-        Schema::dropIfExists('sys_audit_log');
-        Schema::dropIfExists('sys_login_log');
+        Schema::dropIfExists('gpa_logs');
+        Schema::dropIfExists('gpa_operation_log');
+        Schema::dropIfExists('gpa_audit_log');
+        Schema::dropIfExists('gpa_login_log');
     }
 };

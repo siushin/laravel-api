@@ -26,7 +26,7 @@ class SysFile extends Model
     use HasFactory, SoftDeletes, ModelTool;
 
     protected $primaryKey = 'file_id';
-    protected $table      = 'sys_files';
+    protected $table      = 'gpa_files';
 
     const string DEFAULT_DISK    = 'public';   // 默认存储 disk
     const string DEFAULT_PRIVATE = 'local';   // 默认私人 disk
