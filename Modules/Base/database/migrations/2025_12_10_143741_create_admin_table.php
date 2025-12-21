@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('bs_admin', function (Blueprint $table) {
+        Schema::create('gpa_admin', function (Blueprint $table) {
             $table->id()->comment('管理员ID');
             $table->unsignedBigInteger('account_id')->unique()->comment('账号ID');
             $table->unsignedBigInteger('company_id')->nullable()->comment('所属公司ID');
@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->tinyInteger('is_super')->default(0)->comment('是否超级管理员：1是，0否');
             $table->timestamps();
 
-            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('gpa_account')->onDelete('cascade');
             $table->index('company_id');
             $table->index('department_id');
             $table->comment('管理员表');
@@ -30,7 +30,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_admin');
+        Schema::dropIfExists('gpa_admin');
     }
 };
 

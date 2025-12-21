@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AccountProfile extends Model
 {
-    protected $table = 'bs_account_profile';
+    protected $table = 'gpa_account_profile';
 
     protected $fillable = [
         'id',

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('module_name', 50)->comment('模块名称（对应module.json中的name）');
             $table->string('module_alias', 100)->nullable()->comment('模块别名（对应module.json中的alias）');
             $table->text('module_description')->nullable()->comment('模块描述（对应module.json中的description）');
-            $table->unsignedBigInteger('uploader_id')->nullable()->comment('上传人ID（关联bs_account.id）');
+            $table->unsignedBigInteger('uploader_id')->nullable()->comment('上传人ID（关联gpa_account.id）');
             $table->tinyInteger('status')->default(1)->comment('状态: 1启用, 0禁用');
             $table->unsignedInteger('priority')->default(0)->comment('优先级（对应module.json中的priority，数字越大优先级越高）');
             $table->string('version', 20)->nullable()->comment('模块版本号');
@@ -28,7 +28,7 @@ return new class extends Migration {
 
             $table->foreign('uploader_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 

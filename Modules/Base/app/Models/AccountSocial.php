@@ -11,7 +11,7 @@ use Siushin\LaravelTool\Enums\SocialTypeEnum;
  */
 class AccountSocial extends Model
 {
-    protected $table = 'bs_account_social';
+    protected $table = 'gpa_account_social';
 
     protected $fillable = [
         'id',

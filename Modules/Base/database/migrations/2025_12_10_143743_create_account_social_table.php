@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         $socialTypeComment = buildEnumComment(SocialTypeEnum::cases(), '社交类型');
 
-        Schema::create('bs_account_social', function (Blueprint $table) use ($socialTypeComment) {
+        Schema::create('gpa_account_social', function (Blueprint $table) use ($socialTypeComment) {
             $table->id()->comment('社交网络ID');
             $table->unsignedBigInteger('account_id')->comment('账号ID');
             $table->string('social_type', 20)
@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->timestamp('verified_at')->nullable()->comment('验证时间');
             $table->timestamps();
 
-            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('gpa_account')->onDelete('cascade');
             $table->index(['account_id', 'social_type']);
             $table->unique(['social_type', 'social_account'], 'account_social_unique');
             $table->comment('账号社交网络表');
@@ -37,6 +37,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_account_social');
+        Schema::dropIfExists('gpa_account_social');
     }
 };

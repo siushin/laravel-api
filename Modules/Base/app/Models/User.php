@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class User extends Model
 {
-    protected $table = 'bs_user';
+    protected $table = 'gpa_user';
 
     protected $fillable = [
         'id',

@@ -29,7 +29,7 @@ return new class extends Migration {
         // 常规日志表（用于记录各种业务操作日志，如：文件上传、消息推送、短信发送等）
         Schema::create('gpa_logs', function (Blueprint $table) use ($sourceTypeComment) {
             $table->id('log_id')->comment('日志ID');
-            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联gpa_account.id）');
             $table->string('source_type', 50)->comment($sourceTypeComment);
             $table->char('action_type', 20)->comment('操作类型（对应LogActionEnum）');
             $table->string('content')->comment('日志内容');
@@ -40,7 +40,7 @@ return new class extends Migration {
 
             $table->foreign('account_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 
@@ -57,7 +57,7 @@ return new class extends Migration {
         // 操作日志表（用于记录HTTP请求相关的操作日志）
         Schema::create('gpa_operation_log', function (Blueprint $table) use ($sourceTypeComment, $operationActionComment, $httpMethodComment) {
             $table->id()->comment('操作日志ID');
-            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联gpa_account.id）');
             $table->string('source_type', 50)->comment($sourceTypeComment);
             $table->string('module', 50)->comment('模块名称');
             $table->string('action', 50)->comment($operationActionComment);
@@ -73,7 +73,7 @@ return new class extends Migration {
 
             $table->foreign('account_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 
@@ -92,7 +92,7 @@ return new class extends Migration {
         // 审计日志表（用于记录敏感操作和重要数据变更）
         Schema::create('gpa_audit_log', function (Blueprint $table) use ($operationActionComment, $resourceTypeComment) {
             $table->id()->comment('审计日志ID');
-            $table->unsignedBigInteger('account_id')->nullable()->comment('操作人ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->nullable()->comment('操作人ID（关联gpa_account.id）');
             $table->string('module', 50)->comment('模块名称');
             $table->string('action', 50)->comment($operationActionComment);
             $table->string('resource_type', 50)->nullable()->comment($resourceTypeComment);
@@ -107,7 +107,7 @@ return new class extends Migration {
 
             $table->foreign('account_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 
@@ -128,7 +128,7 @@ return new class extends Migration {
         // 登录日志表（用于记录用户登录/登出日志）
         Schema::create('gpa_login_log', function (Blueprint $table) use ($browserComment, $operatingSystemComment, $deviceTypeComment) {
             $table->id()->comment('登录日志ID');
-            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->nullable()->comment('账号ID（关联gpa_account.id）');
             $table->string('username', 50)->nullable()->comment('用户名（冗余字段，便于查询）');
             $table->tinyInteger('status')->default(0)->comment('登录状态: 1成功, 0失败');
             $table->ipAddress('ip_address')->comment('IP地址');
@@ -143,7 +143,7 @@ return new class extends Migration {
 
             $table->foreign('account_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 

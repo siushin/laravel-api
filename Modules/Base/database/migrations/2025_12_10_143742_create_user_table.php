@@ -10,12 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('bs_user', function (Blueprint $table) {
+        Schema::create('gpa_user', function (Blueprint $table) {
             $table->id()->comment('用户ID');
             $table->unsignedBigInteger('account_id')->unique()->comment('账号ID');
             $table->timestamps();
 
-            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('gpa_account')->onDelete('cascade');
             $table->comment('用户表');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_user');
+        Schema::dropIfExists('gpa_user');
     }
 };
 

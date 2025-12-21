@@ -15,7 +15,7 @@ return new class extends Migration {
         $genderComment = buildEnumComment(GenderTypeEnum::cases(), '性别');
         $verificationMethodComment = buildEnumComment(VerificationMethodEnum::cases(), '认证方式');
 
-        Schema::create('bs_account_profile', function (Blueprint $table) use ($genderComment, $verificationMethodComment) {
+        Schema::create('gpa_account_profile', function (Blueprint $table) use ($genderComment, $verificationMethodComment) {
             $table->id()->comment('账号资料ID');
             $table->unsignedBigInteger('account_id')->unique()->comment('账号ID');
             $table->string('nickname')->nullable()->comment('昵称');
@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->timestamp('verified_at')->nullable()->comment('认证时间');
             $table->timestamps();
 
-            $table->foreign('account_id')->references('id')->on('bs_account')->onDelete('cascade');
+            $table->foreign('account_id')->references('id')->on('gpa_account')->onDelete('cascade');
             $table->comment('账号资料表');
         });
     }
@@ -41,6 +41,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_account_profile');
+        Schema::dropIfExists('gpa_account_profile');
     }
 };

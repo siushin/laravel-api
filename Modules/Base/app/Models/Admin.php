@@ -19,7 +19,7 @@ class Admin extends Model
 {
     use ParamTool;
 
-    protected $table = 'bs_admin';
+    protected $table = 'gpa_admin';
 
     protected $fillable = [
         'id',

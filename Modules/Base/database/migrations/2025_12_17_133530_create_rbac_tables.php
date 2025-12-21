@@ -73,13 +73,13 @@ return new class extends Migration {
         // 用户角色关联表
         Schema::create('gpa_user_role', function (Blueprint $table) {
             $table->id()->comment('关联ID');
-            $table->unsignedBigInteger('account_id')->comment('账号ID（关联bs_account.id）');
+            $table->unsignedBigInteger('account_id')->comment('账号ID（关联gpa_account.id）');
             $table->unsignedBigInteger('role_id')->comment('角色ID');
             $table->timestamps();
 
             $table->foreign('account_id')
                 ->references('id')
-                ->on('bs_account')
+                ->on('gpa_account')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 

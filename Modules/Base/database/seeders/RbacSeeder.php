@@ -268,7 +268,7 @@ class RbacSeeder extends Seeder
         $userType = AccountTypeEnum::User->value;
 
         // 为超级管理员账号分配超级管理员角色
-        $superAdminAccount = DB::table('bs_account')
+        $superAdminAccount = DB::table('gpa_account')
             ->where('account_type', $adminType)
             ->where('username', env('APP_ADMIN', 'admin'))
             ->first();
@@ -278,7 +278,7 @@ class RbacSeeder extends Seeder
         }
 
         // 为前5个Admin账号随机分配角色
-        $adminAccounts = DB::table('bs_account')
+        $adminAccounts = DB::table('gpa_account')
             ->where('account_type', $adminType)
             ->where('username', '!=', env('APP_ADMIN', 'admin'))
             ->limit(5)
@@ -294,7 +294,7 @@ class RbacSeeder extends Seeder
         }
 
         // 为前10个User账号随机分配角色
-        $userAccounts = DB::table('bs_account')
+        $userAccounts = DB::table('gpa_account')
             ->where('account_type', $userType)
             ->limit(10)
             ->get();

@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         $accountTypeComment = buildEnumComment(AccountTypeEnum::cases(), '账号类型');
 
-        Schema::create('bs_account', function (Blueprint $table) use ($accountTypeComment) {
+        Schema::create('gpa_account', function (Blueprint $table) use ($accountTypeComment) {
             $table->id()->comment('账号ID');
             $table->string('account_type', 20)
                 ->default(AccountTypeEnum::User->value)
@@ -54,7 +54,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('bs_account');
+        Schema::dropIfExists('gpa_account');
         Schema::dropIfExists('sys_password_reset_tokens');
         Schema::dropIfExists('sys_sessions');
     }

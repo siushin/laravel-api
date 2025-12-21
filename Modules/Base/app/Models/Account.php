@@ -27,7 +27,7 @@ class Account extends Authenticatable
     /** @use HasFactory<AccountFactory> */
     use HasApiTokens, HasFactory, Notifiable, ParamTool, SoftDeletes;
 
-    protected $table = 'bs_account';
+    protected $table = 'gpa_account';
 
     /**
      * The attributes that are mass assignable.
