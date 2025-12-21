@@ -86,8 +86,6 @@ class LogSeeder extends Seeder
         if (!empty($logs)) {
             SysGeneralLog::query()->insert($logs);
         }
-
-        $this->command->info('常规日志数据填充完成：200条');
     }
 
     /**
@@ -99,7 +97,6 @@ class LogSeeder extends Seeder
     private function seedAuditLogs(array $accountIds): void
     {
         $logs = [];
-        $sourceTypes = array_map(fn($case) => $case->value, RequestSourceEnum::cases());
         $actions = array_map(fn($case) => $case->value, OperationActionEnum::cases());
         $resourceTypes = array_map(fn($case) => $case->value, ResourceTypeEnum::cases());
         $modules = ['账号管理', '角色管理', '菜单管理', '配置管理', '文件管理', '用户管理'];
@@ -143,8 +140,6 @@ class LogSeeder extends Seeder
         if (!empty($logs)) {
             SysAuditLog::query()->insert($logs);
         }
-
-        $this->command->info('审计日志数据填充完成：150条');
     }
 
     /**
@@ -227,8 +222,6 @@ class LogSeeder extends Seeder
         if (!empty($logs)) {
             SysOperationLog::query()->insert($logs);
         }
-
-        $this->command->info('操作日志数据填充完成：180条');
     }
 
     /**
@@ -293,8 +286,6 @@ class LogSeeder extends Seeder
         if (!empty($logs)) {
             SysLoginLog::query()->insert($logs);
         }
-
-        $this->command->info('登录日志数据填充完成：120条');
     }
 
     /**

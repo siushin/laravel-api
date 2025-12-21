@@ -35,6 +35,7 @@ return new class extends Migration {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+            $table->comment('重置密码-授权码表');
         });
 
         Schema::create('sys_sessions', function (Blueprint $table) {
@@ -44,6 +45,7 @@ return new class extends Migration {
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
+            $table->comment('session会话表');
         });
     }
 
