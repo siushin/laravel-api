@@ -4,8 +4,8 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Models\SysDictionary;
-use Modules\Base\Models\SysDictionaryCategory;
+use Modules\Base\Models\Dictionary;
+use Modules\Base\Models\DictionaryCategory;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class DictionaryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::getPageData($params));
+        return success(Dictionary::getPageData($params));
     }
 
     /**
@@ -46,7 +46,7 @@ class DictionaryController extends Controller
     public function all(Request $request, array $fields = []): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::getAllData($params, $fields));
+        return success(Dictionary::getAllData($params, $fields));
     }
 
     /**
@@ -60,7 +60,7 @@ class DictionaryController extends Controller
     public function add(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::addDictionary($params));
+        return success(Dictionary::addDictionary($params));
     }
 
     /**
@@ -74,7 +74,7 @@ class DictionaryController extends Controller
     public function update(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::updateDictionary($params));
+        return success(Dictionary::updateDictionary($params));
     }
 
     /**
@@ -88,7 +88,7 @@ class DictionaryController extends Controller
     public function delete(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::deleteDictionary($params));
+        return success(Dictionary::deleteDictionary($params));
     }
 
     /**
@@ -102,7 +102,7 @@ class DictionaryController extends Controller
     public function batchDelete(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysDictionary::batchDeleteDictionary($params));
+        return success(Dictionary::batchDeleteDictionary($params));
     }
 
     /**
@@ -116,7 +116,7 @@ class DictionaryController extends Controller
     public function getTplFile(Request $request): BinaryFileResponse
     {
         $params = trimParam($request->all());
-        [$category_name, $tpl_path] = SysDictionaryCategory::getDictionaryTempFilePath($params);
+        [$category_name, $tpl_path] = DictionaryCategory::getDictionaryTempFilePath($params);
         return response()->download($tpl_path, "{$category_name}_模板文件.xlsx");
     }
 
@@ -131,9 +131,9 @@ class DictionaryController extends Controller
     public function getPidData(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        $category_id = SysDictionaryCategory::checkCodeValidate($params);
-        $parent_ids = SysDictionary::query()->where(compact('category_id'))->distinct()->pluck('parent_id');
-        $list = SysDictionary::query()->whereIn('category_id', $parent_ids)->pluck('dictionary_name', 'dictionary_id')->toArray();
+        $category_id = DictionaryCategory::checkCodeValidate($params);
+        $parent_ids = Dictionary::query()->where(compact('category_id'))->distinct()->pluck('parent_id');
+        $list = Dictionary::query()->whereIn('category_id', $parent_ids)->pluck('dictionary_name', 'dictionary_id')->toArray();
         return success($list);
     }
 }

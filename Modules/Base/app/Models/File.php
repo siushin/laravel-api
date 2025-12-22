@@ -21,7 +21,7 @@ use Siushin\LaravelTool\Traits\ModelTool;
 /**
  * 模型：文件
  */
-class SysFile extends Model
+class File extends Model
 {
     use HasFactory, SoftDeletes, ModelTool;
 
@@ -56,7 +56,7 @@ class SysFile extends Model
      */
     public function image(): HasOne
     {
-        return $this->hasOne(SysFileImage::class);
+        return $this->hasOne(FileImage::class);
     }
 
     /**
@@ -68,7 +68,7 @@ class SysFile extends Model
     public static function getFileableType(string $file_type): string
     {
         return match ($file_type) {
-            self::FILE_IMAGE => SysFileImage::class,
+            self::FILE_IMAGE => FileImage::class,
             default => '',
         };
     }

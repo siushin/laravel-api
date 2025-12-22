@@ -1,9 +1,9 @@
 ---
 alwaysApply: true
 scope:
-  filePatterns: ["*.php", "app/**/*.php"]  # 仅对Laravel项目的PHP文件生效
-  aiScenarios: ["generate", "refactor", "debug"]  # AI生成/重构/调试时都遵守
-  version: "1.0.0"  # 规则版本(便于迭代)
+    filePatterns: [ "*.php", "app/**/*.php" ]  # 仅对Laravel项目的PHP文件生效
+    aiScenarios: [ "generate", "refactor", "debug" ]  # AI生成/重构/调试时都遵守
+    version: "1.0.0"  # 规则版本(便于迭代)
 ---
 
 # 【数据库模块】规则约束
@@ -16,15 +16,34 @@ scope:
 
 **所有分页数据、列表数据查询时，都必须支持 `account_id` 的完全匹配查询。**
 
-## 2. 主键ID生成规范
+## 2. Eloquent ORM/数据库使用约束
 
-### 2.1 必须使用 generateId() 函数
+**参数必填项校验**：必须使用 `self::checkEmptyParam($params, ['organization_type']);` 进行参数校验，需要 `use ParamTool`。
+
+**构造where数组**：必须使用
+`$where = self::buildWhereData($params, ['organization_type' => '=', 'organization_name' => 'like']);` 构造查询条件，需要
+`use ModelTool`。
+
+第二个参数支持的查询类型：
+
+- `'='` - 完全匹配查询，例如：`'organization_type' => '='`
+- `'like'` - 模糊查询（LIKE），例如：`'organization_name' => 'like'`
+- `'date_range'` 或 `'time_range'` - 日期/时间范围查询，需要指定字段名，例如：`'date_range' => 'created_at'` 或
+  `'time_range' => 'created_at'`
+- `'keyword'` - 关键词查询，支持以下格式：
+    - 单个字段：`'keyword' => 'content'`
+    - 多个字段（用 `|` 分隔）：`'keyword' => 'content|ip_location'`
+    - 字段数组：`'keyword' => ['before_data', 'after_data', 'description']`
+
+## 3. 主键ID生成规范
+
+### 3.1 必须使用 generateId() 函数
 
 - **禁止**：直接使用数据库自增（AUTO_INCREMENT）或手动指定ID值
 - **必须**：使用 `generateId()` 助手函数生成主键ID
 - **适用范围**：所有需要指定主键ID的数据创建操作
 
-### 2.2 使用场景
+### 3.2 使用场景
 
 以下场景必须使用 `generateId()`：
 
@@ -34,7 +53,7 @@ scope:
 4. **Seeder 数据填充时**
 5. **任何需要手动指定主键ID的场景**
 
-### 2.3 数据差异对比
+### 3.3 数据差异对比
 
 **重要**：如果需要对比新旧数据，找出差异部分，进行新增、更新、删除操作的，必须使用助手函数 `compareDbDataDiff()`。
 
@@ -42,146 +61,13 @@ scope:
 - **必须**：使用 `compareDbDataDiff()` 助手函数自动计算差异
 - **适用范围**：所有需要批量处理数据变更的场景（如批量更新关联数据、同步数据等）
 
-### 2.4 account_id 查询支持规范
+### 3.4 account_id 查询支持规范
 
 **重要**：所有分页数据、列表数据查询时，都必须支持 `account_id` 的完全匹配查询。
 
 - **必须**：在使用 `fastGetPageData()` 或 `fastGetAllData()` 等方法时，必须在查询配置数组中包含 `'account_id' => '='`
 - **适用范围**：所有使用封装的分页/列表查询方法的场景
 - **目的**：确保普通用户只能查看自己的数据，管理员可以按账号ID筛选数据
-
-## 3. 正确示例
-
-### 3.1 控制器中创建记录
-
-```php
-// 正确：使用 generateId() 生成主键ID
-AccountProfile::create([
-    'id'       => generateId(),  // 必须使用 generateId()
-    'user_id'  => $account->id,
-    'nickname' => $request['username'],
-]);
-
-// 错误：不使用 generateId()
-AccountProfile::create([
-    // 'id' => ...,  // 错误：缺少主键ID
-    'user_id'  => $account->id,
-    'nickname' => $request['username'],
-]);
-```
-
-### 3.2 Factory 中定义
-
-```php
-// 正确：使用 generateId() 生成主键ID
-public function definition(): array
-{
-    return [
-        'id'          => generateId(),  // 必须使用 generateId()
-        'username'    => fake()->unique()->word(),
-        'password'    => static::$password ??= Hash::make('123456'),
-        'account_type' => fake()->randomElement(AccountTypeEnum::cases()),
-    ];
-}
-```
-
-### 3.3 Seeder 中填充数据
-
-```php
-// 正确：使用 generateId() 生成主键ID
-AccountProfile::query()->create([
-    'id' => generateId(),  // 必须使用 generateId()
-    'user_id' => $account->id,
-    'nickname' => $generateRandomName(),
-    'gender' => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
-    'avatar' => null,
-]);
-
-AccountSocial::query()->create([
-    'id' => generateId(),  // 必须使用 generateId()
-    'user_id' => $account->id,
-    'social_type' => SocialTypeEnum::Phone->value,
-    'social_account' => $generatePhoneNumber(),
-]);
-```
-
-### 3.4 数据差异对比示例
-
-```php
-// 正确：使用 compareDbDataDiff() 对比新旧数据
-$oldData = UserRole::where('user_id', $userId)->get()->toArray();
-$newData = $request->input('roles');  // 新的角色数据
-
-// 使用助手函数自动计算差异
-$diff = compareDbDataDiff($oldData, $newData, 'role_id');
-
-// 执行新增操作
-foreach ($diff['create'] as $item) {
-    UserRole::create([
-        'id' => generateId(),
-        'user_id' => $userId,
-        'role_id' => $item['role_id'],
-    ]);
-}
-
-// 执行更新操作
-foreach ($diff['update'] as $item) {
-    UserRole::where('id', $item['id'])->update($item);
-}
-
-// 执行删除操作
-foreach ($diff['delete'] as $item) {
-    UserRole::where('id', $item['id'])->delete();
-}
-
-// 错误：手动编写循环对比逻辑
-// $oldIds = array_column($oldData, 'role_id');
-// $newIds = array_column($newData, 'role_id');
-// $toCreate = array_diff($newIds, $oldIds);
-// $toDelete = array_diff($oldIds, $newIds);
-// ... 手动处理逻辑
-```
-
-### 3.5 分页/列表查询中支持 account_id 示例
-
-```php
-// 正确：在 fastGetPageData() 中必须包含 account_id 的完全匹配查询
-public static function getPageData(array $params = []): array
-{
-    $data = self::fastGetPageData(self::query(), $params, [
-        'account_id'   => '=',  // 必须：支持 account_id 的完全匹配查询
-        'source_type'  => '=',
-        'action_type'  => '=',
-        'ip_address'   => 'like',
-        'content'      => 'like',
-        'keyword'      => 'content',
-        'date_range'   => 'created_at',
-    ]);
-    return $data;
-}
-
-// 正确：在 fastGetAllData() 中也要包含 account_id
-public static function getAllData(array $params = [], array $fields = []): array
-{
-    $data = self::fastGetAllData(self::query(), $params, [
-        'account_id'   => '=',  // 必须：支持 account_id 的完全匹配查询
-        'category_id'  => '=',
-        'status'        => '=',
-    ], $fields);
-    return $data;
-}
-
-// 错误：缺少 account_id 查询支持
-public static function getPageData(array $params = []): array
-{
-    $data = self::fastGetPageData(self::query(), $params, [
-        // 'account_id' => '=',  // 错误：缺少 account_id 查询支持
-        'source_type'  => '=',
-        'action_type'  => '=',
-    ]);
-    return $data;
-}
-```
 
 ## 4. 重要提醒
 

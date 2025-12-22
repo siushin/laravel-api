@@ -11,7 +11,7 @@ use Siushin\Util\Traits\ParamTool;
 /**
  * 模型：字典分类
  */
-class SysDictionaryCategory extends Model
+class DictionaryCategory extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 

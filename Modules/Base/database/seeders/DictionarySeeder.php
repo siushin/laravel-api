@@ -3,8 +3,8 @@
 namespace Modules\Base\Database\Seeders;
 
 use Modules\Base\Enums\DictionaryCategoryEnum;
-use Modules\Base\Models\SysDictionary;
-use Modules\Base\Models\SysDictionaryCategory;
+use Modules\Base\Models\Dictionary;
+use Modules\Base\Models\DictionaryCategory;
 use Illuminate\Database\Seeder;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\UploadFileTypeEnum;
@@ -30,7 +30,7 @@ class DictionarySeeder extends Seeder
                 'tpl_path'      => 'tpl/Dictionary.xlsx',
             ];
         }
-        SysDictionaryCategory::query()->upsert(
+        DictionaryCategory::query()->upsert(
             $categories,
             ['category_code'],
             ['category_name']
@@ -43,7 +43,7 @@ class DictionarySeeder extends Seeder
         ];
         $dictionary_data = [];
         foreach ($dictionary_map as $category_code => $dictionary_enums) {
-            $category_id = SysDictionaryCategory::checkCodeValidate(compact('category_code'));
+            $category_id = DictionaryCategory::checkCodeValidate(compact('category_code'));
             foreach ($dictionary_enums as $dictionary_item) {
                 $dictionary_data[] = [
                     'category_id'      => $category_id,
@@ -55,6 +55,6 @@ class DictionarySeeder extends Seeder
                 ];
             }
         }
-        SysDictionary::query()->insert($dictionary_data);
+        Dictionary::query()->insert($dictionary_data);
     }
 }

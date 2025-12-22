@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * 模型：菜单
  */
-class SysMenu extends Model
+class Menu extends Model
 {
     use SoftDeletes;
 

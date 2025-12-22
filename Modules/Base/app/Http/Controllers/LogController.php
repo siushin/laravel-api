@@ -10,10 +10,10 @@ use Modules\Base\Enums\LogActionEnum;
 use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\OperatingSystemEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
-use Modules\Base\Models\SysAuditLog;
-use Modules\Base\Models\SysGeneralLog;
-use Modules\Base\Models\SysLoginLog;
-use Modules\Base\Models\SysOperationLog;
+use Modules\Base\Models\AuditLog;
+use Modules\Base\Models\GeneralLog;
+use Modules\Base\Models\LoginLog;
+use Modules\Base\Models\OperationLog;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class LogController extends Controller
     public function generalLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysGeneralLog::getPageData($params));
+        return success(GeneralLog::getPageData($params));
     }
 
     /**
@@ -50,7 +50,7 @@ class LogController extends Controller
     public function operationLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysOperationLog::getPageData($params));
+        return success(OperationLog::getPageData($params));
     }
 
     /**
@@ -64,7 +64,7 @@ class LogController extends Controller
     public function auditLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysAuditLog::getPageData($params));
+        return success(AuditLog::getPageData($params));
     }
 
     /**
@@ -78,7 +78,7 @@ class LogController extends Controller
     public function loginLog(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(SysLoginLog::getPageData($params));
+        return success(LoginLog::getPageData($params));
     }
 
     /**
@@ -122,7 +122,7 @@ class LogController extends Controller
     public function getOperationLogSearchData(): JsonResponse
     {
         // 模块名称列表（去重）
-        $modules = SysOperationLog::query()
+        $modules = OperationLog::query()
             ->distinct()
             ->whereNotNull('module')
             ->where('module', '!=', '')
@@ -157,7 +157,7 @@ class LogController extends Controller
         }
 
         // 响应状态码列表（去重）
-        $responseCodes = SysOperationLog::query()
+        $responseCodes = OperationLog::query()
             ->distinct()
             ->whereNotNull('response_code')
             ->orderBy('response_code')
@@ -199,7 +199,7 @@ class LogController extends Controller
     public function getAuditLogSearchData(): JsonResponse
     {
         // 模块名称列表（从审计日志表去重）
-        $modules = SysAuditLog::query()
+        $modules = AuditLog::query()
             ->distinct()
             ->whereNotNull('module')
             ->where('module', '!=', '')

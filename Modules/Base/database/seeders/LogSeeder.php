@@ -11,10 +11,10 @@ use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\OperatingSystemEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Models\Account;
-use Modules\Base\Models\SysAuditLog;
-use Modules\Base\Models\SysLoginLog;
-use Modules\Base\Models\SysGeneralLog;
-use Modules\Base\Models\SysOperationLog;
+use Modules\Base\Models\AuditLog;
+use Modules\Base\Models\LoginLog;
+use Modules\Base\Models\GeneralLog;
+use Modules\Base\Models\OperationLog;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 /**
@@ -77,14 +77,14 @@ class LogSeeder extends Seeder
 
             // 批量插入，每100条插入一次
             if (count($logs) >= 100) {
-                SysGeneralLog::query()->insert($logs);
+                GeneralLog::query()->insert($logs);
                 $logs = [];
             }
         }
 
         // 插入剩余数据
         if (!empty($logs)) {
-            SysGeneralLog::query()->insert($logs);
+            GeneralLog::query()->insert($logs);
         }
     }
 
@@ -131,14 +131,14 @@ class LogSeeder extends Seeder
 
             // 批量插入，每100条插入一次
             if (count($logs) >= 100) {
-                SysAuditLog::query()->insert($logs);
+                AuditLog::query()->insert($logs);
                 $logs = [];
             }
         }
 
         // 插入剩余数据
         if (!empty($logs)) {
-            SysAuditLog::query()->insert($logs);
+            AuditLog::query()->insert($logs);
         }
     }
 
@@ -213,14 +213,14 @@ class LogSeeder extends Seeder
 
             // 批量插入，每100条插入一次
             if (count($logs) >= 100) {
-                SysOperationLog::query()->insert($logs);
+                OperationLog::query()->insert($logs);
                 $logs = [];
             }
         }
 
         // 插入剩余数据
         if (!empty($logs)) {
-            SysOperationLog::query()->insert($logs);
+            OperationLog::query()->insert($logs);
         }
     }
 
@@ -277,14 +277,14 @@ class LogSeeder extends Seeder
 
             // 批量插入，每100条插入一次
             if (count($logs) >= 100) {
-                SysLoginLog::query()->insert($logs);
+                LoginLog::query()->insert($logs);
                 $logs = [];
             }
         }
 
         // 插入剩余数据
         if (!empty($logs)) {
-            SysLoginLog::query()->insert($logs);
+            LoginLog::query()->insert($logs);
         }
     }
 

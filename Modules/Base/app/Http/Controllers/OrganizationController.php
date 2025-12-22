@@ -4,7 +4,7 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Models\SysOrganization;
+use Modules\Base\Models\Organization;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Siushin\Util\Traits\ParamTool;
@@ -20,13 +20,14 @@ class OrganizationController extends Controller
     /**
      * 获取组织架构（树状结构）
      * @return JsonResponse
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::index)]
     public function index(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(SysOrganization::getTreeData($params));
+        return success(Organization::getTreeData($params));
     }
 
     /**
@@ -39,7 +40,7 @@ class OrganizationController extends Controller
     public function add(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(SysOrganization::addOrganization($params));
+        return success(Organization::addOrganization($params));
     }
 
     /**
@@ -52,7 +53,7 @@ class OrganizationController extends Controller
     public function update(): JsonResponse
     {
         $params = trimParam(request()->only(['organization_id', 'organization_name', 'organization_pid']));
-        return success(SysOrganization::updateOrganization($params));
+        return success(Organization::updateOrganization($params));
     }
 
     /**
@@ -65,7 +66,7 @@ class OrganizationController extends Controller
     public function delete(): JsonResponse
     {
         $params = trimParam(request()->only(['organization_id']));
-        return success(SysOrganization::deleteOrganization($params));
+        return success(Organization::deleteOrganization($params));
     }
 
     /**
@@ -78,6 +79,6 @@ class OrganizationController extends Controller
     public function move(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(SysOrganization::moveOrganization($params));
+        return success(Organization::moveOrganization($params));
     }
 }

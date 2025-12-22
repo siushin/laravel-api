@@ -4,7 +4,7 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Models\SysFile;
+use Modules\Base\Models\File;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,7 +27,7 @@ class FileController extends Controller
     {
         $file = $request->file('file');
         !isset($file) && throw_exception('请上传文件');
-        return success(SysFile::uploadFile($file));
+        return success(File::uploadFile($file));
     }
 
     /**
@@ -44,7 +44,7 @@ class FileController extends Controller
         $account_id = currentUserId();
         empty($account_id) && throw_exception('无效token，请重新登录');
         $params['account_id'] = $account_id;
-        return success(SysFile::deleteFile($params), '删除文件成功');
+        return success(File::deleteFile($params), '删除文件成功');
     }
 
     /**
@@ -58,7 +58,7 @@ class FileController extends Controller
     {
         $account_id = currentUserId();
         empty($account_id) && throw_exception('无效token，请重新登录');
-        SysFile::cleanupFileByAccountId($account_id, true);
+        File::cleanupFileByAccountId($account_id, true);
         return success([], '清空文件成功');
     }
 }

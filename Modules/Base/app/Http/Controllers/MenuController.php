@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Base\Models\SysMenu;
+use Modules\Base\Models\Menu;
 use Modules\Base\Enums\AccountTypeEnum;
 
 /**
@@ -39,7 +39,7 @@ class MenuController extends Controller
 
         // 超级管理员返回所有 account_type 为 admin 的菜单
         if ($isSuperAdmin) {
-            $menus = SysMenu::where('account_type', AccountTypeEnum::Admin->value)
+            $menus = Menu::where('account_type', AccountTypeEnum::Admin->value)
                 ->where('status', 1)
                 ->orderBy('sort', 'asc')
                 ->orderBy('menu_id', 'asc')
@@ -54,7 +54,7 @@ class MenuController extends Controller
                 ->toArray();
 
             // 获取必须选中的菜单（is_required = 1）
-            $requiredMenuIds = SysMenu::where('account_type', $user->account_type->value)
+            $requiredMenuIds = Menu::where('account_type', $user->account_type->value)
                 ->where('is_required', 1)
                 ->where('status', 1)
                 ->pluck('menu_id')
@@ -66,7 +66,7 @@ class MenuController extends Controller
             if (empty($allMenuIds)) {
                 $menus = [];
             } else {
-                $menus = SysMenu::whereIn('menu_id', $allMenuIds)
+                $menus = Menu::whereIn('menu_id', $allMenuIds)
                     ->where('status', 1)
                     ->orderBy('sort', 'asc')
                     ->orderBy('menu_id', 'asc')

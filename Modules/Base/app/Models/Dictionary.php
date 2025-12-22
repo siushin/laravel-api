@@ -17,7 +17,7 @@ use Siushin\Util\Traits\ParamTool;
 /**
  * 模型：字典
  */
-class SysDictionary extends Model
+class Dictionary extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
@@ -50,7 +50,7 @@ class SysDictionary extends Model
      */
     public static function getPageData(array $params = []): array
     {
-        $category_id = SysDictionaryCategory::checkCodeValidate($params);
+        $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
         $data = self::fastGetPageData(self::query(), $params, [
             'category_id'      => '=',
@@ -73,7 +73,7 @@ class SysDictionary extends Model
     public static function getAllData(array $params = [], array $fields = []): array
     {
         $fields = $fields ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'created_at'];
-        $category_id = SysDictionaryCategory::checkCodeValidate($params);
+        $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
         $data = self::fastGetAllData(self::class, $params, [
             'category_id'      => '=',
@@ -117,7 +117,7 @@ class SysDictionary extends Model
     public static function getDictionaryByCode(string $category_code, array $fields = [], bool $isValue2Key = false): array
     {
         $fields = $fields ?: ['dictionary_name', 'dictionary_value'];
-        $category_id = SysDictionaryCategory::checkCodeValidate(compact('category_code'));
+        $category_id = DictionaryCategory::checkCodeValidate(compact('category_code'));
         $data = self::fastGetAllData(self::query(), compact('category_id'), [
             'category_id' => '=',
         ], $fields);
@@ -147,7 +147,7 @@ class SysDictionary extends Model
      */
     public static function addDictionary(array $params = [], array $response_keys = []): array
     {
-        $category_id = SysDictionaryCategory::checkCodeValidate($params);
+        $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
 
         self::trimValueArray($params, [], [null]);
@@ -227,7 +227,7 @@ class SysDictionary extends Model
         $parent_id = $info['parent_id'];
         $check_where = compact('category_id', 'dictionary_name');
         !$parent_id && $check_where['parent_id'] = $parent_id;
-        $category_code = SysDictionaryCategory::query()->where('category_id', $info['category_id'])->value('category_code');
+        $category_code = DictionaryCategory::query()->where('category_id', $info['category_id'])->value('category_code');
         $update_data = compact('dictionary_name');
         $extend_data && $update_data['extend_data'] = $extend_data;
 

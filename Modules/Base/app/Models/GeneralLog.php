@@ -3,33 +3,52 @@
 namespace Modules\Base\Models;
 
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Siushin\LaravelTool\Cases\Json;
+use Modules\Base\Enums\LogActionEnum;
+use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 
 /**
- * 模型：审计日志
+ * 模型：常规日志
  */
-class SysAuditLog extends Model
+class GeneralLog extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
-    protected $table = 'gpa_audit_log';
+    protected $primaryKey = 'log_id';
+    protected $table      = 'gpa_logs';
 
     protected $guarded = [];
 
     protected function casts(): array
     {
         return [
-            'before_data' => Json::class,
-            'after_data'  => Json::class,
+            'extend_data' => Json::class,
         ];
     }
 
+    protected $hidden = ['extend_data'];
+
+    protected function sourceType(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => RequestSourceEnum::from($value)->value,
+        );
+    }
+
+    protected function actionType(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => LogActionEnum::{$value}->value,
+        );
+    }
+
     /**
-     * 获取审计日志列表
+     * 获取日志列表
      * @param array $params
      * @return array
      * @throws Exception
@@ -38,30 +57,27 @@ class SysAuditLog extends Model
     public static function getPageData(array $params = []): array
     {
         $data = self::fastGetPageData(self::query(), $params, [
-            'account_id'    => '=',
-            'module'        => 'like',
-            'action'        => '=',
-            'resource_type' => '=',
-            'keyword'       => ['before_data', 'after_data', 'description'],
-            'resource_id'   => '=',
-            'ip_address'    => 'like',
-            'date_range'    => 'audited_at',
+            'account_id'  => '=',
+            'source_type' => '=',
+            'action_type' => '=',
+            'keyword'     => 'content|ip_location',
+            'ip_address'  => 'like',
+            'date_range'  => 'created_at',
         ]);
 
-        // 关联账号信息
         $accountIds = array_values(array_unique(array_filter(array_column($data['data'], 'account_id'))));
         if (!empty($accountIds)) {
             $accounts = Account::query()
                 ->whereIn('id', $accountIds)
                 ->with('profile')
-                ->select(['id', 'username'])
+                ->select(['username', 'id'])
                 ->get()
-                ->keyBy('id')
                 ->toArray();
+            $accountList = array_column($accounts, null, 'id');
 
             foreach ($data['data'] as &$item) {
-                if (isset($accounts[$item['account_id']])) {
-                    $account = $accounts[$item['account_id']];
+                if (isset($accountList[$item['account_id']])) {
+                    $account = $accountList[$item['account_id']];
                     $nickname = $account['profile']['nickname'] ?? '';
                     $username = $account['username'];
                     $item['username'] = $nickname ? "{$nickname}({$username})" : $username;

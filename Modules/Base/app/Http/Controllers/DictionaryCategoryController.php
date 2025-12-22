@@ -4,7 +4,7 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Models\SysDictionaryCategory;
+use Modules\Base\Models\DictionaryCategory;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
@@ -23,6 +23,6 @@ class DictionaryCategoryController extends Controller
     #[OperationAction(OperationActionEnum::index)]
     public function index(): JsonResponse
     {
-        return success(SysDictionaryCategory::getAllData());
+        return success(DictionaryCategory::getAllData());
     }
 }

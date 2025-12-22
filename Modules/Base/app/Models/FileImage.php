@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * 模型：图片文件
  */
-class SysFileImage extends Model implements IFile
+class FileImage extends Model implements IFile
 {
     use HasFactory;
 
@@ -28,7 +28,7 @@ class SysFileImage extends Model implements IFile
      */
     public function file(): BelongsTo
     {
-        return $this->belongsTo(SysFile::class);
+        return $this->belongsTo(File::class);
     }
 
     /**

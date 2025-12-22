@@ -17,7 +17,7 @@ use Siushin\Util\Traits\ParamTool;
 /**
  * 模型：组织架构
  */
-class SysOrganization extends Model
+class Organization extends Model
 {
     use HasFactory, ParamTool, ModelTool;
 
@@ -36,17 +36,17 @@ class SysOrganization extends Model
      * 获取组织架构（树状结构）
      * @param array $params
      * @return array
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
     public static function getTreeData(array $params = []): array
     {
-        $organization_name = $params['organization_name'] ?? false;
+        self::checkEmptyParam($params, ['organization_type']);
 
-        if ($organization_name) {
-            $where[] = ['organization_name', 'like', "%$organization_name%"];
-        } else {
-            $where = [];
-        }
+        $where = self::buildWhereData($params, [
+            'organization_type' => '=',
+            'organization_name' => 'like',
+        ]);
 
         $searchData = self::query()->where($where)->pluck('full_organization_pid')->toArray();
         // 根据搜索结果，找出所有上级数据
@@ -248,7 +248,7 @@ class SysOrganization extends Model
             // 更新组织的 parent ID 和 full_organization_pid
             self::query()->where('organization_id', $organization_id)
                 ->update([
-                    'organization_pid' => $newOrganization->organization_id,
+                    'organization_pid'      => $newOrganization->organization_id,
                     'full_organization_pid' => $newFullOrganizationId
                 ]);
 
