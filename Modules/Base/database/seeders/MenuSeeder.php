@@ -242,12 +242,20 @@ class MenuSeeder extends Seeder
         // 插入组织架构管理的子菜单
         $organizationChildren = [
             [
+                'menu_name' => '组织架构',
+                'menu_key'  => 'organization.organization',
+                'menu_path' => '/organization/organization',
+                'menu_icon' => 'ApartmentOutlined',
+                'component' => './System/Organization',
+                'sort'      => 1,
+            ],
+            [
                 'menu_name' => '公司管理',
                 'menu_key'  => 'organization.company',
                 'menu_path' => '/organization/company',
                 'menu_icon' => 'BankOutlined',
                 'component' => './Organization/Company',
-                'sort'      => 1,
+                'sort'      => 2,
             ],
             [
                 'menu_name' => '部门管理',
@@ -255,7 +263,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/organization/department',
                 'menu_icon' => 'PartitionOutlined',
                 'component' => './Organization/Department',
-                'sort'      => 2,
+                'sort'      => 3,
             ],
             [
                 'menu_name' => '职位管理',
@@ -263,7 +271,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/organization/position',
                 'menu_icon' => 'SolutionOutlined',
                 'component' => './Organization/Position',
-                'sort'      => 3,
+                'sort'      => 4,
             ],
             [
                 'menu_name' => '岗位管理',
@@ -271,7 +279,7 @@ class MenuSeeder extends Seeder
                 'menu_path' => '/organization/job',
                 'menu_icon' => 'IdcardOutlined',
                 'component' => './Organization/Job',
-                'sort'      => 4,
+                'sort'      => 5,
             ],
         ];
 
@@ -386,14 +394,6 @@ class MenuSeeder extends Seeder
                 'menu_icon' => 'UserOutlined',
                 'component' => './System/Admin',
                 'sort'      => 2,
-            ],
-            [
-                'menu_name' => '组织架构',
-                'menu_key'  => 'system.organization',
-                'menu_path' => '/system/organization',
-                'menu_icon' => 'ApartmentOutlined',
-                'component' => './System/Organization',
-                'sort'      => 3,
             ],
             [
                 'menu_name' => '数据字典',

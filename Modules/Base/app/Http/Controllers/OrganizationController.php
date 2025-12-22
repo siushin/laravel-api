@@ -4,9 +4,11 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\OrganizationTypeEnum;
 use Modules\Base\Models\Organization;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use ReflectionException;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -28,6 +30,17 @@ class OrganizationController extends Controller
     {
         $params = trimParam(request()->all());
         return success(Organization::getTreeData($params));
+    }
+
+    /**
+     * 获取组织架构类型列表
+     * @return JsonResponse
+     * @throws ReflectionException
+     * @author siushin<siushin@163.com>
+     */
+    public function getOrganizationTypeList(): JsonResponse
+    {
+        return success(enumToArrayFromComment(OrganizationTypeEnum::class));
     }
 
     /**

@@ -58,3 +58,37 @@ function buildEnumComment(array $enumCases, string $typeName): string
     return $typeName . '[' . implode(',', $commentParts) . ']';
 }
 
+/**
+ * 将枚举类转换为数组格式（值作为键名，注释转为值）
+ * @param string|UnitEnum $enumClass 枚举类名或枚举类实例
+ * @return array 格式：[['key' => 'enum_value', 'value' => 'comment']]
+ * @throws ReflectionException
+ * @author siushin<siushin@163.com>
+ */
+function enumToArrayFromComment(string|UnitEnum $enumClass): array
+{
+    // 如果传入的是实例，获取类名
+    if ($enumClass instanceof UnitEnum) {
+        $enumClass = $enumClass::class;
+    }
+
+    // 获取所有枚举 cases
+    $cases = $enumClass::cases();
+    $result = [];
+
+    foreach ($cases as $case) {
+        // 获取枚举值（BackedEnum 有 value 属性，Pure Enum 使用 name）
+        $enumValue = ($case instanceof BackedEnum) ? $case->value : $case->name;
+
+        // 获取注释，如果没有注释则使用枚举名称
+        $comment = getEnumComment($case) ?? $case->name;
+
+        $result[] = [
+            'key'   => $enumValue,
+            'value' => $comment
+        ];
+    }
+
+    return $result;
+}
+

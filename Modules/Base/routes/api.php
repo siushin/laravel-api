@@ -43,6 +43,7 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/file/cleanup', [FileController::class, 'cleanup']);   // 清空文件
 
     // 组织架构管理
+    Route::post('/organization/getOrganizationTypeList', [OrganizationController::class, 'getOrganizationTypeList']);
     Route::post('/organization/index', [OrganizationController::class, 'index']);
     Route::post('/organization/add', [OrganizationController::class, 'add']);
     Route::post('/organization/update', [OrganizationController::class, 'update']);
