@@ -49,6 +49,12 @@ class Organization extends Model
         ]);
 
         $searchData = self::query()->where($where)->pluck('full_organization_pid')->toArray();
+
+        // 如果没有搜索结果，直接返回空数组
+        if (empty($searchData)) {
+            return [];
+        }
+
         // 根据搜索结果，找出所有上级数据
         $all_organization_ids = [];
         foreach ($searchData as $full_organization_pid) {
@@ -57,11 +63,9 @@ class Organization extends Model
         $all_organization_ids = array_unique($all_organization_ids);
         $data = self::query()->whereIn('organization_id', $all_organization_ids)->get()->toArray();
 
-        // 加上根数据
-        $organization_ids = array_column($data, 'organization_pid');
-        if (!in_array(0, $organization_ids)) {
-            $rootData = self::query()->where('organization_pid', 0)->limit(1)->get()->toArray();
-            $data = array_merge($rootData, $data);
+        // 如果没有数据，返回空数组
+        if (empty($data)) {
+            return [];
         }
 
         return (new Tree('organization_id', 'organization_pid'))->getTree($data);
