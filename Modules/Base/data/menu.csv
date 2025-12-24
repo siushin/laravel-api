@@ -20,12 +20,11 @@ org,部门管理,org.dept,/organization/department,PartitionOutlined,menu,./Orga
 org,职位管理,org.position,/organization/position,SolutionOutlined,menu,./Organization/Position,,1,canAdmin,,0,1
 org,岗位管理,org.job,/organization/job,IdcardOutlined,menu,./Organization/Job,,1,canAdmin,,0,1
 ,,,,,,,,,,,,
+,菜单管理,menu,/menu,BlockOutlined,menu,,/menu/role,1,canAdmin,,0,1
+menu,角色管理,menu.role,/menu/role,ProfileOutlined,menu,./Menu/Role,,1,canAdmin,,0,1
+menu,菜单管理,menu.menu,/menu/menu,BlockOutlined,menu,./Menu/Menu,,1,canAdmin,,0,1
+,,,,,,,,,,,,
 ,系统管理,system,/system,SettingOutlined,menu,,/system/admin,1,canAdmin,,0,1
-system,角色权限,system.rbac,/system/rbac,SafetyOutlined,menu,,/system/rbac/role,1,canAdmin,,0,1
-system.rbac,角色管理,system.role,/system/rbac/role,ProfileOutlined,menu,./System/Role,,1,canAdmin,,0,1
-system.rbac,菜单管理,system.menu,/system/rbac/menu,BlockOutlined,menu,./System/Menu,,1,canAdmin,,0,1
-system.rbac,用户角色关联,system.userRole,/system/rbac/user-role,UsergroupAddOutlined,menu,./System/UserRole,,1,canAdmin,,0,1
-system.rbac,角色菜单关联,system.roleMenu,/system/rbac/role-menu,UnorderedListOutlined,menu,./System/RoleMenu,,1,canAdmin,,0,1
 system,管理员管理,system.admin,/system/admin,UserOutlined,menu,./System/Admin,,1,canAdmin,,0,1
 system,数据字典,system.dict,/system/dict,BookOutlined,menu,./System/Dict,,1,canAdmin,,0,1
 system,数据字典（树状）,system.dict.tree,/system/dict/tree,BookOutlined,menu,./System/DictTree,,1,canAdmin,,0,1
