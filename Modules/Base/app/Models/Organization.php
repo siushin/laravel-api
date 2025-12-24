@@ -41,10 +41,10 @@ class Organization extends Model
      */
     public static function getTreeData(array $params = []): array
     {
-        self::checkEmptyParam($params, ['organization_type']);
+        self::checkEmptyParam($params, ['organization_tid']);
 
         $where = self::buildWhereData($params, [
-            'organization_type' => '=',
+            'organization_tid'  => '=',
             'organization_name' => 'like',
         ]);
 

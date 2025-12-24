@@ -3,8 +3,10 @@
 namespace Modules\Base\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Models\Menu;
+use Modules\Base\Models\Module;
+use Modules\Base\Models\ModuleMenu;
 
 /**
  * 数据填充：菜单
@@ -16,7 +18,6 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
-        $now = now();
         $accountType = AccountTypeEnum::Admin->value;
 
         // 读取 CSV 文件
@@ -49,26 +50,26 @@ class MenuSeeder extends Seeder
             $menuIdMap[$menu['menu_key']] = $menuId;
             $processedKeys[] = $menu['menu_key'];
 
-            DB::table('gpa_menu')->insert([
-                'menu_id'      => $menuId,
-                'account_type' => $accountType,
-                'menu_name'    => $menu['menu_name'],
-                'menu_key'     => $menu['menu_key'],
-                'menu_path'    => $menu['menu_path'],
-                'menu_icon'    => $menu['menu_icon'],
-                'menu_type'    => $menu['menu_type'],
-                'parent_id'    => 0,
-                'component'    => $menu['component'] ?: null,
-                'redirect'     => $menu['redirect'] ?: null,
-                'layout'       => (bool)$menu['layout'],
-                'access'       => $menu['access'],
-                'wrappers'     => $menu['wrappers'] ?: null,
-                'is_required'  => (int)$menu['is_required'],
-                'sort'         => $sort++,
-                'status'       => (int)$menu['status'],
-                'created_at'   => $now,
-                'updated_at'   => $now,
-            ]);
+            Menu::upsert([
+                [
+                    'menu_id'      => $menuId,
+                    'account_type' => $accountType,
+                    'menu_name'    => $menu['menu_name'],
+                    'menu_key'     => $menu['menu_key'],
+                    'menu_path'    => $menu['menu_path'],
+                    'menu_icon'    => $menu['menu_icon'],
+                    'menu_type'    => $menu['menu_type'],
+                    'parent_id'    => 0,
+                    'component'    => $menu['component'] ?: null,
+                    'redirect'     => $menu['redirect'] ?: null,
+                    'layout'       => (bool)$menu['layout'],
+                    'access'       => $menu['access'],
+                    'wrappers'     => $menu['wrappers'] ?: null,
+                    'is_required'  => (int)$menu['is_required'],
+                    'sort'         => $sort++,
+                    'status'       => (int)$menu['status'],
+                ]
+            ], ['account_type', 'menu_key']);
         }
 
         // 移除已处理的顶级菜单
@@ -88,30 +89,29 @@ class MenuSeeder extends Seeder
                     $parentId = $menuIdMap[$parentKey];
 
                     // 获取同父菜单下的其他子菜单数量，用于计算 sort
-                    $siblingCount = DB::table('gpa_menu')
-                        ->where('parent_id', $parentId)
+                    $siblingCount = Menu::where('parent_id', $parentId)
                         ->count();
 
-                    DB::table('gpa_menu')->insert([
-                        'menu_id'      => $menuId,
-                        'account_type' => $accountType,
-                        'menu_name'    => $menu['menu_name'],
-                        'menu_key'     => $menu['menu_key'],
-                        'menu_path'    => $menu['menu_path'],
-                        'menu_icon'    => $menu['menu_icon'],
-                        'menu_type'    => $menu['menu_type'],
-                        'parent_id'    => $parentId,
-                        'component'    => $menu['component'] ?: null,
-                        'redirect'     => $menu['redirect'] ?: null,
-                        'layout'       => (bool)$menu['layout'],
-                        'access'       => $menu['access'],
-                        'wrappers'     => $menu['wrappers'] ?: null,
-                        'is_required'  => (int)$menu['is_required'],
-                        'sort'         => $siblingCount + 1,
-                        'status'       => (int)$menu['status'],
-                        'created_at'   => $now,
-                        'updated_at'   => $now,
-                    ]);
+                    Menu::upsert([
+                        [
+                            'menu_id'      => $menuId,
+                            'account_type' => $accountType,
+                            'menu_name'    => $menu['menu_name'],
+                            'menu_key'     => $menu['menu_key'],
+                            'menu_path'    => $menu['menu_path'],
+                            'menu_icon'    => $menu['menu_icon'],
+                            'menu_type'    => $menu['menu_type'],
+                            'parent_id'    => $parentId,
+                            'component'    => $menu['component'] ?: null,
+                            'redirect'     => $menu['redirect'] ?: null,
+                            'layout'       => (bool)$menu['layout'],
+                            'access'       => $menu['access'],
+                            'wrappers'     => $menu['wrappers'] ?: null,
+                            'is_required'  => (int)$menu['is_required'],
+                            'sort'         => $siblingCount + 1,
+                            'status'       => (int)$menu['status'],
+                        ]
+                    ], ['account_type', 'menu_key']);
 
                     $processedInThisRound[] = $menu['menu_key'];
                 }
@@ -168,7 +168,7 @@ class MenuSeeder extends Seeder
                     break;
                 }
             }
-            
+
             if ($isEmpty) {
                 continue; // 跳过空行
             }
@@ -191,42 +191,38 @@ class MenuSeeder extends Seeder
     private function associateMenusToBaseModule(): void
     {
         // 查找Base模块
-        $baseModule = DB::table('gpa_module')
-            ->where('module_identifier', 'base')
+        $baseModule = Module::where('module_identifier', 'base')
             ->orWhere('module_name', 'Base')
             ->first();
 
         if (!$baseModule) {
             // 如果Base模块不存在，创建它
             $baseModuleId = generateId();
-            DB::table('gpa_module')->insert([
-                'module_id'          => $baseModuleId,
-                'module_identifier'  => 'base',
-                'module_name'        => 'Base',
-                'module_alias'       => '基础服务',
-                'module_description' => 'LaravelAPI 基础服务，勿删除！',
-                'status'             => 1,
-                'priority'           => 0,
-                'created_at'         => now(),
-                'updated_at'         => now(),
-            ]);
+            Module::upsert([
+                [
+                    'module_id'          => $baseModuleId,
+                    'module_identifier'  => 'base',
+                    'module_name'        => 'Base',
+                    'module_alias'       => '基础服务',
+                    'module_description' => 'LaravelAPI 基础服务，勿删除！',
+                    'status'             => 1,
+                    'priority'           => 0,
+                ]
+            ], ['module_identifier']);
         } else {
             $baseModuleId = $baseModule->module_id;
         }
 
         // 获取所有Base模块的Admin菜单
-        $menuIds = DB::table('gpa_menu')
-            ->where('account_type', AccountTypeEnum::Admin->value)
+        $menuIds = Menu::where('account_type', AccountTypeEnum::Admin->value)
             ->pluck('menu_id')
             ->toArray();
 
         // 关联菜单到Base模块
-        $now = now();
         $moduleMenuData = [];
         foreach ($menuIds as $menuId) {
             // 检查是否已存在关联
-            $exists = DB::table('gpa_module_menu')
-                ->where('module_id', $baseModuleId)
+            $exists = ModuleMenu::where('module_id', $baseModuleId)
                 ->where('menu_id', $menuId)
                 ->exists();
 
@@ -235,14 +231,12 @@ class MenuSeeder extends Seeder
                     'id'         => generateId(),
                     'module_id'  => $baseModuleId,
                     'menu_id'    => $menuId,
-                    'created_at' => $now,
-                    'updated_at' => $now,
                 ];
             }
         }
 
         if (!empty($moduleMenuData)) {
-            DB::table('gpa_module_menu')->insert($moduleMenuData);
+            ModuleMenu::upsert($moduleMenuData, ['module_id', 'menu_id']);
         }
     }
 }

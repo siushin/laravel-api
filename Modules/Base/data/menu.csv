@@ -15,7 +15,6 @@ app,应用市场,app.market,/app/market,ShopOutlined,menu,./App/Market,,1,canAdm
 app,我的应用,app.my,/app/my,AppstoreOutlined,menu,./App/My,,1,canAdmin,,0,1
 ,,,,,,,,,,,,
 ,组织架构管理,org,/organization,ApartmentOutlined,menu,,/organization/company,1,canAdmin,,0,1
-org,组织架构,org.org,/organization/organization,ApartmentOutlined,menu,./System/Organization,,1,canAdmin,,0,1
 org,公司管理,org.company,/organization/company,BankOutlined,menu,./Organization/Company,,1,canAdmin,,0,1
 org,部门管理,org.dept,/organization/department,PartitionOutlined,menu,./Organization/Department,,1,canAdmin,,0,1
 org,职位管理,org.position,/organization/position,SolutionOutlined,menu,./Organization/Position,,1,canAdmin,,0,1
@@ -29,4 +28,5 @@ system.rbac,用户角色关联,system.userRole,/system/rbac/user-role,UsergroupA
 system.rbac,角色菜单关联,system.roleMenu,/system/rbac/role-menu,UnorderedListOutlined,menu,./System/RoleMenu,,1,canAdmin,,0,1
 system,管理员管理,system.admin,/system/admin,UserOutlined,menu,./System/Admin,,1,canAdmin,,0,1
 system,数据字典,system.dict,/system/dict,BookOutlined,menu,./System/Dict,,1,canAdmin,,0,1
+system,数据字典（树状）,system.dict.tree,/system/dict/tree,BookOutlined,menu,./System/DictTree,,1,canAdmin,,0,1
 system,系统日志,system.log,/system/log,FileTextOutlined,menu,./System/Log,,1,canAdmin,,0,1
