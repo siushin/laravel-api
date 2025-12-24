@@ -27,15 +27,20 @@ class DictionarySeeder extends Seeder
                 'category_name' => $category->value,
                 'category_code' => $category->name,
                 'tpl_path'      => 'tpl/Dictionary.xlsx',
+                'category_desc' => getEnumComment($category) ?? '',
             ];
         }
         DictionaryCategory::upsert($categories, uniqueBy: ['category_code'], update: ['category_name']);
 
-        $region_data = ['region' => '行政区划', 'company' => '企业组织架构'];
-        $region_data = collect($region_data)->map(function ($value, $key) {
+        $region_data = [
+            ['name' => 'region', 'value' => '行政区划', 'desc' => '标识地区行政层级及归属，如省、市、区 / 县、街道 / 乡镇等'],
+            ['name' => 'company', 'value' => '企业组织架构', 'desc' => '定义企业内部管理架构层级，如总部、事业部、分公司、部门、班组等'],
+        ];
+        $region_data = collect($region_data)->map(function ($item) {
             return (object)[
-                'name'  => $key,
-                'value' => $value,
+                'name'  => $item['name'],
+                'value' => $item['value'],
+                'desc'  => $item['desc'],
             ];
         })->values()->all();
 
@@ -54,6 +59,7 @@ class DictionarySeeder extends Seeder
                     'category_id'      => $category_id,
                     'dictionary_name'  => $dictionary_item->name,
                     'dictionary_value' => $dictionary_item->value,
+                    'dictionary_desc'  => $dictionary_item->desc ?? null,
                 ];
             }
         }

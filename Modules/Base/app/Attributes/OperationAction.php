@@ -18,6 +18,7 @@ class OperationAction
 {
     public function __construct(
         public OperationActionEnum $action
-    ) {
+    )
+    {
     }
 }

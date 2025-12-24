@@ -1,11 +1,14 @@
 <?php
 
+use Modules\Base\Attributes\DictionaryDescription;
+
 /**
  * 助手函数：通用辅助函数
  */
 
 /**
  * 从枚举注释中提取中文描述
+ * 优先从 Attribute 中读取，如果不存在则从注释中读取（向后兼容）
  * @param UnitEnum $case 枚举实例
  * @return string|null 中文描述，如果未找到则返回 null
  * @throws ReflectionException
@@ -13,6 +16,21 @@
  */
 function getEnumComment(UnitEnum $case): ?string
 {
+    // 优先尝试从 Attribute 中读取描述
+    try {
+        $reflection = new ReflectionEnumUnitCase($case::class, $case->name);
+        $attributes = $reflection->getAttributes(DictionaryDescription::class);
+        
+        if (!empty($attributes)) {
+            /** @var DictionaryDescription $dictionaryDescription */
+            $dictionaryDescription = $attributes[0]->newInstance();
+            return $dictionaryDescription->description;
+        }
+    } catch (\ReflectionException $e) {
+        // 如果反射失败，继续尝试从注释中读取
+    }
+    
+    // 向后兼容：从注释中读取（旧格式）
     $reflection = new ReflectionClass($case::class);
     $file = $reflection->getFileName();
     if ($file && file_exists($file)) {

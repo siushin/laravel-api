@@ -41,7 +41,7 @@ class OrganizationController extends Controller
     {
         $data = Dictionary::getAllData(
             ['category_code' => 'OrganizationType', 'sortbys' => 'dictionary_id=asc'],
-            ['dictionary_id', 'dictionary_name', 'dictionary_value']
+            ['dictionary_id', 'dictionary_name', 'dictionary_value', 'dictionary_desc']
         );
         return success($data);
     }

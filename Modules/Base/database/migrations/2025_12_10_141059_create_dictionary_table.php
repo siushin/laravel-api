@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('category_name')->comment('数据字典分类名');
             $table->string('category_code')->comment('数据字典编码');
             $table->string('tpl_path')->nullable()->default('')->comment('模板文件路径');
+            $table->text('category_desc')->nullable()->comment('描述');
             $table->timestamps();
 
             $table->unique('category_name');
@@ -32,6 +33,7 @@ return new class extends Migration {
                 ->on('gpa_dictionary_category');
             $table->string('dictionary_name')->comment('键名');
             $table->string('dictionary_value')->comment('值');
+            $table->text('dictionary_desc')->nullable()->comment('描述');
             $table->unique(['category_id', 'dictionary_name', 'dictionary_value'], 'unique_dictionary');
             $table->timestamps();
 
