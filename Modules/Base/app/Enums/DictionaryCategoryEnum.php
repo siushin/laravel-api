@@ -7,7 +7,7 @@ namespace Modules\Base\Enums;
  */
 enum DictionaryCategoryEnum: string
 {
-    case UserType            = '用户类型';
+    case RequestSource       = '请求来源';
+    case OrganizationType    = '组织架构类型';
     case AllowUploadFileType = '允许上传文件类型';
-    case Region              = '地区';
 }

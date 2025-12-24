@@ -4,11 +4,10 @@ namespace Modules\Base\Http\Controllers;
 
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Enums\OrganizationTypeEnum;
+use Modules\Base\Models\Dictionary;
 use Modules\Base\Models\Organization;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use ReflectionException;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -35,12 +34,16 @@ class OrganizationController extends Controller
     /**
      * 获取组织架构类型列表
      * @return JsonResponse
-     * @throws ReflectionException
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
     public function getOrganizationTypeList(): JsonResponse
     {
-        return success(enumToArrayFromComment(OrganizationTypeEnum::class));
+        $data = Dictionary::getAllData(
+            ['category_code' => 'OrganizationType', 'sortbys' => 'dictionary_id=asc'],
+            ['dictionary_id', 'dictionary_name', 'dictionary_value']
+        );
+        return success($data);
     }
 
     /**

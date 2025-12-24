@@ -30,11 +30,9 @@ return new class extends Migration {
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete()
                 ->on('gpa_dictionary_category');
-            $table->string('dictionary_name')->comment('名称');
+            $table->string('dictionary_name')->comment('键名');
             $table->string('dictionary_value')->comment('值');
-            $table->unsignedBigInteger('parent_id')->default(0)->comment('父ID');
-            $table->json('extend_data')->nullable()->comment('扩展数据');
-            $table->unique(['category_id', 'dictionary_name', 'dictionary_value', 'parent_id'], 'unique_dictionary');
+            $table->unique(['category_id', 'dictionary_name', 'dictionary_value'], 'unique_dictionary');
             $table->timestamps();
 
             $table->comment('数据字典表');

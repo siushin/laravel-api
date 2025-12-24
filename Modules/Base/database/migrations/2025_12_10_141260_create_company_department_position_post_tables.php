@@ -47,9 +47,9 @@ return new class extends Migration {
         // 公司表
         Schema::create('gpa_company', function (Blueprint $table) {
             $table->id('company_id')->comment('公司ID');
-            $table->string('company_name')->comment('公司名称');
-            $table->string('company_code')->nullable()->comment('公司编码');
             $table->unsignedBigInteger('organization_id')->nullable()->comment('关联组织架构ID');
+            $table->string('company_code')->nullable()->comment('公司编码');
+            $table->string('company_name')->comment('公司名称');
             $table->string('legal_person')->nullable()->comment('法人代表');
             $table->string('contact_phone')->nullable()->comment('联系电话');
             $table->string('contact_email')->nullable()->comment('联系邮箱');
@@ -66,7 +66,9 @@ return new class extends Migration {
                 ->onDelete('set null');
 
             $table->index('organization_id');
-            $table->index('company_code');
+            $table->unique(['company_code'], 'unique_company_code');
+            $table->unique(['company_name'], 'unique_company_name');
+
             $table->comment('公司表');
         });
 
@@ -94,6 +96,11 @@ return new class extends Migration {
             $table->index('company_id');
             $table->index('parent_id');
             $table->index('department_code');
+            // 同一公司、同一父级下不能有同名部门
+            $table->unique(['company_id', 'parent_id', 'department_name']);
+            // 部门编码在公司内唯一（如果提供）
+            $table->unique(['company_id', 'department_code']);
+
             $table->comment('部门表');
         });
 
@@ -120,6 +127,11 @@ return new class extends Migration {
 
             $table->index('department_id');
             $table->index('position_code');
+            // 同一部门下不能有同名职位
+            $table->unique(['department_id', 'position_name'], 'unique_position_department_name');
+            // 职位编码全局唯一（如果提供）
+            $table->unique(['position_code'], 'unique_position_code');
+
             $table->comment('职位表（部门内的具体岗位）');
         });
 
@@ -153,6 +165,11 @@ return new class extends Migration {
             $table->index('position_id');
             $table->index('department_id');
             $table->index('post_code');
+            // 同一职位下不能有同名岗位
+            $table->unique(['position_id', 'post_name'], 'unique_post_position_name');
+            // 岗位编码全局唯一（如果提供）
+            $table->unique(['post_code'], 'unique_post_code');
+
             $table->comment('岗位表（具体工作职责）');
         });
     }

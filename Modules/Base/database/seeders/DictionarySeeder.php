@@ -19,42 +19,44 @@ class DictionarySeeder extends Seeder
      */
     public function run(): void
     {
-        $now = now();
-
         // 数据字典分类
         $categories = [];
         foreach (DictionaryCategoryEnum::cases() as $category) {
             $categories[] = [
+                'category_id'   => generateId(),
                 'category_name' => $category->value,
                 'category_code' => $category->name,
                 'tpl_path'      => 'tpl/Dictionary.xlsx',
             ];
         }
-        DictionaryCategory::query()->upsert(
-            $categories,
-            ['category_code'],
-            ['category_name']
-        );
+        DictionaryCategory::upsert($categories, uniqueBy: ['category_code'], update: ['category_name']);
+
+        $region_data = ['region' => '行政区划', 'company' => '企业组织架构'];
+        $region_data = collect($region_data)->map(function ($value, $key) {
+            return (object)[
+                'name'  => $key,
+                'value' => $value,
+            ];
+        })->values()->all();
 
         // 数据字典
         $dictionary_map = [
-            DictionaryCategoryEnum::UserType->name            => RequestSourceEnum::cases(),
+            DictionaryCategoryEnum::RequestSource->name       => RequestSourceEnum::cases(),
             DictionaryCategoryEnum::AllowUploadFileType->name => UploadFileTypeEnum::cases(),
+            DictionaryCategoryEnum::OrganizationType->name    => $region_data,
         ];
         $dictionary_data = [];
         foreach ($dictionary_map as $category_code => $dictionary_enums) {
             $category_id = DictionaryCategory::checkCodeValidate(compact('category_code'));
             foreach ($dictionary_enums as $dictionary_item) {
                 $dictionary_data[] = [
+                    'dictionary_id'    => generateId(),
                     'category_id'      => $category_id,
                     'dictionary_name'  => $dictionary_item->name,
                     'dictionary_value' => $dictionary_item->value,
-                    'parent_id'        => 0,
-                    'created_at'       => $now,
-                    'updated_at'       => $now,
                 ];
             }
         }
-        Dictionary::query()->insert($dictionary_data);
+        Dictionary::upsert($dictionary_data, uniqueBy: ['category_id', 'dictionary_name', 'dictionary_value']);
     }
 }

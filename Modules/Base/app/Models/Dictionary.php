@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Siushin\LaravelTool\Cases\Json;
 use Modules\Base\Enums\LogActionEnum;
 use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
@@ -25,15 +24,8 @@ class Dictionary extends Model
     protected $table      = 'gpa_dictionary';
 
     protected $fillable = [
-        'dictionary_id', 'category_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'extend_data'
+        'dictionary_id', 'category_id', 'dictionary_name', 'dictionary_value'
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'extend_data' => Json::class,
-        ];
-    }
 
     // 自动生成值（按照序号自增）
     private static array $auto_ins_generate_value = [];
@@ -52,14 +44,12 @@ class Dictionary extends Model
     {
         $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
-        $data = self::fastGetPageData(self::query(), $params, [
+        return self::fastGetPageData(self::query(), $params, [
             'category_id'      => '=',
-            'parent_id'        => '=',
             'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
             'time_range'       => 'created_at',
-        ], ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'created_at']);
-        return self::appendParentData($data);
+        ], ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at']);
     }
 
     /**
@@ -72,37 +62,34 @@ class Dictionary extends Model
      */
     public static function getAllData(array $params = [], array $fields = []): array
     {
-        $fields = $fields ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'created_at'];
+        $fields = $fields ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
         $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
-        $data = self::fastGetAllData(self::class, $params, [
+        return self::fastGetAllData(self::class, $params, [
             'category_id'      => '=',
-            'parent_id'        => '=',
             'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
             'time_range'       => 'created_at',
         ], $fields);
-        return ($fields && in_array('parent_name', $fields)) ? self::appendParentData($data, 'all') : $data;
     }
 
     /**
-     * 追加父级数据
-     * @param array  $data
-     * @param string $type
-     * @return array
+     * 根据code获取数据字典id
+     * @param string $category_code
+     * @param string $dictionary_name
+     * @param string $dictionary_value
+     * @return int
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    public static function appendParentData(array &$data, string $type = 'page'): array
+    public static function getDictionaryIdByCode(string $category_code, string $dictionary_name = '', string $dictionary_value = ''): int
     {
-        $parent_ids = array_unique(array_column($type == 'page' ? $data['data'] : $data, 'parent_id'));
-        $parent_list = self::query()->whereIn('dictionary_id', $parent_ids)->pluck('dictionary_name', 'dictionary_id');
-        $update_data = $type == 'page' ? $data['data'] : $data;
-        foreach ($update_data as &$item) {
-            $parent_name = $item['parent_id'] ? ($parent_list[$item['parent_id']] ?? '') : '';
-            $item['parent_name'] = $parent_name;
-        }
-        $type == 'page' ? ($data['data'] = $update_data) : ($data = $update_data);
-        return $data;
+        $category_id = DictionaryCategory::checkCodeValidate(compact('category_code'));
+        $where = self::buildWhereData(
+            compact('category_id', 'dictionary_name', 'dictionary_value'),
+            ['category_id' => '=', 'dictionary_name' => '=', 'dictionary_value' => '=']
+        );
+        return self::where('category_id', $category_id)->where($where)->value('dictionary_id', 0);
     }
 
     /**
@@ -155,15 +142,11 @@ class Dictionary extends Model
 
         $category_code = $params['category_code'];
         $dictionary_name = $params['dictionary_name'];
-        $parent_id = $params['parent_id'] = self::getIntValOrNull($params, 'parent_id') ?: 0;
 
         $check_where = compact('category_id', 'dictionary_name');
-        !$parent_id && $check_where['parent_id'] = $parent_id;
 
         if (array_key_exists($category_code, self::$auto_ins_generate_value)) {
             $where = compact('category_id');
-            // 判断是否有parent_id值
-            !is_null($parent_id) && $where['parent_id'] = $parent_id;
             $last_max_info = self::query()->where($where)->selectRaw('max(cast(dictionary_value as SIGNED)) as dictionary_value')->first();
             // 自动生成值（取当前数据库最大值+1）
             $params['dictionary_value'] = !is_null($last_max_info->dictionary_value) ?
@@ -211,25 +194,21 @@ class Dictionary extends Model
     public static function updateDictionary(array $params = []): array
     {
         self::trimValueArray($params, [], [null]);
-        $params = self::getArrayByKeys($params, ['dictionary_id', 'dictionary_name', 'dictionary_value', 'parent_id', 'extend_data']);
+        $params = self::getArrayByKeys($params, ['dictionary_id', 'dictionary_name', 'dictionary_value']);
 
         self::checkEmptyParam($params, ['dictionary_id', 'dictionary_name']);
 
         $dictionary_id = $params['dictionary_id'];
         $dictionary_name = $params['dictionary_name'];
-        $extend_data = self::getQueryParam($params, 'extend_data');
 
         $info = self::query()->find($dictionary_id);
         $old_data = $info->toArray();
         !$info && throw_exception('找不到该数据，请刷新后重试');
 
         $category_id = $info['category_id'];
-        $parent_id = $info['parent_id'];
         $check_where = compact('category_id', 'dictionary_name');
-        !$parent_id && $check_where['parent_id'] = $parent_id;
         $category_code = DictionaryCategory::query()->where('category_id', $info['category_id'])->value('category_code');
         $update_data = compact('dictionary_name');
-        $extend_data && $update_data['extend_data'] = $extend_data;
 
         // 自动生成值（按照序号自增）
         if (array_key_exists($category_code, self::$auto_ins_generate_value)) {
