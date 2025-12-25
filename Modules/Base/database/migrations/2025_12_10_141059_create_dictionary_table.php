@@ -38,6 +38,7 @@ return new class extends Migration {
             $table->string('dictionary_name')->comment('键名');
             $table->string('dictionary_value')->comment('值');
             $table->text('dictionary_desc')->nullable()->comment('描述');
+            $table->unsignedInteger('sort')->default(0)->comment('排序');
             $table->unsignedTinyInteger('can_delete')->default(CanDeleteEnum::ALLOWED->value)->comment($canDeleteComment);
             $table->unique(['category_id', 'dictionary_name'], 'unique_dictionary_name');
             $table->unique(['category_id', 'dictionary_name', 'dictionary_value'], 'unique_dictionary');

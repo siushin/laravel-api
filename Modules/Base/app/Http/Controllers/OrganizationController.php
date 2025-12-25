@@ -17,6 +17,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
 use Siushin\Util\Utils\TreeHtmlFormatter;
+use Throwable;
 
 /**
  * 控制器：组织架构
@@ -244,7 +245,7 @@ class OrganizationController extends Controller
     /**
      * 新增组织架构
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::add)]
@@ -257,7 +258,7 @@ class OrganizationController extends Controller
     /**
      * 更新组织架构
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface|Throwable
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::update)]
@@ -270,7 +271,7 @@ class OrganizationController extends Controller
     /**
      * 删除组织架构
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::delete)]
@@ -283,7 +284,7 @@ class OrganizationController extends Controller
     /**
      * 移动组织架构
      * @return JsonResponse
-     * @throws Exception
+     * @throws Exception|Throwable
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::move)]

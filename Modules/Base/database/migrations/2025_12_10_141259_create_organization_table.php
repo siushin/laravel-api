@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->char('organization_name')->comment('组织架构名称');
             $table->unsignedBigInteger('organization_pid')->comment('上级组织架构ID');
             $table->char('full_organization_pid')->comment('完整上级组织架构ID');
+            $table->unsignedInteger('sort')->default(0)->comment('排序');
             $table->timestamps();
             $table->unique(['organization_pid', 'organization_name']);
 

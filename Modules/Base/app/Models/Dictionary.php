@@ -27,6 +27,8 @@ class Dictionary extends Model
         'dictionary_id', 'category_id', 'dictionary_name', 'dictionary_value'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // 自动生成值（按照序号自增）
     private static array $auto_ins_generate_value = [];
 
@@ -48,8 +50,10 @@ class Dictionary extends Model
             'category_id'      => '=',
             'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
+            'dictionary_desc'  => 'like',
+            'can_delete'       => '=',
             'time_range'       => 'created_at',
-        ], ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at']);
+        ]);
     }
 
     /**
@@ -62,7 +66,6 @@ class Dictionary extends Model
      */
     public static function getAllData(array $params = [], array $fields = []): array
     {
-        $fields = $fields ?: ['dictionary_id', 'dictionary_name', 'dictionary_value', 'created_at'];
         $category_id = DictionaryCategory::checkCodeValidate($params);
         $params['category_id'] = $category_id;
         return self::fastGetAllData(self::class, $params, [
