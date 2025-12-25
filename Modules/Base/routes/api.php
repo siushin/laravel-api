@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/organization/addOrganizationType', [OrganizationController::class, 'addOrganizationType']);
     Route::post('/organization/updateOrganizationType', [OrganizationController::class, 'updateOrganizationType']);
     Route::post('/organization/deleteOrganizationType', [OrganizationController::class, 'deleteOrganizationType']);
+    Route::post('/organization/getFullTreeDataForHtml', [OrganizationController::class, 'getFullTreeDataForHtml']);
     Route::post('/organization/index', [OrganizationController::class, 'index']);
     Route::post('/organization/add', [OrganizationController::class, 'add']);
     Route::post('/organization/update', [OrganizationController::class, 'update']);

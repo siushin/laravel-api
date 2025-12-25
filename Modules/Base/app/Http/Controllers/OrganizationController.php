@@ -2,7 +2,9 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\CanDeleteEnum;
 use Modules\Base\Enums\OperationActionEnum;
@@ -10,12 +12,11 @@ use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Models\Dictionary;
 use Modules\Base\Models\DictionaryCategory;
 use Modules\Base\Models\Organization;
-use Exception;
-use Illuminate\Http\JsonResponse;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Traits\ModelTool;
 use Siushin\Util\Traits\ParamTool;
+use Siushin\Util\Utils\TreeHtmlFormatter;
 
 /**
  * 控制器：组织架构
@@ -144,7 +145,7 @@ class OrganizationController extends Controller
     /**
      * 删除组织架构类型
      * @return JsonResponse
-     * @throws Exception|ContainerExceptionInterface|NotFoundExceptionInterface
+     * @throws Exception
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::delete)]
@@ -190,6 +191,41 @@ class OrganizationController extends Controller
         );
 
         return success([], '删除成功');
+    }
+
+    /**
+     * 获取组织架构树状Html数据
+     * tips：按层级使用占位符 ├─、└─ 缩进
+     * @return JsonResponse
+     * @throws Exception
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::list)]
+    public function getFullTreeDataForHtml(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+
+        // 获取树形数据
+        $treeData = Organization::getTreeData($params);
+
+        // 如果没有数据，返回空数组
+        if (empty($treeData)) {
+            return success();
+        }
+
+        // 使用 TreeHtmlFormatter 格式化数据
+        $formatter = new TreeHtmlFormatter([
+            'id_field'       => 'organization_id',
+            'output_id'      => 'organization_pid',
+            'title_field'    => 'organization_name',
+            'children_field' => 'children',
+            'output_title'   => 'organization_name',
+            'fields'         => ['organization_id', 'organization_name'], // 只返回指定字段
+        ]);
+
+        $htmlData = $formatter->format($treeData);
+
+        return success($htmlData);
     }
 
     /**

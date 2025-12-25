@@ -3877,16 +3877,16 @@
         },
         {
             "name": "siushin/util",
-            "version": "v1.0.4",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/siushin/php-util.git",
-                "reference": "5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb"
+                "reference": "d745de92dc589f35c80998fd93fa8ac57c2ace34"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/siushin/php-util/zipball/5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb",
-                "reference": "5d95f66b7e58ae4157ed48beed6ff3d5f23d70bb",
+                "url": "https://api.github.com/repos/siushin/php-util/zipball/d745de92dc589f35c80998fd93fa8ac57c2ace34",
+                "reference": "d745de92dc589f35c80998fd93fa8ac57c2ace34",
                 "shasum": ""
             },
             "require": {
@@ -3926,9 +3926,9 @@
             ],
             "support": {
                 "issues": "https://github.com/siushin/php-util/issues",
-                "source": "https://github.com/siushin/php-util/tree/v1.0.4"
+                "source": "https://github.com/siushin/php-util/tree/v1.0.6"
             },
-            "time": "2025-12-20T06:29:11+00:00"
+            "time": "2025-12-25T12:03:53+00:00"
         },
         {
             "name": "symfony/clock",
