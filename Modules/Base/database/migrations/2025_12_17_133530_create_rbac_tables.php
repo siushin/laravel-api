@@ -4,6 +4,7 @@ use Modules\Base\Enums\AccountTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Modules\Base\Enums\CanDeleteEnum;
 
 return new class extends Migration {
     /**
@@ -12,6 +13,7 @@ return new class extends Migration {
     public function up(): void
     {
         $accountTypeComment = buildEnumComment(AccountTypeEnum::cases(), '账号类型');
+        $canDeleteComment = buildEnumComment(CanDeleteEnum::cases(), '禁止删除标识');
 
         // 角色表
         Schema::create('gpa_role', function (Blueprint $table) use ($accountTypeComment) {
@@ -36,7 +38,7 @@ return new class extends Migration {
         });
 
         // 菜单表
-        Schema::create('gpa_menu', function (Blueprint $table) use ($accountTypeComment) {
+        Schema::create('gpa_menu', function (Blueprint $table) use ($accountTypeComment, $canDeleteComment) {
             $table->id('menu_id')->comment('菜单ID');
             $table->string('account_type', 20)
                 ->default(AccountTypeEnum::Admin->value)
@@ -52,7 +54,8 @@ return new class extends Migration {
             $table->boolean('layout')->nullable()->comment('是否使用布局: true使用, false不使用, null默认');
             $table->string('access', 100)->nullable()->comment('权限控制（如：canAdmin）');
             $table->text('wrappers')->nullable()->comment('包装组件（JSON数组格式）');
-            $table->tinyInteger('is_required')->default(0)->comment('是否必须选中: 1必须选中, 0非必须');
+            $table->unsignedTinyInteger('is_required')->default(0)->comment('是否必须选中: 1必须选中, 0非必须');
+            $table->unsignedTinyInteger('can_delete')->default(CanDeleteEnum::ALLOWED->value)->comment($canDeleteComment);
             $table->unsignedInteger('sort')->default(0)->comment('排序');
             $table->tinyInteger('status')->default(1)->comment('状态: 1启用, 0禁用');
             $table->timestamps();

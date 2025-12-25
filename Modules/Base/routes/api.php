@@ -44,6 +44,9 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
 
     // 组织架构管理
     Route::post('/organization/getOrganizationTypeList', [OrganizationController::class, 'getOrganizationTypeList']);
+    Route::post('/organization/addOrganizationType', [OrganizationController::class, 'addOrganizationType']);
+    Route::post('/organization/updateOrganizationType', [OrganizationController::class, 'updateOrganizationType']);
+    Route::post('/organization/deleteOrganizationType', [OrganizationController::class, 'deleteOrganizationType']);
     Route::post('/organization/index', [OrganizationController::class, 'index']);
     Route::post('/organization/add', [OrganizationController::class, 'add']);
     Route::post('/organization/update', [OrganizationController::class, 'update']);

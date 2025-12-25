@@ -9,6 +9,8 @@ use Modules\Base\Models\DictionaryCategory;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Siushin\Util\Traits\ParamTool;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -53,7 +55,7 @@ class DictionaryController extends Controller
      * 新增数据字典
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::add)]
@@ -67,7 +69,7 @@ class DictionaryController extends Controller
      * 编辑数据字典
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::update)]
@@ -81,7 +83,7 @@ class DictionaryController extends Controller
      * 删除数据字典
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::delete)]
@@ -95,7 +97,7 @@ class DictionaryController extends Controller
      * 批量删除数据字典
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
      */
     #[OperationAction(OperationActionEnum::batchDelete)]

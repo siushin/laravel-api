@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Modules\Base\Enums\CanDeleteEnum;
 
 return new class extends Migration {
     /**
@@ -10,12 +11,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('gpa_dictionary_category', function (Blueprint $table) {
+        $canDeleteComment = buildEnumComment(CanDeleteEnum::cases(), '禁止删除标识');
+
+        Schema::create('gpa_dictionary_category', function (Blueprint $table) use ($canDeleteComment) {
             $table->id('category_id')->comment('数据字典分类ID');
             $table->string('category_name')->comment('数据字典分类名');
             $table->string('category_code')->comment('数据字典编码');
             $table->string('tpl_path')->nullable()->default('')->comment('模板文件路径');
             $table->text('category_desc')->nullable()->comment('描述');
+            $table->unsignedTinyInteger('can_delete')->default(CanDeleteEnum::ALLOWED->value)->comment($canDeleteComment);
             $table->timestamps();
 
             $table->unique('category_name');
@@ -24,7 +28,7 @@ return new class extends Migration {
             $table->comment('数据字典分类表');
         });
 
-        Schema::create('gpa_dictionary', function (Blueprint $table) {
+        Schema::create('gpa_dictionary', function (Blueprint $table) use ($canDeleteComment) {
             $table->id('dictionary_id')->comment('数据字典ID');
             $table->unsignedBigInteger('category_id')->comment('字典类型ID');
             $table->foreign('category_id')->references('category_id')
@@ -34,6 +38,8 @@ return new class extends Migration {
             $table->string('dictionary_name')->comment('键名');
             $table->string('dictionary_value')->comment('值');
             $table->text('dictionary_desc')->nullable()->comment('描述');
+            $table->unsignedTinyInteger('can_delete')->default(CanDeleteEnum::ALLOWED->value)->comment($canDeleteComment);
+            $table->unique(['category_id', 'dictionary_name'], 'unique_dictionary_name');
             $table->unique(['category_id', 'dictionary_name', 'dictionary_value'], 'unique_dictionary');
             $table->timestamps();
 

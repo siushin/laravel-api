@@ -4,6 +4,7 @@ namespace Modules\Base\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\CanDeleteEnum;
 use Modules\Base\Models\Menu;
 use Modules\Base\Models\Module;
 use Modules\Base\Models\ModuleMenu;
@@ -68,6 +69,7 @@ class MenuSeeder extends Seeder
                     'is_required'  => (int)$menu['is_required'],
                     'sort'         => $sort++,
                     'status'       => (int)$menu['status'],
+                    'can_delete'   => CanDeleteEnum::DISABLE,
                 ]
             ], ['account_type', 'menu_key']);
         }
@@ -110,6 +112,7 @@ class MenuSeeder extends Seeder
                             'is_required'  => (int)$menu['is_required'],
                             'sort'         => $siblingCount + 1,
                             'status'       => (int)$menu['status'],
+                            'can_delete'   => CanDeleteEnum::DISABLE,
                         ]
                     ], ['account_type', 'menu_key']);
 
@@ -127,7 +130,6 @@ class MenuSeeder extends Seeder
                 break;
             }
         }
-
 
         // 关联菜单到Base模块
         $this->associateMenusToBaseModule();
@@ -228,9 +230,9 @@ class MenuSeeder extends Seeder
 
             if (!$exists) {
                 $moduleMenuData[] = [
-                    'id'         => generateId(),
-                    'module_id'  => $baseModuleId,
-                    'menu_id'    => $menuId,
+                    'id'        => generateId(),
+                    'module_id' => $baseModuleId,
+                    'menu_id'   => $menuId,
                 ];
             }
         }

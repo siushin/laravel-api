@@ -8,6 +8,7 @@ namespace Modules\Base\Enums;
 enum OperationActionEnum: string
 {
     case index       = '列表查询';
+    case list        = '列表';
     case create      = '新增';
     case add         = '添加';
     case update      = '更新';

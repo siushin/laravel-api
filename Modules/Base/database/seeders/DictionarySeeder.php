@@ -2,6 +2,7 @@
 
 namespace Modules\Base\Database\Seeders;
 
+use Modules\Base\Enums\CanDeleteEnum;
 use Modules\Base\Enums\DictionaryCategoryEnum;
 use Modules\Base\Models\Dictionary;
 use Modules\Base\Models\DictionaryCategory;
@@ -28,6 +29,7 @@ class DictionarySeeder extends Seeder
                 'category_code' => $category->name,
                 'tpl_path'      => 'tpl/Dictionary.xlsx',
                 'category_desc' => getEnumComment($category) ?? '',
+                'can_delete'    => CanDeleteEnum::DISABLE,
             ];
         }
         DictionaryCategory::upsert($categories, uniqueBy: ['category_code'], update: ['category_name']);
@@ -60,6 +62,7 @@ class DictionarySeeder extends Seeder
                     'dictionary_name'  => $dictionary_item->name,
                     'dictionary_value' => $dictionary_item->value,
                     'dictionary_desc'  => $dictionary_item->desc ?? null,
+                    'can_delete'       => CanDeleteEnum::DISABLE,
                 ];
             }
         }
