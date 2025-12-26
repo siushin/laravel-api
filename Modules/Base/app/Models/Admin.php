@@ -341,6 +341,100 @@ class Admin extends Model
 
         return [];
     }
+
+    /**
+     * 获取管理员详情
+     * @param array $params
+     * @return array
+     * @throws Exception
+     * @author siushin<siushin@163.com>
+     */
+    public static function getAdminDetail(array $params): array
+    {
+        self::checkEmptyParam($params, ['id']);
+
+        $account = Account::query()
+            ->where('id', $params['id'])
+            ->where('account_type', AccountTypeEnum::Admin->value)
+            ->with(['adminInfo', 'profile', 'socialAccounts'])
+            ->first();
+
+        if (!$account) {
+            throw_exception('管理员不存在');
+        }
+
+        $adminInfo = $account->adminInfo;
+        $profile = $account->profile;
+        $socialAccounts = $account->socialAccounts;
+
+        // 获取公司信息
+        $company = null;
+        if ($adminInfo?->company_id) {
+            $company = Company::query()
+                ->where('company_id', $adminInfo->company_id)
+                ->first();
+        }
+
+        // 获取部门信息
+        $department = null;
+        if ($adminInfo?->department_id) {
+            $department = Department::query()
+                ->where('department_id', $adminInfo->department_id)
+                ->first();
+        }
+
+        // 处理社交账号信息
+        $socialData = [];
+        foreach ($socialAccounts as $social) {
+            $socialData[] = [
+                'id' => $social->id,
+                'social_type' => $social->social_type->value ?? $social->social_type,
+                'social_account' => $social->social_account,
+                'social_name' => $social->social_name,
+                'avatar' => $social->avatar,
+                'is_verified' => $social->is_verified,
+                'verified_at' => $social->verified_at?->format('Y-m-d H:i:s'),
+                'created_at' => $social->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $social->updated_at?->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return [
+            'account' => [
+                'id' => $account->id,
+                'username' => $account->username,
+                'account_type' => $account->account_type->value,
+                'status' => $account->status,
+                'last_login_ip' => $account->last_login_ip,
+                'last_login_time' => $account->last_login_time?->format('Y-m-d H:i:s'),
+                'created_at' => $account->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $account->updated_at?->format('Y-m-d H:i:s'),
+            ],
+            'profile' => $profile ? [
+                'id' => $profile->id,
+                'nickname' => $profile->nickname,
+                'gender' => $profile->gender,
+                'avatar' => $profile->avatar,
+                'real_name' => $profile->real_name,
+                'id_card' => $profile->id_card,
+                'verification_method' => $profile->verification_method,
+                'verified_at' => $profile->verified_at?->format('Y-m-d H:i:s'),
+                'created_at' => $profile->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $profile->updated_at?->format('Y-m-d H:i:s'),
+            ] : null,
+            'admin' => $adminInfo ? [
+                'id' => $adminInfo->id,
+                'is_super' => $adminInfo->is_super,
+                'company_id' => $adminInfo->company_id,
+                'company_name' => $company?->company_name,
+                'department_id' => $adminInfo->department_id,
+                'department_name' => $department?->department_name,
+                'created_at' => $adminInfo->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $adminInfo->updated_at?->format('Y-m-d H:i:s'),
+            ] : null,
+            'social' => $socialData,
+        ];
+    }
 }
 
 

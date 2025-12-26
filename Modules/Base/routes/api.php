@@ -38,6 +38,8 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/admin/add', [AdminController::class, 'add']);
     Route::post('/admin/update', [AdminController::class, 'update']);
     Route::post('/admin/delete', [AdminController::class, 'delete']);
+    Route::post('/admin/getDetail', [AdminController::class, 'getDetail']);
+    Route::post('/admin/getLogs', [AdminController::class, 'getLogs']);
 
     // 文件管理
     Route::post('/file/upload', [FileController::class, 'upload']);     // 上传文件
