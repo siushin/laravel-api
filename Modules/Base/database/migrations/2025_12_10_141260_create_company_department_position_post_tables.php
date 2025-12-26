@@ -75,13 +75,13 @@ return new class extends Migration {
         // 部门表
         Schema::create('gpa_department', function (Blueprint $table) {
             $table->id('department_id')->comment('部门ID');
-            $table->string('department_name')->comment('部门名称');
-            $table->string('department_code')->nullable()->comment('部门编码');
             $table->unsignedBigInteger('company_id')->nullable()->comment('所属公司ID');
-            $table->unsignedBigInteger('parent_id')->default(0)->comment('上级部门ID');
-            $table->string('full_parent_id')->nullable()->comment('完整上级部门ID路径');
+            $table->string('department_code')->nullable()->comment('部门编码');
+            $table->string('department_name')->comment('部门名称');
             $table->string('manager_id')->nullable()->comment('部门负责人ID');
             $table->text('description')->nullable()->comment('部门描述');
+            $table->unsignedBigInteger('parent_id')->default(0)->comment('上级部门ID');
+            $table->string('full_parent_id')->nullable()->comment('完整上级部门ID路径');
             $table->tinyInteger('status')->default(1)->comment('状态：1正常，0禁用');
             $table->integer('sort_order')->default(0)->comment('排序');
             $table->timestamps();
@@ -94,8 +94,8 @@ return new class extends Migration {
                 ->onDelete('set null');
 
             $table->index('company_id');
-            $table->index('parent_id');
             $table->index('department_code');
+            $table->index('parent_id');
             // 同一公司、同一父级下不能有同名部门
             $table->unique(['company_id', 'parent_id', 'department_name']);
             // 部门编码在公司内唯一（如果提供）

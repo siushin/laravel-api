@@ -3,13 +3,14 @@
 namespace Modules\Base\Models;
 
 use Exception;
-use Modules\Base\Enums\AccountTypeEnum;
-use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Enums\ResourceTypeEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
+use Siushin\LaravelTool\Enums\SocialTypeEnum;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -51,12 +52,9 @@ class Admin extends Model
 
         $query = Account::query()
             ->where('account_type', AccountTypeEnum::Admin->value)
-            ->with('adminInfo')
+            ->with(['adminInfo', 'profile', 'socialAccounts'])
             ->when(!empty($params['username']), function ($q) use ($params) {
                 $q->where('username', 'like', "%{$params['username']}%");
-            })
-            ->when(isset($params['account_type']), function ($q) use ($params) {
-                $q->where('account_type', $params['account_type']);
             })
             ->when(isset($params['status']), function ($q) use ($params) {
                 $q->where('status', $params['status']);
@@ -64,17 +62,41 @@ class Admin extends Model
             ->when(!empty($params['keyword']), function ($q) use ($params) {
                 $q->where(function ($query) use ($params) {
                     $query->where('username', 'like', "%{$params['keyword']}%")
-                        ->orWhere('last_login_ip', 'like', "%{$params['keyword']}%");
+                        ->orWhere('last_login_ip', 'like', "%{$params['keyword']}%")
+                        ->orWhereHas('profile', function ($q) use ($params) {
+                            $q->where('nickname', 'like', "%{$params['keyword']}%");
+                        })
+                        ->orWhereHas('socialAccounts', function ($q) use ($params) {
+                            $q->where(function ($subQuery) use ($params) {
+                                $subQuery->where('social_type', SocialTypeEnum::Phone->value)
+                                    ->where('social_account', 'like', "%{$params['keyword']}%");
+                            })->orWhere(function ($subQuery) use ($params) {
+                                $subQuery->where('social_type', SocialTypeEnum::Email->value)
+                                    ->where('social_account', 'like', "%{$params['keyword']}%");
+                            });
+                        });
                 });
             })
             ->when(!empty($params['last_login_time']), function ($q) use ($params) {
                 if (is_array($params['last_login_time']) && count($params['last_login_time']) === 2) {
-                    $q->whereBetween('last_login_time', $params['last_login_time']);
+                    $startTime = $params['last_login_time'][0];
+                    $endTime = $params['last_login_time'][1];
+                    // 如果结束时间不包含时分秒（只有日期部分），则设置为当天的最后一秒
+                    if (strlen($endTime) <= 10 || !str_contains($endTime, ' ')) {
+                        $endTime = $endTime . ' 23:59:59';
+                    }
+                    $q->whereBetween('last_login_time', [$startTime, $endTime]);
                 }
             })
             ->when(!empty($params['created_at']), function ($q) use ($params) {
                 if (is_array($params['created_at']) && count($params['created_at']) === 2) {
-                    $q->whereBetween('created_at', $params['created_at']);
+                    $startTime = $params['created_at'][0];
+                    $endTime = $params['created_at'][1];
+                    // 如果结束时间不包含时分秒（只有日期部分），则设置为当天的最后一秒
+                    if (strlen($endTime) <= 10 || !str_contains($endTime, ' ')) {
+                        $endTime = $endTime . ' 23:59:59';
+                    }
+                    $q->whereBetween('created_at', [$startTime, $endTime]);
                 }
             });
 
@@ -92,27 +114,67 @@ class Admin extends Model
             ->get()
             ->map(function ($account) {
                 $adminInfo = $account->adminInfo;
+                $profile = $account->profile;
+                $socialAccounts = $account->socialAccounts;
+
+                // 获取手机号
+                $phone = $socialAccounts->firstWhere('social_type', SocialTypeEnum::Phone->value)?->social_account;
+                // 获取邮箱
+                $email = $socialAccounts->firstWhere('social_type', SocialTypeEnum::Email->value)?->social_account;
+
                 return [
-                    'id' => $account->id,
-                    'account_id' => $account->id,
-                    'username' => $account->username,
-                    'account_type' => $account->account_type->value,
-                    'status' => $account->status,
-                    'is_super' => $adminInfo?->is_super ?? 0,
-                    'company_id' => $adminInfo?->company_id,
-                    'department_id' => $adminInfo?->department_id,
-                    'last_login_ip' => $account->last_login_ip,
+                    'id'              => $account->id,
+                    'account_id'      => $account->id,
+                    'username'        => $account->username,
+                    'nickname'        => $profile?->nickname,
+                    'phone'           => $phone,
+                    'email'           => $email,
+                    'account_type'    => $account->account_type->value,
+                    'status'          => $account->status,
+                    'is_super'        => $adminInfo?->is_super ?? 0,
+                    'company_id'      => $adminInfo?->company_id,
+                    'department_id'   => $adminInfo?->department_id,
+                    'last_login_ip'   => $account->last_login_ip,
                     'last_login_time' => $account->last_login_time?->format('Y-m-d H:i:s'),
-                    'created_at' => $account->created_at?->format('Y-m-d H:i:s'),
-                    'updated_at' => $account->updated_at?->format('Y-m-d H:i:s'),
+                    'created_at'      => $account->created_at?->format('Y-m-d H:i:s'),
+                    'updated_at'      => $account->updated_at?->format('Y-m-d H:i:s'),
                 ];
-            });
+            })
+            ->toArray();
+
+        // 批量查询公司名和部门名
+        $companyIds = array_filter(array_unique(array_column($list, 'company_id')));
+        $departmentIds = array_filter(array_unique(array_column($list, 'department_id')));
+
+        // 批量查询公司
+        $companies = [];
+        if (!empty($companyIds)) {
+            $companies = Company::query()
+                ->whereIn('company_id', $companyIds)
+                ->pluck('company_name', 'company_id')
+                ->toArray();
+        }
+
+        // 批量查询部门
+        $departments = [];
+        if (!empty($departmentIds)) {
+            $departments = Department::query()
+                ->whereIn('department_id', $departmentIds)
+                ->pluck('department_name', 'department_id')
+                ->toArray();
+        }
+
+        // 遍历数据赋值公司名和部门名
+        foreach ($list as &$item) {
+            $item['company_name'] = $companies[$item['company_id']] ?? '';
+            $item['department_name'] = $departments[$item['department_id']] ?? '';
+        }
 
         return [
             'data' => $list,
             'page' => [
-                'total' => $total,
-                'page' => $page,
+                'total'    => $total,
+                'page'     => $page,
                 'pageSize' => $pageSize,
             ],
         ];
@@ -127,7 +189,7 @@ class Admin extends Model
      */
     public static function addAdmin(array $params): array
     {
-        self::checkEmptyParam($params, ['username', 'password', 'account_type']);
+        self::checkEmptyParam($params, ['username', 'password']);
 
         DB::beginTransaction();
         try {
@@ -140,7 +202,7 @@ class Admin extends Model
             $account = new Account();
             $account->username = $params['username'];
             $account->password = Hash::make($params['password']);
-            $account->account_type = $params['account_type'];
+            $account->account_type = AccountTypeEnum::Admin->value;
             $account->status = $params['status'] ?? 1;
             $account->save();
 

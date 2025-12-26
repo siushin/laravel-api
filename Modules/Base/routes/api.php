@@ -1,5 +1,7 @@
 <?php
 
+use Modules\Base\Http\Controllers\CompanyController;
+use Modules\Base\Http\Controllers\DepartmentController;
 use Modules\Base\Http\Controllers\DictionaryCategoryController;
 use Modules\Base\Http\Controllers\DictionaryController;
 use Modules\Base\Http\Controllers\FileController;
@@ -43,28 +45,10 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/file/cleanup', [FileController::class, 'cleanup']);   // 清空文件
 
     // 组织架构管理
-    Route::post('/organization/getOrganizationTypeList', [OrganizationController::class, 'getOrganizationTypeList']);
-    Route::post('/organization/addOrganizationType', [OrganizationController::class, 'addOrganizationType']);
-    Route::post('/organization/updateOrganizationType', [OrganizationController::class, 'updateOrganizationType']);
-    Route::post('/organization/deleteOrganizationType', [OrganizationController::class, 'deleteOrganizationType']);
-    Route::post('/organization/getFullTreeDataForHtml', [OrganizationController::class, 'getFullTreeDataForHtml']);
-    Route::post('/organization/index', [OrganizationController::class, 'index']);
-    Route::post('/organization/add', [OrganizationController::class, 'add']);
-    Route::post('/organization/update', [OrganizationController::class, 'update']);
-    Route::post('/organization/delete', [OrganizationController::class, 'delete']);
-    Route::post('/organization/move', [OrganizationController::class, 'move']);
-
-    // 数据字典分类管理
-    Route::post('/DictionaryCategory/index', [DictionaryCategoryController::class, 'index']);
-    // 数据字典管理
-    Route::post('/dictionary/index', [DictionaryController::class, 'index']);
-    Route::post('/dictionary/all', [DictionaryController::class, 'all']);
-    Route::post('/dictionary/add', [DictionaryController::class, 'add']);
-    Route::post('/dictionary/update', [DictionaryController::class, 'update']);
-    Route::post('/dictionary/delete', [DictionaryController::class, 'delete']);
-    Route::post('/dictionary/batchDelete', [DictionaryController::class, 'batchDelete']);
-    Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);
-    Route::post('/dictionary/getPidData', [DictionaryController::class, 'getPidData']);
+    // 公司管理
+    Route::post('/company/list', [CompanyController::class, 'list']);
+    // 部门管理
+    Route::post('/department/list', [DepartmentController::class, 'list']);
 
     // 日志管理
     Route::post('/log/generalLog', [LogController::class, 'generalLog']);  // 常规日志列表
@@ -78,4 +62,28 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
 
     // 应用管理
     Route::post('/app/myApps', [AppController::class, 'getMyApps']);  // 获取我的应用列表
+
+    // 系统管理
+    // 数据字典分类管理
+    Route::post('/DictionaryCategory/index', [DictionaryCategoryController::class, 'index']);
+    // 数据字典管理
+    Route::post('/dictionary/index', [DictionaryController::class, 'index']);
+    Route::post('/dictionary/all', [DictionaryController::class, 'all']);
+    Route::post('/dictionary/add', [DictionaryController::class, 'add']);
+    Route::post('/dictionary/update', [DictionaryController::class, 'update']);
+    Route::post('/dictionary/delete', [DictionaryController::class, 'delete']);
+    Route::post('/dictionary/batchDelete', [DictionaryController::class, 'batchDelete']);
+    Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);
+    Route::post('/dictionary/getPidData', [DictionaryController::class, 'getPidData']);
+    // 数据字典（树状）
+    Route::post('/organization/getOrganizationTypeList', [OrganizationController::class, 'getOrganizationTypeList']);
+    Route::post('/organization/addOrganizationType', [OrganizationController::class, 'addOrganizationType']);
+    Route::post('/organization/updateOrganizationType', [OrganizationController::class, 'updateOrganizationType']);
+    Route::post('/organization/deleteOrganizationType', [OrganizationController::class, 'deleteOrganizationType']);
+    Route::post('/organization/getFullTreeDataForHtml', [OrganizationController::class, 'getFullTreeDataForHtml']);
+    Route::post('/organization/index', [OrganizationController::class, 'index']);
+    Route::post('/organization/add', [OrganizationController::class, 'add']);
+    Route::post('/organization/update', [OrganizationController::class, 'update']);
+    Route::post('/organization/delete', [OrganizationController::class, 'delete']);
+    Route::post('/organization/move', [OrganizationController::class, 'move']);
 });
