@@ -4,7 +4,7 @@ namespace Modules\Base\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Base\Enums\AccountTypeEnum;
-use Modules\Base\Enums\CanDeleteEnum;
+use Modules\Base\Enums\SysParamFlagEnum;
 use Modules\Base\Models\Menu;
 use Modules\Base\Models\Module;
 use Modules\Base\Models\ModuleMenu;
@@ -53,23 +53,23 @@ class MenuSeeder extends Seeder
 
             Menu::upsert([
                 [
-                    'menu_id'      => $menuId,
-                    'account_type' => $accountType,
-                    'menu_name'    => $menu['menu_name'],
-                    'menu_key'     => $menu['menu_key'],
-                    'menu_path'    => $menu['menu_path'],
-                    'menu_icon'    => $menu['menu_icon'],
-                    'menu_type'    => $menu['menu_type'],
-                    'parent_id'    => 0,
-                    'component'    => $menu['component'] ?: null,
-                    'redirect'     => $menu['redirect'] ?: null,
-                    'layout'       => (bool)$menu['layout'],
-                    'access'       => $menu['access'],
-                    'wrappers'     => $menu['wrappers'] ?: null,
-                    'is_required'  => (int)$menu['is_required'],
-                    'sort'         => $sort++,
-                    'status'       => (int)$menu['status'],
-                    'can_delete'   => CanDeleteEnum::DISABLE,
+                    'menu_id'        => $menuId,
+                    'account_type'   => $accountType,
+                    'menu_name'      => $menu['menu_name'],
+                    'menu_key'       => $menu['menu_key'],
+                    'menu_path'      => $menu['menu_path'],
+                    'menu_icon'      => $menu['menu_icon'],
+                    'menu_type'      => $menu['menu_type'],
+                    'parent_id'      => 0,
+                    'component'      => $menu['component'] ?: null,
+                    'redirect'       => $menu['redirect'] ?: null,
+                    'layout'         => (bool)$menu['layout'],
+                    'access'         => $menu['access'],
+                    'wrappers'       => $menu['wrappers'] ?: null,
+                    'is_required'    => (int)$menu['is_required'],
+                    'sort'           => $sort++,
+                    'status'         => (int)$menu['status'],
+                    'sys_param_flag' => SysParamFlagEnum::Yes,
                 ]
             ], ['account_type', 'menu_key']);
         }
@@ -96,23 +96,23 @@ class MenuSeeder extends Seeder
 
                     Menu::upsert([
                         [
-                            'menu_id'      => $menuId,
-                            'account_type' => $accountType,
-                            'menu_name'    => $menu['menu_name'],
-                            'menu_key'     => $menu['menu_key'],
-                            'menu_path'    => $menu['menu_path'],
-                            'menu_icon'    => $menu['menu_icon'],
-                            'menu_type'    => $menu['menu_type'],
-                            'parent_id'    => $parentId,
-                            'component'    => $menu['component'] ?: null,
-                            'redirect'     => $menu['redirect'] ?: null,
-                            'layout'       => (bool)$menu['layout'],
-                            'access'       => $menu['access'],
-                            'wrappers'     => $menu['wrappers'] ?: null,
-                            'is_required'  => (int)$menu['is_required'],
-                            'sort'         => $siblingCount + 1,
-                            'status'       => (int)$menu['status'],
-                            'can_delete'   => CanDeleteEnum::DISABLE,
+                            'menu_id'        => $menuId,
+                            'account_type'   => $accountType,
+                            'menu_name'      => $menu['menu_name'],
+                            'menu_key'       => $menu['menu_key'],
+                            'menu_path'      => $menu['menu_path'],
+                            'menu_icon'      => $menu['menu_icon'],
+                            'menu_type'      => $menu['menu_type'],
+                            'parent_id'      => $parentId,
+                            'component'      => $menu['component'] ?: null,
+                            'redirect'       => $menu['redirect'] ?: null,
+                            'layout'         => (bool)$menu['layout'],
+                            'access'         => $menu['access'],
+                            'wrappers'       => $menu['wrappers'] ?: null,
+                            'is_required'    => (int)$menu['is_required'],
+                            'sort'           => $siblingCount + 1,
+                            'status'         => (int)$menu['status'],
+                            'sys_param_flag' => SysParamFlagEnum::Yes,
                         ]
                     ], ['account_type', 'menu_key']);
 

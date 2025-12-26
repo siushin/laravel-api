@@ -416,6 +416,16 @@ class Organization extends Model
                 $newParentName = $newParent->organization_name;
             }
 
+            // 验证：目标位置下不能存在相同名称的组织架构（排除自己）
+            $existingOrganization = self::query()
+                ->where('organization_pid', $belong_organization_id)
+                ->where('organization_name', $organization->organization_name)
+                ->where('organization_id', '!=', $organization_id)
+                ->first();
+            if ($existingOrganization) {
+                throw_exception("目标组织架构下已存在名称为「{$organization->organization_name}」的组织架构");
+            }
+
             // 如果目标上级已经是当前上级，无需移动
             if ($organization->organization_pid === $belong_organization_id) {
                 return;

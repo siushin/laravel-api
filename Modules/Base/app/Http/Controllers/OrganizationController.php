@@ -6,9 +6,9 @@ use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Modules\Base\Attributes\OperationAction;
-use Modules\Base\Enums\CanDeleteEnum;
 use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
+use Modules\Base\Enums\SysParamFlagEnum;
 use Modules\Base\Models\Dictionary;
 use Modules\Base\Models\DictionaryCategory;
 use Modules\Base\Models\Organization;
@@ -38,7 +38,7 @@ class OrganizationController extends Controller
     {
         $data = Dictionary::getAllData(
             ['category_code' => 'OrganizationType', 'sortbys' => 'dictionary_id=asc'],
-            ['dictionary_id', 'dictionary_name', 'dictionary_value', 'dictionary_desc', 'can_delete']
+            ['dictionary_id', 'dictionary_name', 'dictionary_value', 'dictionary_desc', 'sys_param_flag']
         );
         return success($data);
     }
@@ -166,7 +166,7 @@ class OrganizationController extends Controller
         $info->category_id != $category_id && throw_exception('该数据不是组织架构类型');
 
         // 检查是否禁止删除
-        $info->can_delete == CanDeleteEnum::DISABLE->value && throw_exception('该组织架构类型禁止删除');
+        $info->sys_param_flag == SysParamFlagEnum::Yes->value && throw_exception('该组织架构类型禁止删除');
 
         // 检查是否有关联的组织架构数据
         $hasOrganization = Organization::query()
