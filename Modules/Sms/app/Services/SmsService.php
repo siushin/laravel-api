@@ -115,7 +115,7 @@ class SmsService
         // 获取 IP 地址和相关信息
         $ip = request()->ip();
         $accountId = currentUserId() ?? null;
-        $sourceType = request()->request_source ?? RequestSourceEnum::guest->value;
+        $sourceType = request()->attributes->get('_request_source') ?? RequestSourceEnum::guest->value;
 
         try {
             // IP 频繁请求限制检查

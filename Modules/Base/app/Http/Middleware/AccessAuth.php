@@ -2,9 +2,9 @@
 
 namespace Modules\Base\Http\Middleware;
 
-use Modules\Base\Enums\AccountTypeEnum;
 use Closure;
 use Illuminate\Http\Request;
+use Modules\Base\Enums\AccountTypeEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,44 +39,10 @@ class AccessAuth
             ? AccountTypeEnum::Admin->value
             : AccountTypeEnum::User->value;
 
-        // 将请求来源和账号类型注入请求
-        $request->merge([
-            'request_source' => $requestSource,
-            'account_type' => $accountType,
-        ]);
-
-        // 普通用户访问时，自动追加账号ID
-        $this->appendAccountIdForUser($request);
+        // 将请求来源和账号类型存储到请求的 attributes 中，与请求参数分离
+        $request->attributes->set('_request_source', $requestSource);
+        $request->attributes->set('_account_type', $accountType);
 
         return $next($request);
-    }
-
-    /**
-     * 为普通用户自动追加账号ID
-     *
-     * @param Request $request
-     * @return void
-     */
-    private function appendAccountIdForUser(Request $request): void
-    {
-        $user = $request->user();
-
-        // 如果用户未认证，直接返回
-        if (!$user) {
-            return;
-        }
-
-        // 从认证用户中获取账号类型
-        $accountType = $user->account_type;
-
-        // 如果不是普通用户，直接返回
-        if ($accountType !== AccountTypeEnum::User) {
-            return;
-        }
-
-        // 追加 account_id 参数，如果已存在则覆盖（确保普通用户只能查看自己的数据）
-        $request->merge([
-            'account_id' => $user->id,
-        ]);
     }
 }

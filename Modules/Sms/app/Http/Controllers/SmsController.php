@@ -3,17 +3,15 @@
 namespace Modules\Sms\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Validation\ValidationException;
-use Modules\Base\Attributes\OperationAction;
-use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Modules\Sms\Services\SmsService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Psr\SimpleCache\InvalidArgumentException;
+use Illuminate\Validation\ValidationException;
+use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\LogActionEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Sms\Services\SmsService;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * 控制器：短信服务
@@ -39,10 +37,10 @@ class SmsController extends Controller
      * 发送短信验证码
      * @param Request $request
      * @return JsonResponse
-     * @throws InvalidArgumentException|ValidationException|ContainerExceptionInterface|NotFoundExceptionInterface
+     * @throws InvalidArgumentException|ValidationException
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::add)]
+    #[OperationAction(OperationActionEnum::requestService)]
     public function sendSms(Request $request): JsonResponse
     {
         // 校验参数

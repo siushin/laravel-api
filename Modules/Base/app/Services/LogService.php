@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Ip2Region;
 use Modules\Base\Models\AccountSocial;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -26,7 +24,6 @@ class LogService
      * @param array    $extendData 扩展数据
      * @param int|null $accountId  账号ID（可选，如果不提供会尝试从请求中获取）
      * @return bool
-     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      */
     public function logGeneral(string $actionType, string $content, array $extendData = [], ?int $accountId = null): bool
     {
@@ -50,7 +47,7 @@ class LogService
                 }
             }
 
-            $sourceType = $request->get('request_source') ?? RequestSourceEnum::guest->value;
+            $sourceType = $request->attributes->get('_request_source') ?? RequestSourceEnum::guest->value;
             $ipAddress = $request->ip();
 
             // 获取IP归属地
@@ -101,7 +98,7 @@ class LogService
     ): bool
     {
         try {
-            $sourceType = $request->get('request_source') ?? RequestSourceEnum::guest->value;
+            $sourceType = $request->attributes->get('_request_source') ?? RequestSourceEnum::guest->value;
             $ipAddress = $request->ip();
             $userAgent = $request->userAgent() ?? '';
 

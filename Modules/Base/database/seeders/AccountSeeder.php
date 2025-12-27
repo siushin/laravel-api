@@ -2,14 +2,14 @@
 
 namespace Modules\Base\Database\Seeders;
 
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Modules\Base\Enums\AccountTypeEnum;
-use Modules\Base\Models\Admin;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountProfile;
 use Modules\Base\Models\AccountSocial;
+use Modules\Base\Models\Admin;
 use Modules\Base\Models\User;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Siushin\LaravelTool\Enums\GenderTypeEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -52,50 +52,50 @@ class AccountSeeder extends Seeder
         foreach ($accounts as $account) {
             // 创建账号资料
             AccountProfile::query()->create([
-                'id' => generateId(),
+                'id'         => generateId(),
                 'account_id' => $account->id,
-                'nickname' => $generateRandomName(),
-                'gender' => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
-                'avatar' => null,
+                'nickname'   => $generateRandomName(),
+                'gender'     => fake()->randomElement(array_column(GenderTypeEnum::cases(), 'name')),
+                'avatar'     => null,
             ]);
 
             // 创建社交网络数据（手机号）
             AccountSocial::query()->create([
-                'id' => generateId(),
-                'account_id' => $account->id,
-                'social_type' => SocialTypeEnum::Phone->value,
+                'id'             => generateId(),
+                'account_id'     => $account->id,
+                'social_type'    => SocialTypeEnum::Phone->value,
                 'social_account' => $generatePhoneNumber(),
-                'social_name' => null,
-                'avatar' => null,
-                'is_verified' => fake()->boolean(30), // 30% 概率已验证
-                'verified_at' => fake()->boolean(30) ? now() : null,
+                'social_name'    => null,
+                'avatar'         => null,
+                'is_verified'    => fake()->boolean(30), // 30% 概率已验证
+                'verified_at'    => fake()->boolean(30) ? now() : null,
             ]);
 
             // 随机决定是否创建邮箱数据
             if (fake()->boolean()) {
                 AccountSocial::query()->create([
-                    'id' => generateId(),
-                    'account_id' => $account->id,
-                    'social_type' => SocialTypeEnum::Email->value,
+                    'id'             => generateId(),
+                    'account_id'     => $account->id,
+                    'social_type'    => SocialTypeEnum::Email->value,
                     'social_account' => fake()->unique()->safeEmail(),
-                    'social_name' => null,
-                    'avatar' => null,
-                    'is_verified' => fake()->boolean(50), // 50% 概率已验证
-                    'verified_at' => fake()->boolean(50) ? now() : null,
+                    'social_name'    => null,
+                    'avatar'         => null,
+                    'is_verified'    => fake()->boolean(50), // 50% 概率已验证
+                    'verified_at'    => fake()->boolean(50) ? now() : null,
                 ]);
             }
 
             // 根据账号类型创建对应的附属信息
             if ($account->account_type === AccountTypeEnum::Admin) {
                 Admin::query()->create([
-                    'id' => generateId(),
-                    'account_id' => $account->id,
-                    'company_id' => null,
+                    'id'            => generateId(),
+                    'account_id'    => $account->id,
+                    'company_id'    => null,
                     'department_id' => null,
                 ]);
             } elseif ($account->account_type === AccountTypeEnum::User) {
                 User::query()->create([
-                    'id' => generateId(),
+                    'id'         => generateId(),
                     'account_id' => $account->id,
                 ]);
             }
@@ -127,7 +127,7 @@ class AccountSeeder extends Seeder
                 ['account_id' => $adminAccount->id],
                 [
                     'nickname' => env('APP_ADMIN_NAME', '超级管理员'),
-                    'gender' => GenderTypeEnum::male->name,
+                    'gender'   => GenderTypeEnum::male->name,
                 ]
             );
 
@@ -142,19 +142,19 @@ class AccountSeeder extends Seeder
                 if ($phoneSocial) {
                     $phoneSocial->update([
                         'social_account' => $adminPhone,
-                        'is_verified' => true,
-                        'verified_at' => now(),
+                        'is_verified'    => true,
+                        'verified_at'    => now(),
                     ]);
                 } else {
                     AccountSocial::query()->create([
-                        'id' => generateId(),
-                        'account_id' => $adminAccount->id,
-                        'social_type' => SocialTypeEnum::Phone->value,
+                        'id'             => generateId(),
+                        'account_id'     => $adminAccount->id,
+                        'social_type'    => SocialTypeEnum::Phone->value,
                         'social_account' => $adminPhone,
-                        'social_name' => null,
-                        'avatar' => null,
-                        'is_verified' => true,
-                        'verified_at' => now(),
+                        'social_name'    => null,
+                        'avatar'         => null,
+                        'is_verified'    => true,
+                        'verified_at'    => now(),
                     ]);
                 }
             }
@@ -170,19 +170,19 @@ class AccountSeeder extends Seeder
                 if ($emailSocial) {
                     $emailSocial->update([
                         'social_account' => $adminEmail,
-                        'is_verified' => true,
-                        'verified_at' => now(),
+                        'is_verified'    => true,
+                        'verified_at'    => now(),
                     ]);
                 } else {
                     AccountSocial::query()->create([
-                        'id' => generateId(),
-                        'account_id' => $adminAccount->id,
-                        'social_type' => SocialTypeEnum::Email->value,
+                        'id'             => generateId(),
+                        'account_id'     => $adminAccount->id,
+                        'social_type'    => SocialTypeEnum::Email->value,
                         'social_account' => $adminEmail,
-                        'social_name' => null,
-                        'avatar' => null,
-                        'is_verified' => true,
-                        'verified_at' => now(),
+                        'social_name'    => null,
+                        'avatar'         => null,
+                        'is_verified'    => true,
+                        'verified_at'    => now(),
                     ]);
                 }
             }
@@ -191,11 +191,11 @@ class AccountSeeder extends Seeder
             if ($wasCustomer) {
                 // 新创建的管理员标记为超级管理员
                 Admin::query()->create([
-                    'id' => generateId(),
-                    'account_id' => $adminAccount->id,
-                    'company_id' => null,
+                    'id'            => generateId(),
+                    'account_id'    => $adminAccount->id,
+                    'company_id'    => null,
                     'department_id' => null,
-                    'is_super' => 1,
+                    'is_super'      => 1,
                 ]);
             } else {
                 // 原本就是管理员类型，直接将对应管理员标记为超级管理员

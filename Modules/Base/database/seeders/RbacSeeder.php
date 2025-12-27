@@ -43,25 +43,25 @@ class RbacSeeder extends Seeder
 
         $roles = [
             [
-                'role_name' => '超级管理员',
-                'role_code' => 'super_admin',
+                'role_name'   => '超级管理员',
+                'role_code'   => 'super_admin',
                 'description' => '拥有所有权限的超级管理员角色',
-                'status' => 1,
-                'sort' => 1,
+                'status'      => 1,
+                'sort'        => 1,
             ],
             [
-                'role_name' => '系统管理员',
-                'role_code' => 'system_admin',
+                'role_name'   => '系统管理员',
+                'role_code'   => 'system_admin',
                 'description' => '系统管理相关权限的管理员角色',
-                'status' => 1,
-                'sort' => 2,
+                'status'      => 1,
+                'sort'        => 2,
             ],
             [
-                'role_name' => '普通管理员',
-                'role_code' => 'normal_admin',
+                'role_name'   => '普通管理员',
+                'role_code'   => 'normal_admin',
                 'description' => '拥有基础管理权限的普通管理员角色',
-                'status' => 1,
-                'sort' => 3,
+                'status'      => 1,
+                'sort'        => 3,
             ],
         ];
 
@@ -76,15 +76,15 @@ class RbacSeeder extends Seeder
             if (!$exists) {
                 $roleId = generateId();
                 DB::table('gpa_role')->insert([
-                    'role_id' => $roleId,
+                    'role_id'      => $roleId,
                     'account_type' => $adminType,
-                    'role_name' => $role['role_name'],
-                    'role_code' => $role['role_code'],
-                    'description' => $role['description'],
-                    'status' => $role['status'],
-                    'sort' => $role['sort'],
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'role_name'    => $role['role_name'],
+                    'role_code'    => $role['role_code'],
+                    'description'  => $role['description'],
+                    'status'       => $role['status'],
+                    'sort'         => $role['sort'],
+                    'created_at'   => $now,
+                    'updated_at'   => $now,
                 ]);
                 $roleIds[$role['role_code']] = $roleId;
             } else {
@@ -109,18 +109,18 @@ class RbacSeeder extends Seeder
 
         $roles = [
             [
-                'role_name' => '普通用户',
-                'role_code' => 'normal_user',
+                'role_name'   => '普通用户',
+                'role_code'   => 'normal_user',
                 'description' => '拥有基础功能的普通用户角色',
-                'status' => 1,
-                'sort' => 1,
+                'status'      => 1,
+                'sort'        => 1,
             ],
             [
-                'role_name' => 'VIP用户',
-                'role_code' => 'vip_user',
+                'role_name'   => 'VIP用户',
+                'role_code'   => 'vip_user',
                 'description' => '拥有更多权限的VIP用户角色',
-                'status' => 1,
-                'sort' => 2,
+                'status'      => 1,
+                'sort'        => 2,
             ],
         ];
 
@@ -135,15 +135,15 @@ class RbacSeeder extends Seeder
             if (!$exists) {
                 $roleId = generateId();
                 DB::table('gpa_role')->insert([
-                    'role_id' => $roleId,
+                    'role_id'      => $roleId,
                     'account_type' => $userType,
-                    'role_name' => $role['role_name'],
-                    'role_code' => $role['role_code'],
-                    'description' => $role['description'],
-                    'status' => $role['status'],
-                    'sort' => $role['sort'],
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'role_name'    => $role['role_name'],
+                    'role_code'    => $role['role_code'],
+                    'description'  => $role['description'],
+                    'status'       => $role['status'],
+                    'sort'         => $role['sort'],
+                    'created_at'   => $now,
+                    'updated_at'   => $now,
                 ]);
                 $roleIds[$role['role_code']] = $roleId;
             } else {
@@ -185,7 +185,7 @@ class RbacSeeder extends Seeder
         if (isset($adminRoles['system_admin'])) {
             $systemMenus = $menus->filter(function ($menu) {
                 return str_contains($menu->menu_key ?? '', 'system.') ||
-                       str_contains($menu->menu_path ?? '', '/system');
+                    str_contains($menu->menu_path ?? '', '/system');
             });
             $this->assignMenusToRole($adminRoles['system_admin'], $systemMenus, $now);
         }
@@ -194,7 +194,7 @@ class RbacSeeder extends Seeder
         if (isset($adminRoles['normal_admin'])) {
             $normalMenus = $menus->filter(function ($menu) {
                 return !str_contains($menu->menu_key ?? '', 'system.') &&
-                       !str_contains($menu->menu_path ?? '', '/system');
+                    !str_contains($menu->menu_path ?? '', '/system');
             });
             $this->assignMenusToRole($adminRoles['normal_admin'], $normalMenus, $now);
         }
@@ -245,9 +245,9 @@ class RbacSeeder extends Seeder
 
             if (!$exists) {
                 $roleMenuData[] = [
-                    'id' => generateId(),
-                    'role_id' => $roleId,
-                    'menu_id' => $menu->menu_id,
+                    'id'         => generateId(),
+                    'role_id'    => $roleId,
+                    'menu_id'    => $menu->menu_id,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -321,9 +321,9 @@ class RbacSeeder extends Seeder
 
         if (!$exists) {
             DB::table('gpa_user_role')->insert([
-                'id' => generateId(),
+                'id'         => generateId(),
                 'account_id' => $accountId,
-                'role_id' => $roleId,
+                'role_id'    => $roleId,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);

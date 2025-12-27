@@ -51,7 +51,7 @@ class Dictionary extends Model
             'category_id'      => '=',
             'dictionary_name'  => 'like',
             'dictionary_value' => 'like',
-            'dictionary_desc'  => 'like',
+            // 'dictionary_desc'  => 'like',
             'sys_param_flag'   => '=',
             'date_range'       => 'created_at',
             'time_range'       => 'created_at',

@@ -7,8 +7,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Modules\Base\Services\LogService;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * 记录常规日志
@@ -17,7 +15,6 @@ use Psr\Container\NotFoundExceptionInterface;
  * @param array    $extend_data
  * @param int|null $account_id
  * @return bool
- * @throws ContainerExceptionInterface|NotFoundExceptionInterface
  * @author siushin<siushin@163.com>
  */
 function logGeneral(string $action_type, string $content, array $extend_data = [], ?int $account_id = null): bool

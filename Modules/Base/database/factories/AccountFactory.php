@@ -2,10 +2,10 @@
 
 namespace Modules\Base\Database\Factories;
 
-use Modules\Base\Enums\AccountTypeEnum;
-use Modules\Base\Models\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Models\Account;
 
 /**
  * @extends Factory<Account>
@@ -32,9 +32,9 @@ class AccountFactory extends Factory
     public function definition(): array
     {
         return [
-            'id'          => generateId(),
-            'username'    => fake()->unique()->word(),
-            'password'    => static::$password ??= Hash::make('123456'),
+            'id'           => generateId(),
+            'username'     => fake()->unique()->word(),
+            'password'     => static::$password ??= Hash::make('123456'),
             'account_type' => fake()->randomElement(AccountTypeEnum::cases()),
         ];
     }

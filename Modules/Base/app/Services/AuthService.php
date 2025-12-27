@@ -6,9 +6,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\LogActionEnum;
 use Modules\Base\Models\Account;
 use Modules\Base\Models\AccountSocial;
-use Modules\Base\Enums\LogActionEnum;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
@@ -48,9 +48,9 @@ class AuthService
      */
     public function validateRequestSource(Request $request): array
     {
-        // AccessAuth 中间件已经根据路径注入了 request_source 和 account_type
-        $requestSource = $request->get('request_source');
-        $accountType = $request->get('account_type');
+        // AccessAuth 中间件已经根据路径注入了 _request_source 和 _account_type（存储在 attributes 中）
+        $requestSource = $request->attributes->get('_request_source');
+        $accountType = $request->attributes->get('_account_type');
 
         // 验证请求来源
         $validSources = array_map(fn($case) => $case->value, RequestSourceEnum::cases());

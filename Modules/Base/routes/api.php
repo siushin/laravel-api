@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Modules\Base\Http\Controllers\AccountController;
+use Modules\Base\Http\Controllers\AdminController;
+use Modules\Base\Http\Controllers\AppController;
 use Modules\Base\Http\Controllers\CompanyController;
 use Modules\Base\Http\Controllers\DepartmentController;
 use Modules\Base\Http\Controllers\DictionaryCategoryController;
@@ -8,10 +12,7 @@ use Modules\Base\Http\Controllers\FileController;
 use Modules\Base\Http\Controllers\LogController;
 use Modules\Base\Http\Controllers\MenuController;
 use Modules\Base\Http\Controllers\OrganizationController;
-use Modules\Base\Http\Controllers\AccountController;
-use Modules\Base\Http\Controllers\AppController;
-use Modules\Base\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\Route;
+use Modules\Base\Http\Controllers\RoleController;
 
 // 公共路由
 Route::get('/dictionary/getTplFile', [DictionaryController::class, 'getTplFile']);  // 下载数据字典模板
@@ -52,6 +53,19 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     // 部门管理
     Route::post('/department/list', [DepartmentController::class, 'list']);
 
+    // 菜单管理
+    // 角色管理
+    Route::post('/role/index', [RoleController::class, 'index']);
+    Route::post('/role/add', [RoleController::class, 'add']);
+    Route::post('/role/update', [RoleController::class, 'update']);
+    Route::post('/role/delete', [RoleController::class, 'delete']);
+    // 菜单管理
+    Route::post('/menu/index', [MenuController::class, 'index']);
+    Route::post('/menu/tree', [MenuController::class, 'tree']);
+    Route::post('/menu/add', [MenuController::class, 'add']);
+    Route::post('/menu/update', [MenuController::class, 'update']);
+    Route::post('/menu/delete', [MenuController::class, 'delete']);
+
     // 日志管理
     Route::post('/log/generalLog', [LogController::class, 'generalLog']);  // 常规日志列表
     Route::post('/log/operationLog', [LogController::class, 'operationLog']);  // 操作日志列表
@@ -70,7 +84,7 @@ Route::middleware(['auth:sanctum'])->prefix('/admin')->group(function () {
     Route::post('/DictionaryCategory/index', [DictionaryCategoryController::class, 'index']);
     // 数据字典管理
     Route::post('/dictionary/index', [DictionaryController::class, 'index']);
-    Route::post('/dictionary/all', [DictionaryController::class, 'all']);
+    Route::post('/dictionary/list', [DictionaryController::class, 'list']);
     Route::post('/dictionary/add', [DictionaryController::class, 'add']);
     Route::post('/dictionary/update', [DictionaryController::class, 'update']);
     Route::post('/dictionary/delete', [DictionaryController::class, 'delete']);

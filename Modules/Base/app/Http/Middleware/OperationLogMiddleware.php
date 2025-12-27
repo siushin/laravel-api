@@ -34,12 +34,10 @@ class OperationLogMiddleware
         // 获取模块名称和操作类型（从路由/控制器注释中解析）
         [$module, $action] = $this->extractModuleAndAction($request, $route);
 
-        // 将开始时间和模块信息存储到请求中，供后续使用
-        $request->merge([
-            '_operation_log_start_time' => $startTime,
-            '_operation_log_module'     => $module,
-            '_operation_log_action'     => $action,
-        ]);
+        // 将开始时间和模块信息存储到请求的 attributes 中，与请求参数分离
+        $request->attributes->set('_operation_log_start_time', $startTime);
+        $request->attributes->set('_operation_log_module', $module);
+        $request->attributes->set('_operation_log_action', $action);
 
         // 执行请求
         $response = $next($request);
@@ -192,9 +190,9 @@ class OperationLogMiddleware
             'download'    => OperationActionEnum::download->value,
             'move'        => OperationActionEnum::move->value,
             'copy'        => OperationActionEnum::copy->value,
-            'view'        => OperationActionEnum::query->value,
-            'show'        => OperationActionEnum::query->value,
-            'search'      => OperationActionEnum::search->value,
+            'view'        => OperationActionEnum::detail->value,
+            'show'        => OperationActionEnum::detail->value,
+            'search'      => OperationActionEnum::index->value,
             'login'       => OperationActionEnum::login->value,
             'loginbycode' => OperationActionEnum::login->value,
             'logout'      => OperationActionEnum::logout->value,
@@ -228,9 +226,9 @@ class OperationLogMiddleware
             'download'    => OperationActionEnum::download->value,
             'move'        => OperationActionEnum::move->value,
             'copy'        => OperationActionEnum::copy->value,
-            'view'        => OperationActionEnum::query->value,
-            'show'        => OperationActionEnum::query->value,
-            'search'      => OperationActionEnum::search->value,
+            'view'        => OperationActionEnum::detail->value,
+            'show'        => OperationActionEnum::detail->value,
+            'search'      => OperationActionEnum::index->value,
             'login'       => OperationActionEnum::login->value,
             'logout'      => OperationActionEnum::logout->value,
         ];
@@ -308,9 +306,9 @@ class OperationLogMiddleware
             'download' => OperationActionEnum::download->value,
             'move'     => OperationActionEnum::move->value,
             'copy'     => OperationActionEnum::copy->value,
-            'view'     => OperationActionEnum::query->value,
-            'show'     => OperationActionEnum::query->value,
-            'search'   => OperationActionEnum::search->value,
+            'view'     => OperationActionEnum::detail->value,
+            'show'     => OperationActionEnum::detail->value,
+            'search'   => OperationActionEnum::index->value,
             'login'    => OperationActionEnum::login->value,
             'logout'   => OperationActionEnum::logout->value,
         ];
@@ -321,14 +319,14 @@ class OperationLogMiddleware
 
         // 根据HTTP方法推断
         $methodMap = [
-            'GET'    => OperationActionEnum::query->value,
+            'GET'    => OperationActionEnum::detail->value,
             'POST'   => OperationActionEnum::add->value,
             'PUT'    => OperationActionEnum::update->value,
             'PATCH'  => OperationActionEnum::update->value,
             'DELETE' => OperationActionEnum::delete->value,
         ];
 
-        return $methodMap[strtoupper($method)] ?? OperationActionEnum::query->value;
+        return $methodMap[strtoupper($method)] ?? OperationActionEnum::detail->value;
     }
 
     /**
@@ -378,16 +376,14 @@ class OperationLogMiddleware
                 }
             }
 
-            // 获取请求参数（排除敏感信息、大型数据和临时中间件参数）
+            // 获取请求参数（排除敏感信息和大型数据）
+            // 注意：_operation_log_* 参数已存储在 attributes 中，不会出现在请求参数中
             $params = trimParam($request->except([
                 'password',
                 'confirm_password',
                 'current_password',
                 'token',
                 'access_token',
-                '_operation_log_start_time',
-                '_operation_log_module',
-                '_operation_log_action',
             ]));
 
             // 处理文件上传：只记录文件名，不记录文件内容

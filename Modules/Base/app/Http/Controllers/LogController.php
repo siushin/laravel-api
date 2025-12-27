@@ -2,21 +2,21 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\BrowserEnum;
 use Modules\Base\Enums\DeviceTypeEnum;
 use Modules\Base\Enums\HttpMethodEnum;
 use Modules\Base\Enums\LogActionEnum;
-use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\OperatingSystemEnum;
+use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Enums\ResourceTypeEnum;
 use Modules\Base\Models\AuditLog;
 use Modules\Base\Models\GeneralLog;
 use Modules\Base\Models\LoginLog;
 use Modules\Base\Models\OperationLog;
-use Exception;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Siushin\LaravelTool\Enums\RequestSourceEnum;
 
 /**
@@ -86,7 +86,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::paramData)]
     public function getGeneralLogSearchData(): JsonResponse
     {
         // 操作类型列表（常规日志）
@@ -118,7 +118,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::paramData)]
     public function getOperationLogSearchData(): JsonResponse
     {
         // 模块名称列表（去重）
@@ -195,7 +195,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::paramData)]
     public function getAuditLogSearchData(): JsonResponse
     {
         // 模块名称列表（从审计日志表去重）
@@ -245,7 +245,7 @@ class LogController extends Controller
      * @return JsonResponse
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::paramData)]
     public function getLoginLogSearchData(): JsonResponse
     {
         // 浏览器列表

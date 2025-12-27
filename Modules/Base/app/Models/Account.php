@@ -4,10 +4,6 @@ namespace Modules\Base\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Exception;
-use Modules\Base\Enums\AccountTypeEnum;
-use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Enums\ResourceTypeEnum;
-use Modules\Base\Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -17,6 +13,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Base\Database\Factories\AccountFactory;
+use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Enums\ResourceTypeEnum;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -133,54 +133,6 @@ class Account extends Authenticatable
     }
 
     /**
-     * 修改账号密码
-     * @param array $params
-     * @return array
-     * @throws Exception
-     * @author siushin<siushin@163.com>
-     */
-    public static function updatePassword(array $params): array
-    {
-        self::checkEmptyParam($params, ['account_id', 'password']);
-
-        $info = self::query()->findOrFail($params['account_id']);
-        !$info && throw_exception('账号不存在');
-
-        // 保存旧数据（排除密码字段）
-        $old_data = $info->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
-
-        $info->password = Hash::make($params['password']);
-        $info->save();
-
-        // 记录审计日志（不记录密码）
-        $new_data = $info->fresh()->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
-        logAudit(
-            request(),
-            currentUserId(),
-            '账号管理',
-            OperationActionEnum::update->value,
-            ResourceTypeEnum::user->value,
-            $params['account_id'],
-            $old_data,
-            $new_data,
-            "修改账号密码: {$info->username}"
-        );
-
-        return [];
-    }
-
-    /**
-     * 根据账号IDs获取用户名（键值对 - 列表）
-     * @param array $account_ids
-     * @return Collection
-     * @author siushin<siushin@163.com>
-     */
-    public static function getUsernameByIDs(array $account_ids): Collection
-    {
-        return self::query()->whereIn('id', $account_ids)->pluck('username', 'id');
-    }
-
-    /**
      * 管理员信息
      * @return HasOne
      */
@@ -222,5 +174,53 @@ class Account extends Authenticatable
     protected static function newFactory()
     {
         return AccountFactory::new();
+    }
+
+    /**
+     * 修改账号密码
+     * @param array $params
+     * @return array
+     * @throws Exception
+     * @author siushin<siushin@163.com>
+     */
+    public static function updatePassword(array $params): array
+    {
+        self::checkEmptyParam($params, ['account_id', 'password']);
+
+        $info = self::query()->findOrFail($params['account_id']);
+        !$info && throw_exception('账号不存在');
+
+        // 保存旧数据（排除密码字段）
+        $old_data = $info->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
+
+        $info->password = Hash::make($params['password']);
+        $info->save();
+
+        // 记录审计日志（不记录密码）
+        $new_data = $info->fresh()->only(['id', 'username', 'account_type', 'status', 'last_login_ip', 'last_login_time', 'created_at', 'updated_at']);
+        logAudit(
+            request(),
+            currentUserId(),
+            '账号管理',
+            OperationActionEnum::update->value,
+            ResourceTypeEnum::user->value,
+            $params['account_id'],
+            $old_data,
+            $new_data,
+            "修改账号密码: $info->username"
+        );
+
+        return [];
+    }
+
+    /**
+     * 根据账号IDs获取用户名（键值对 - 列表）
+     * @param array $account_ids
+     * @return Collection
+     * @author siushin<siushin@163.com>
+     */
+    public static function getUsernameByIDs(array $account_ids): Collection
+    {
+        return self::query()->whereIn('id', $account_ids)->pluck('username', 'id');
     }
 }

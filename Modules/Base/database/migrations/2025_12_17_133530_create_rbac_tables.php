@@ -51,9 +51,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('parent_id')->default(0)->comment('父菜单ID, 0表示顶级菜单');
             $table->string('component', 200)->nullable()->comment('组件路径（相对路径，如：./Dashboard/Workplace）');
             $table->string('redirect', 200)->nullable()->comment('重定向路径');
-            $table->boolean('layout')->nullable()->comment('是否使用布局: true使用, false不使用, null默认');
-            $table->string('access', 100)->nullable()->comment('权限控制（如：canAdmin）');
-            $table->text('wrappers')->nullable()->comment('包装组件（JSON数组格式）');
             $table->unsignedTinyInteger('is_required')->default(0)->comment('是否必须选中: 1必须选中, 0非必须');
             $table->unsignedTinyInteger('sys_param_flag')->default(SysParamFlagEnum::No)->comment($sysParamFlagComment);
             $table->unsignedInteger('sort')->default(0)->comment('排序');

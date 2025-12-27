@@ -2,11 +2,15 @@
 
 namespace Modules\Base\Http\Controllers;
 
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
 use Modules\Base\Models\Admin;
-use Exception;
-use Illuminate\Http\JsonResponse;
+use Modules\Base\Models\AuditLog;
+use Modules\Base\Models\GeneralLog;
+use Modules\Base\Models\LoginLog;
+use Modules\Base\Models\OperationLog;
 use Siushin\Util\Traits\ParamTool;
 
 /**
@@ -74,7 +78,7 @@ class AdminController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::detail)]
     public function getDetail(): JsonResponse
     {
         $params = trimParam(request()->only(['id']));
@@ -87,7 +91,7 @@ class AdminController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::list)]
     public function getLogs(): JsonResponse
     {
         $params = trimParam(request()->all());
@@ -101,18 +105,13 @@ class AdminController extends Controller
         $accountId = $params['account_id'];
         $requestParams = array_merge($params, ['account_id' => $accountId]);
 
-        switch ($logType) {
-            case 'general':
-                return success(\Modules\Base\Models\GeneralLog::getPageData($requestParams));
-            case 'operation':
-                return success(\Modules\Base\Models\OperationLog::getPageData($requestParams));
-            case 'audit':
-                return success(\Modules\Base\Models\AuditLog::getPageData($requestParams));
-            case 'login':
-                return success(\Modules\Base\Models\LoginLog::getPageData($requestParams));
-            default:
-                throw_exception('不支持的日志类型: ' . $logType);
-        }
+        return match ($logType) {
+            'general' => success(GeneralLog::getPageData($requestParams)),
+            'operation' => success(OperationLog::getPageData($requestParams)),
+            'audit' => success(AuditLog::getPageData($requestParams)),
+            'login' => success(LoginLog::getPageData($requestParams)),
+            default => throw_exception('不支持的日志类型: ' . $logType),
+        };
     }
 }
 

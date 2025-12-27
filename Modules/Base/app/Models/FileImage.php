@@ -2,10 +2,10 @@
 
 namespace Modules\Base\Models;
 
-use Modules\Base\Models\Intfs\IFile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Base\Models\Intfs\IFile;
 
 /**
  * 模型：图片文件

@@ -109,7 +109,7 @@ class File extends Model
             'file_size'        => $file->getSize(),
             'mime_type'        => mime_content_type($file->getPathname()),
             'file_ext_name'    => $extension,
-            'account_id'          => currentUserId(),
+            'account_id'       => currentUserId(),
             'checksum'         => hash_file('sha256', $file->getPathname()),
         ];
         $result = self::query()->create($data);
@@ -184,7 +184,7 @@ class File extends Model
      */
     public static function deleteFile(array $params): array
     {
-        self::checkEmptyParam($params, ['account_id', 'file_path']);
+        self::checkEmptyParam($params, ['file_path']);
         $real_delete = $params['real_delete'] ?? false;
 
         // 文件信息
@@ -194,7 +194,9 @@ class File extends Model
             return [];
         }
 
-        $params['account_id'] != $file_info->account_id && throw_exception('您没有权限删除此文件');
+        if (currentUserId() != $file_info->account_id) {
+            throw_exception('您没有权限删除此文件');
+        }
 
         $from = ltrim($file_info->file_path, '/');
 

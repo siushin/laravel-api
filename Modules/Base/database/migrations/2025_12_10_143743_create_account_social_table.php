@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Siushin\LaravelTool\Enums\SocialTypeEnum;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Siushin\LaravelTool\Enums\SocialTypeEnum;
 
 return new class extends Migration {
     /**

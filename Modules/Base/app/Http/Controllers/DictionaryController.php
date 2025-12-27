@@ -44,8 +44,8 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
-    public function all(Request $request, array $fields = []): JsonResponse
+    #[OperationAction(OperationActionEnum::list)]
+    public function list(Request $request, array $fields = []): JsonResponse
     {
         $params = trimParam($request->all());
         return success(Dictionary::getAllData($params, $fields));
@@ -129,7 +129,7 @@ class DictionaryController extends Controller
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
+    #[OperationAction(OperationActionEnum::paramData)]
     public function getPidData(Request $request): JsonResponse
     {
         $params = trimParam($request->all());

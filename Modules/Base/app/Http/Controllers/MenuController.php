@@ -2,14 +2,15 @@
 
 namespace Modules\Base\Http\Controllers;
 
-use Modules\Base\Attributes\OperationAction;
-use Modules\Base\Enums\OperationActionEnum;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Base\Models\Menu;
+use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\AccountTypeEnum;
+use Modules\Base\Enums\OperationActionEnum;
+use Modules\Base\Models\Menu;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * 控制器：菜单
@@ -19,15 +20,14 @@ class MenuController extends Controller
 {
     /**
      * 获取用户菜单列表
-     * @param Request $request
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
      */
-    #[OperationAction(OperationActionEnum::query)]
-    public function getUserMenus(Request $request): JsonResponse
+    #[OperationAction(OperationActionEnum::loginInfo)]
+    public function getUserMenus(): JsonResponse
     {
-        $user = $request->user();
+        $user = request()->user();
 
         if (!$user) {
             throw_exception('用户未登录');
@@ -41,8 +41,8 @@ class MenuController extends Controller
         if ($isSuperAdmin) {
             $menus = Menu::where('account_type', AccountTypeEnum::Admin->value)
                 ->where('status', 1)
-                ->orderBy('sort', 'asc')
-                ->orderBy('menu_id', 'asc')
+                ->orderBy('sort')
+                ->orderBy('menu_id')
                 ->get()
                 ->toArray();
         } else {
@@ -68,8 +68,8 @@ class MenuController extends Controller
             } else {
                 $menus = Menu::whereIn('menu_id', $allMenuIds)
                     ->where('status', 1)
-                    ->orderBy('sort', 'asc')
-                    ->orderBy('menu_id', 'asc')
+                    ->orderBy('sort')
+                    ->orderBy('menu_id')
                     ->get()
                     ->toArray();
             }
@@ -100,17 +100,7 @@ class MenuController extends Controller
                     'icon'      => $menu['menu_icon'],
                     'component' => $menu['component'],
                     'redirect'  => $menu['redirect'],
-                    'layout'    => $menu['layout'],
-                    'access'    => $menu['access'],
                 ];
-
-                // 处理 wrappers
-                if (!empty($menu['wrappers'])) {
-                    $wrappers = json_decode($menu['wrappers'], true);
-                    if (is_array($wrappers)) {
-                        $menuItem['wrappers'] = $wrappers;
-                    }
-                }
 
                 // 移除null和空字符串字段（但保留false和0）
                 $filteredMenuItem = array_filter($menuItem, function ($value) {
@@ -129,5 +119,69 @@ class MenuController extends Controller
         }
 
         return $tree;
+    }
+
+    /**
+     * 菜单列表
+     * @return JsonResponse
+     * @throws Exception
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::index)]
+    public function index(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+        return success(Menu::getPageData($params));
+    }
+
+    /**
+     * 新增菜单
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::add)]
+    public function add(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+        return success(Menu::addMenu($params));
+    }
+
+    /**
+     * 编辑菜单
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::update)]
+    public function update(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+        return success(Menu::updateMenu($params));
+    }
+
+    /**
+     * 删除菜单
+     * @return JsonResponse
+     * @throws ContainerExceptionInterface|NotFoundExceptionInterface
+     * @author siushin<siushin@163.com>
+     */
+    #[OperationAction(OperationActionEnum::delete)]
+    public function delete(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+        return success(Menu::deleteMenu($params));
+    }
+
+    /**
+     * 获取菜单树形结构
+     * @return JsonResponse
+     * @throws Exception
+     * @author siushin<siushin@163.com>
+     */
+    public function tree(): JsonResponse
+    {
+        $params = trimParam(request()->all());
+        return success(Menu::getTreeData($params));
     }
 }
