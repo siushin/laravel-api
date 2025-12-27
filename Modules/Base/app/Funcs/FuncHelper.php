@@ -1,6 +1,6 @@
 <?php
 
-use Modules\Base\Attributes\DictionaryDescription;
+use Modules\Base\Attributes\DescriptionAttribute;
 
 /**
  * 助手函数：通用辅助函数
@@ -19,17 +19,17 @@ function getEnumComment(UnitEnum $case): ?string
     // 优先尝试从 Attribute 中读取描述
     try {
         $reflection = new ReflectionEnumUnitCase($case::class, $case->name);
-        $attributes = $reflection->getAttributes(DictionaryDescription::class);
-        
+        $attributes = $reflection->getAttributes(DescriptionAttribute::class);
+
         if (!empty($attributes)) {
-            /** @var DictionaryDescription $dictionaryDescription */
-            $dictionaryDescription = $attributes[0]->newInstance();
-            return $dictionaryDescription->description;
+            /** @var DescriptionAttribute $descriptionAttribute */
+            $descriptionAttribute = $attributes[0]->newInstance();
+            return $descriptionAttribute->description;
         }
     } catch (\ReflectionException $e) {
         // 如果反射失败，继续尝试从注释中读取
     }
-    
+
     // 向后兼容：从注释中读取（旧格式）
     $reflection = new ReflectionClass($case::class);
     $file = $reflection->getFileName();
