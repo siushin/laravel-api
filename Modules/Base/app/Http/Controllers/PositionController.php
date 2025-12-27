@@ -7,18 +7,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Base\Attributes\OperationAction;
 use Modules\Base\Enums\OperationActionEnum;
-use Modules\Base\Models\Company;
+use Modules\Base\Models\Position;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
- * 控制器：公司管理
+ * 控制器：职位管理
  * @module 组织架构管理
  */
-class CompanyController extends Controller
+class PositionController extends Controller
 {
     /**
-     * 获取公司列表（全部）
+     * 获取职位列表（全部）
      * @param Request $request
      * @return JsonResponse
      * @throws Exception
@@ -28,11 +28,11 @@ class CompanyController extends Controller
     public function list(Request $request): JsonResponse
     {
         $params = trimParam($request->all());
-        return success(Company::getAllData($params, ['company_id', 'company_code', 'company_name']));
+        return success(Position::getAllData($params));
     }
 
     /**
-     * 公司列表
+     * 职位列表
      * @return JsonResponse
      * @throws Exception
      * @author siushin<siushin@163.com>
@@ -41,11 +41,11 @@ class CompanyController extends Controller
     public function index(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(Company::getPageData($params));
+        return success(Position::getPageData($params));
     }
 
     /**
-     * 新增公司
+     * 新增职位
      * @return JsonResponse
      * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
@@ -54,11 +54,11 @@ class CompanyController extends Controller
     public function add(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(Company::addCompany($params));
+        return success(Position::addPosition($params));
     }
 
     /**
-     * 编辑公司
+     * 编辑职位
      * @return JsonResponse
      * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
@@ -67,11 +67,11 @@ class CompanyController extends Controller
     public function update(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(Company::updateCompany($params));
+        return success(Position::updatePosition($params));
     }
 
     /**
-     * 删除公司
+     * 删除职位
      * @return JsonResponse
      * @throws ContainerExceptionInterface|NotFoundExceptionInterface
      * @author siushin<siushin@163.com>
@@ -80,6 +80,6 @@ class CompanyController extends Controller
     public function delete(): JsonResponse
     {
         $params = trimParam(request()->all());
-        return success(Company::deleteCompany($params));
+        return success(Position::deletePosition($params));
     }
 }
